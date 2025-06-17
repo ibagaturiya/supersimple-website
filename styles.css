@@ -1,0 +1,134 @@
+:root {
+  --hashtag-color: rgba(60,60,60,0.5);
+  --hashtag-active: #111;
+  --font: 'Montserrat', Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: #fafafa;
+  color: #222;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.main {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid {
+  display: grid;
+  layout-grid-type: loose;
+  gap: 18px;
+}
+
+.project {
+  width: 300px;
+  height: 300px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  border: 1px solid #e0e0e0;
+
+  overflow: hidden;
+  transition: box-shadow 0.9s, opacity 0.9s cubic-bezier(.4,0,.2,1), transform 0.9s cubic-bezier(.4,0,.2,1);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  will-change: opacity, transform;
+}
+.project:active, .project:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.project-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.project-picto {
+  position: absolute;
+  left: 7px;
+  bottom: 7px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.85;
+  z-index: 2;
+  background: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.project-label {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  font-size: 0.9em;
+  color: #222;
+  background: rgba(255,255,255,0.7);
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  z-index: 3;
+}
+
+/* Animation classes */
+.show {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: auto;
+  transition: opacity 0.22s cubic-bezier(.4,0,.2,1), transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+.hide {
+  opacity: 0 !important;
+  transform: translateY(40px) scale(0.96) !important;
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(.4,0,.2,1), transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+.hashtags-bar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 10px;
+  z-index: 100;
+  background: none;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.hashtags-bar .hashtag {
+  background: none;
+  color: var(--hashtag-color);
+  border: none;
+  border-radius: 0;
+  padding: 7px 18px 7px 0;
+  font-size: 1rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: color 0.9s, transform 0.9s;
+  outline: none;
+  font-weight: 600;
+  text-align: left;
+  pointer-events: auto;
+  box-shadow: none;
+}
+.hashtags-bar .hashtag.active {
+  color: var(--hashtag-active);
+  background: none;
+}
+.hashtags-bar .hashtag.pressed {
+  transform: scale(0.92);
+  color: #222;
+}
+
