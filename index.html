@@ -7,102 +7,101 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   </head>
-
-  <div class="center-toggle">
-    <label class="switch">
-      <input type="checkbox" id="bubbleToggle" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
   <body>
+    <div class="center-toggle">
+      <label class="switch">
+        <input type="checkbox" id="bubbleToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
     <main class="main">
       <div class="grid" id="projectGrid">
         <a class="project" data-tags="" href="project0001.html">
           <img src="projects/0001/image1.jpg" alt="0001" class="project-img" />
           <span class="project-label">0001</span>
         </a>
-
         <a class="project" data-tags="" href="project0002.html">
           <img src="projects/0002/image1.jpg" alt="0002" class="project-img" />
           <span class="project-label">0002</span>
         </a>
-
         <a class="project" data-tags="" href="project0003.html">
           <img src="projects/0003/image1.jpg" alt="0003" class="project-img" />
           <span class="project-label">0003</span>
         </a>
       </div>
     </main>
-
-    <canvas id="bubbleCanvas"></canvas>
-
     <script>
       const grid = document.getElementById("projectGrid");
       const projects = Array.from(document.querySelectorAll(".project"));
       const toggle = document.getElementById("bubbleToggle");
 
-      // Store original positions for reset
       let originalRects = [];
       let engine,
         render,
         runner,
         bodies = [],
-        mouseConstraint;
+        mouseConstraint,
+        walls = [];
 
       function storeOriginalPositions() {
         originalRects = projects.map((el) => el.getBoundingClientRect());
       }
 
       function startBubblePhysics() {
-        // Hide grid layout (optional: set grid to position: relative)
-        grid.style.position = "relative";
-
-        // Get grid position relative to viewport
-        const gridRect = grid.getBoundingClientRect();
+        grid.classList.add("bubble-mode");
+        grid.style.position = "fixed";
+        grid.style.left = "0";
+        grid.style.top = "0";
+        grid.style.width = "100vw";
+        grid.style.height = "100vh";
+        grid.style.zIndex = "100";
 
         // Create Matter.js engine and world
         engine = Matter.Engine.create();
+        // Remove old renderers if any
+        if (render && render.canvas && render.canvas.parentNode) {
+          render.canvas.parentNode.removeChild(render.canvas);
+        }
         render = Matter.Render.create({
-          element: grid,
+          element: document.body,
           engine: engine,
           options: {
-            width: grid.offsetWidth,
-            height: grid.offsetHeight,
+            width: window.innerWidth,
+            height: window.innerHeight,
             wireframes: false,
             background: "transparent",
           },
         });
 
-        // Create boundaries (walls)
-        const wallThickness = 50;
-        const walls = [
+        // Create boundaries (walls) at viewport edges
+        const wallThickness = 100;
+        walls = [
           Matter.Bodies.rectangle(
-            grid.offsetWidth / 2,
+            window.innerWidth / 2,
             -wallThickness / 2,
-            grid.offsetWidth,
+            window.innerWidth,
             wallThickness,
             { isStatic: true }
           ),
           Matter.Bodies.rectangle(
-            grid.offsetWidth / 2,
-            grid.offsetHeight + wallThickness / 2,
-            grid.offsetWidth,
+            window.innerWidth / 2,
+            window.innerHeight + wallThickness / 2,
+            window.innerWidth,
             wallThickness,
             { isStatic: true }
           ),
           Matter.Bodies.rectangle(
             -wallThickness / 2,
-            grid.offsetHeight / 2,
+            window.innerHeight / 2,
             wallThickness,
-            grid.offsetHeight,
+            window.innerHeight,
             { isStatic: true }
           ),
           Matter.Bodies.rectangle(
-            grid.offsetWidth + wallThickness / 2,
-            grid.offsetHeight / 2,
+            window.innerWidth + wallThickness / 2,
+            window.innerHeight / 2,
             wallThickness,
-            grid.offsetHeight,
+            window.innerHeight,
             { isStatic: true }
           ),
         ];
@@ -114,13 +113,12 @@
           el.style.transition = "none";
           el.style.zIndex = 10;
 
-          // Place in original grid position
+          // Place in original grid position (relative to viewport)
           const rect = el.getBoundingClientRect();
-          const x = rect.left - gridRect.left + rect.width / 2;
-          const y = rect.top - gridRect.top + rect.height / 2;
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
           const r = rect.width / 2;
 
-          // Place element at (x, y)
           el.style.left = x - r + "px";
           el.style.top = y - r + "px";
 
@@ -137,7 +135,7 @@
 
         // Mouse/touch drag
         mouseConstraint = Matter.MouseConstraint.create(engine, {
-          element: grid,
+          element: document.body,
           constraint: { stiffness: 0.2, render: { visible: false } },
         });
         Matter.World.add(engine.world, mouseConstraint);
@@ -172,8 +170,12 @@
           });
         }, 100);
 
-        // Hide grid's CSS layout (optional)
-        grid.classList.add("bubble-mode");
+        // Make Matter.js canvas non-interactive so DOM elements stay clickable
+        setTimeout(() => {
+          if (render.canvas) {
+            render.canvas.style.pointerEvents = "none";
+          }
+        }, 200);
       }
 
       function stopBubblePhysics() {
@@ -184,18 +186,17 @@
         // Stop Matter.js
         Matter.Render.stop(render);
         Matter.Runner.stop(runner);
-        render.canvas.remove();
+        if (render && render.canvas && render.canvas.parentNode) {
+          render.canvas.parentNode.removeChild(render.canvas);
+        }
         engine.events = {};
 
         // Animate bubbles back to grid positions
         projects.forEach((el, i) => {
           el.style.transition = "all 1s cubic-bezier(0.4,2,0.6,1)";
           const rect = originalRects[i];
-          const gridRect = grid.getBoundingClientRect();
-          const x = rect.left - gridRect.left;
-          const y = rect.top - gridRect.top;
-          el.style.left = x + "px";
-          el.style.top = y + "px";
+          el.style.left = rect.left + "px";
+          el.style.top = rect.top + "px";
         });
 
         // After animation, reset styles and grid layout
@@ -206,8 +207,15 @@
             el.style.top = "";
             el.style.transition = "";
             el.style.zIndex = "";
+            el.style.pointerEvents = "";
           });
           grid.classList.remove("bubble-mode");
+          grid.style.position = "";
+          grid.style.left = "";
+          grid.style.top = "";
+          grid.style.width = "";
+          grid.style.height = "";
+          grid.style.zIndex = "";
         }, 1000);
       }
 
@@ -241,6 +249,4 @@
       });
     </script>
   </body>
-
-  <canvas id="bubbleCanvas"></canvas>
 </html>
