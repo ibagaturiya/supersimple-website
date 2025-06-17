@@ -1,32 +1,29 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #000000;
+  background: #b3b3b3;
 }
 
 .main {
-  max-width: 1200px;
+  max-width: auto;
   margin: 40px auto;
-  padding: 0 20px;
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Increase min size for better circles */
-  gap: 100px;
-  justify-items: center; /* Center items in grid cells */
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+  gap: 10px;
 }
 
 .project {
-  aspect-ratio: 1/1;            /* Ensures square shape */
-  width: 100%;                  /* Fill grid cell */
-  max-width: 500px;             /* Optional: limit max size */
-  border-radius: 50%;           /* Perfect circle */
+  aspect-ratio: 1/1;         
+  width: 100%;                 
+  max-width: 120px;          
+  border-radius: 100%;         
   display: flex;
   flex-direction: column;
   background: #000000;
   overflow: hidden;
   box-shadow: 0 0px 1000px rgb(255, 255, 255);
-  text-decoration: none;
   color: inherit;
   transition: transform 1s, box-shadow 0.5s;
   align-items: center;
@@ -34,16 +31,76 @@ body {
 }
 
 .project:hover,
-.project:active {                /* Add :active for touch devices */
-  transform: scale(1.8);
-  box-shadow: 0 6px 20px rgb(255, 255, 255);
+.project:active {               
+  transform: scale(1.1);
+  box-shadow: 0 0 75px rgb(0, 0, 0);
 }
 
 .project-img {
   width: 100%;
   height: 100%;
-  aspect-ratio: 1/1;
   object-fit: cover;
-  display: block;
-  border-radius: 50%;           /* Make image itself a circle */
+}
+
+@keyframes fall-down {
+  to {
+    transform: translateY(100vh) scale(0.8);
+    opacity: 0.2;
+  }
+}
+
+
+
+.center-toggle {
+  position: fixed;
+  top: 10px; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: top;
+  z-index: 9999;
+}
+
+
+.switch {
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 32px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: background 0.3s;
+  border-radius: 32px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: transform 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+input:checked + .slider {
+  background-color: #ff9d00; /* iOS green */
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }
