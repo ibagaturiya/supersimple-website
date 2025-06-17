@@ -42,12 +42,46 @@
         bodies = [],
         mouseConstraint,
         walls = [];
+      let scrollPosition = 0;
 
+      // --- SCROLL LOCK FUNCTIONS ---
+      function lockBodyScroll() {
+        scrollPosition = window.pageYOffset;
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${scrollPosition}px`;
+        document.body.style.width = "100%";
+      }
+      function unlockBodyScroll() {
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, scrollPosition);
+      }
+      function preventTouchMove(e) {
+        e.preventDefault();
+      }
+      function enableTouchLock() {
+        document.body.addEventListener("touchmove", preventTouchMove, {
+          passive: false,
+        });
+      }
+      function disableTouchLock() {
+        document.body.removeEventListener("touchmove", preventTouchMove, {
+          passive: false,
+        });
+      }
+
+      // --- BUBBLE PHYSICS FUNCTIONS ---
       function storeOriginalPositions() {
         originalRects = projects.map((el) => el.getBoundingClientRect());
       }
 
       function startBubblePhysics() {
+        lockBodyScroll();
+        enableTouchLock();
+
         grid.classList.add("bubble-mode");
         grid.style.position = "fixed";
         grid.style.left = "0";
@@ -56,9 +90,7 @@
         grid.style.height = "100vh";
         grid.style.zIndex = "100";
 
-        // Create Matter.js engine and world
         engine = Matter.Engine.create();
-        // Remove old renderers if any
         if (render && render.canvas && render.canvas.parentNode) {
           render.canvas.parentNode.removeChild(render.canvas);
         }
@@ -179,19 +211,23 @@
       }
 
       function stopBubblePhysics() {
-        // Remove event listeners
+        unlockBodyScroll();
+        disableTouchLock();
+
         window.removeEventListener("deviceorientation", handleOrientation);
         window.removeEventListener("mousemove", handleMouseMove);
 
-        // Stop Matter.js
-        Matter.Render.stop(render);
-        Matter.Runner.stop(runner);
         if (render && render.canvas && render.canvas.parentNode) {
+          Matter.Render.stop(render);
           render.canvas.parentNode.removeChild(render.canvas);
         }
-        engine.events = {};
+        if (runner) {
+          Matter.Runner.stop(runner);
+        }
+        if (engine) {
+          engine.events = {};
+        }
 
-        // Animate bubbles back to grid positions
         projects.forEach((el, i) => {
           el.style.transition = "all 1s cubic-bezier(0.4,2,0.6,1)";
           const rect = originalRects[i];
@@ -199,7 +235,6 @@
           el.style.top = rect.top + "px";
         });
 
-        // After animation, reset styles and grid layout
         setTimeout(() => {
           projects.forEach((el) => {
             el.style.position = "";
