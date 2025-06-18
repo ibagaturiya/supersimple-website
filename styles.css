@@ -10,18 +10,23 @@ body {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px; /* or your preferred width */
+  margin: 0 auto;
+  position: relative;
+  justify-items: center;
 }
 
 .project {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #000;
+  background: #ffffff;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0px 100px rgb(255, 255, 255, 0.15);
+  box-shadow: 0 0px 100px rgba(255, 255, 255, 0.17);
   text-decoration: none;
   color: inherit;
   transition: transform 1s, box-shadow 0.5s;
@@ -116,4 +121,118 @@ canvas {
 }
 .switch {
   pointer-events: auto !important;
+}
+
+/* Filter bar styles */
+.filter-bar {
+  position: fixed;
+  left: -15px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10000;
+  background: #00000000; /* Solid black background */
+  padding: px 16px 16px 10px; /* Adjust padding as needed */
+  border-radius: 16px 24px 24px 0; /* Optional: round only top-right and bottom-right */
+}
+
+.filter-btn {
+  background: #b6b6b6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  padding: 7px 18px;
+  margin: 2px 0;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  letter-spacing: 0.04em;
+  text-align: left;
+  outline: none;
+}
+
+.filter-btn.active,
+.filter-btn:focus {
+  background: #fff;
+  color: #111;
+}
+
+.filter-group {
+  position: relative;
+}
+
+.subfilters {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  flex-direction: row;
+  gap: 4px;
+  background: #ff060600;
+  padding: 6px 0;
+  border-radius: 8px;
+  z-index: 10001;
+}
+
+.filter-group.open .subfilters {
+  display: flex;
+}
+
+.subfilter {
+  background: #e8e8e8;
+  color: #fff;
+  font-size: 0.98rem;
+  padding: 5px 16px;
+}
+.project-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2.5px solid #000;
+  background: transparent;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Remove margin and background */
+  margin: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.project-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #ff7700;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 0.25s;
+}
+
+.project:hover .project-label {
+  opacity: 1;
+}
+
+canvas {
+  background: transparent !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none;
+  z-index: 0;
 }

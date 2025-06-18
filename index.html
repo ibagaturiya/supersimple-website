@@ -15,23 +15,45 @@
   </div>
 
 <body>
+  
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn" data-filter="#selected">#SELECTED</button>
+    <div class="filter-group">
+      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
+      <div class="subfilters">
+        <button class="filter-btn subfilter" data-filter="#eth">#ETH</button>
+        <button class="filter-btn subfilter" data-filter="#nh">#NH</button>
+      </div>
+    </div>
+    <button class="filter-btn" data-filter="#art">#ART</button>
+    <button class="filter-btn" data-filter="#music">#MUSIC</button>
+    <button class="filter-btn" data-filter="#tech">#TECH</button>
+    <button class="filter-btn" data-filter="#photo">#PHOTO</button>
+  </div>
+
   <main class="main">
     <div class="grid" id="projectGrid">
       
-        <a class="project" data-tags="" href="project0003.html">
-          <img src="projects/0003/image1.jpg" alt="0003" class="project-img" />
+        <a class="project" data-hashtags="#selected #architecture #tech" href="project0053.html">
+          <img src="projects/0053/icon.svg" alt="icon" class="project-logo" />
+          <span class="project-label">0053</span>
+        </a>
+        
+
+        <a class="project" data-hashtags="" href="project0003.html">
+          <img src="projects/0003/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0003</span>
         </a>
         
 
-        <a class="project" data-tags="" href="project0002.html">
-          <img src="projects/0002/image1.jpg" alt="0002" class="project-img" />
+        <a class="project" data-hashtags="" href="project0002.html">
+          
           <span class="project-label">0002</span>
         </a>
         
 
-        <a class="project" data-tags="" href="project0001.html">
-          <img src="projects/0001/image1.jpg" alt="0001" class="project-img" />
+        <a class="project" data-hashtags="#selected #architecture" href="project0001.html">
+          <img src="projects/0001/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0001</span>
         </a>
         
