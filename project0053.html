@@ -5,85 +5,207 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>0053 – _the NOTE</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- ...styles omitted for brevity... -->
+  <style>
+    body {
+      margin: 0; background: #fff; color: #111; font-family: Arial,sans-serif;
+    }
+    .project-header {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 32px 0 0 0;
+    }
+    .project-title-link {
+      text-decoration: none;
+      color: inherit;
+      font-size: 2.2rem;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 16px;
+      cursor: pointer;
+    }
+    .project-number {
+      font-size: 1.3em;
+      font-weight: bold;
+      opacity: 0.7;
+      margin-right: 8px;
+    }
+    .project-trailer {
+      display: block;
+      width: 100vw;
+      max-height: 340px;
+      object-fit: cover;
+      margin: 0 auto;
+      background: #000;
+      cursor: pointer;
+      z-index: 1;
+      position: absolute;
+      left: 0; top: 0; right: 0;
+    }
+    .project-header, .project-trailer {
+      position: relative;
+    }
+    .project-main {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 24px 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .project-left {
+      flex: 1 1 40%;
+      max-width: 40%;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      padding-right: 24px;
+      word-break: break-word;
+    }
+    .project-right {
+      flex: 1 1 60%;
+      max-width: 60%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .project-right img, .project-right video, .project-right audio {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 12px;
+      background: #eee;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #eee;
+      margin: 0 0 0 0;
+      height: 0;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    .project-nav {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 48px 0 24px 0;
+      z-index: 2;
+      position: relative;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
+      font-size: 2rem;
+      border: none;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.18s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      user-select: none;
+    }
+    .nav-btn:hover:not(.disabled) {
+      background: #333;
+    }
+    .nav-btn.disabled {
+      background: #bbb;
+      color: #fff;
+      cursor: default;
+      pointer-events: none;
+    }
+    @media (max-width: 900px) {
+      .project-main {
+        flex-direction: column;
+        gap: 18px;
+        padding: 32px 4vw 16px 4vw;
+      }
+      .project-left, .project-right {
+        max-width: 100%;
+        padding: 0;
+      }
+    }
+    @media (max-width: 600px) {
+      .project-header {
+        padding-top: 16px;
+      }
+      .project-main {
+        padding: 16px 2vw 8px 2vw;
+      }
+      .nav-btn {
+        width: 38px; height: 38px; font-size: 1.3rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="project-page">
-    <div class="project-number">0053</div>
-    <div class="project-title">_the NOTE</div>
-    <div class="project-text">LOCATION
-
- Dornacherplatz is located at the edge of Solothurn’s old town, 
-
- directly beside the Aare River and close to the main train station. For many years, this central square was used as a…
-
- surface parking lot. To free up the space above ground, parking was relocated to a new underground garage situated 16 meters below the surface. 
-
-
- CONSTRUCTION
-
-The construction of this garage followed several steps: first, a thick slurry wall was built around the excavation site to absorb all horizontal forces from the surrounding soil and water, 
-
- creating a dry, watertight 
-
- “bucket” in which construction 
-
- could proceed from the bottom up.
-
- that means that the internal structure (the ramp) is an independended from outside 
-
-
- NEEDS
-Today, Dornacherplatz remains largely unused and covered with asphalt. 
-
-Solothurn sees itself as a city of culture and actively supports cultural initiatives. 
-
-While there is sufficient affordable housing 
-
-with more developing project being build right now, 
-
-the Solothurn Symphony Orchestra lacks its own rehearsal and concert space within the city. 
-
-FEASIBILITY
-after a deep dive in to acoustical research 
-
- i ve decided to compare the size of varies concert halls - it was clear that dimensions of my parking lot are enough to fit in a concert hall
-
-
-PROJECT
-
- The project idea is converting the existing underground parking into a concert hall. 
-
-The steps would be first to return the site to its “bucket” state, 
-removing all internal structures and ramps—so that only the sealed, empty underground volume remains.
-
-Once the space is cleared, a new concert hall can be constructed from the bottom up within this watertight shell.
-
- The concert hall is designed as a free-standing structure, independent from the outer retaining walls, to minimize vibration and ensure sound isolation. 
-
-
-
- The interior features a shifted vineyard-style seating arrangement to bring the audience closer to the performers, while acoustic extensions helps distribute sound evenly throughout the space. 
-
-
- The negative space
- created between the compact ellipse of the concert hall 
-and the outer retaining wall forms a series of unique spatial sequences. 
-
-
-The concert hall, named “The Note” for its elliptical form set diagonally within the site, is divided into two nearly equal zones—one for the audience and one for the musicians.
-A helical ramp spirals down through both zones, allowing visitors and musicians to experience the full journey through the building. 
- Throughout this descent, the audience and musicians remain separated, with their only visual meeting point 
-at the stage—creating a sense of anticipation and a dynamic interplay, almost like a dance, until they finally come together for the performance 
-in the concerthall “the note”.
-
- and lets experience it together.
- ty</div>
-    <div class="project-images"><img src="projects/0053/image1.jpeg" alt="" />
+  <div style="position:relative;">
+    
+        <video class="project-trailer" src="projects/0053/trailer.mp4" autoplay loop muted playsinline></video>
+        
+    
+    <div class="project-header">
+      <a href="index.html" class="project-title-link">
+        <span class="project-number">0053</span>
+        <span class="project-title">_the NOTE</span>
+      </a>
+    </div>
+    
+  </div>
+  <hr />
+  
+    <div class="project-main">
+      <div class="project-left">
+        
+    <div class="project-desc">
+      LOCATION<br /><br /> Dornacherplatz is located at the edge of Solothurn’s old town, <br /><br /> directly beside the Aare River and close to the main train station. For many years, this central square was used as a…<br /><br /> surface parking lot. To free up the space above ground, parking was relocated to a new underground garage situated 16 meters below the surface. <br /><br /><br /> CONSTRUCTION<br /><br />The construction of this garage followed several steps: first, a thick slurry wall was built around the excavation site to absorb all horizontal forces from the surrounding soil and water, <br /><br /> creating a dry, watertight <br /><br /> “bucket” in which construction <br /><br /> could proceed from the bottom up.<br /><br /> that means that the internal structure (the ramp) is an independended from outside <br /><br /><br /> NEEDS<br />Today, Dornacherplatz remains largely unused and covered with asphalt. <br /><br />Solothurn sees itself as a city of culture and actively supports cultural initiatives. <br /><br />While there is sufficient affordable housing <br /><br />with more developing project being build right now, <br /><br />the Solothurn Symphony Orchestra lacks its own rehearsal and concert space within the city. <br /><br />FEASIBILITY<br />after a deep dive in to acoustical research <br /><br /> i ve decided to compare the size of varies concert halls - it was clear that dimensions of my parking lot are enough to fit in a concert hall<br /><br /><br />PROJECT<br /><br /> The project idea is converting the existing underground parking into a concert hall. <br /><br />The steps would be first to return the site to its “bucket” state, <br />removing all internal structures and ramps—so that only the sealed, empty underground volume remains.<br /><br />Once the space is cleared, a new concert hall can be constructed from the bottom up within this watertight shell.<br /><br /> The concert hall is designed as a free-standing structure, independent from the outer retaining walls, to minimize vibration and ensure sound isolation. <br /><br /><br /><br /> The interior features a shifted vineyard-style seating arrangement to bring the audience closer to the performers, while acoustic extensions helps distribute sound evenly throughout the space. <br /><br /><br /> The negative space<br /> created between the compact ellipse of the concert hall <br />and the outer retaining wall forms a series of unique spatial sequences. <br /><br /><br />The concert hall, named “The Note” for its elliptical form set diagonally within the site, is divided into two nearly equal zones—one for the audience and one for the musicians.<br />A helical ramp spirals down through both zones, allowing visitors and musicians to experience the full journey through the building. <br /> Throughout this descent, the audience and musicians remain separated, with their only visual meeting point <br />at the stage—creating a sense of anticipation and a dynamic interplay, almost like a dance, until they finally come together for the performance <br />in the concerthall “the note”.<br /><br /> and lets experience it together.<br /> ty
+    </div>
+    
+      </div>
+      <div class="project-right">
+        <img src="projects/0053/image1.jpeg" alt="" />
 <img src="projects/0053/image2.jpeg" alt="" />
 <img src="projects/0053/image3.jpeg" alt="" />
-<img src="projects/0053/image4.jpeg" alt="" /></div>
-    <a class="next-btn" href="project0003.html">Next project →</a>
-  </div>
+<img src="projects/0053/image4.jpeg" alt="" />
+      </div>
+    </div>
+    
+  
+    <div class="project-nav">
+      <span class="nav-btn disabled">&#8592;</span>
+      <a class="nav-btn" href="index.html" title="Back to index">&#8593;</a>
+      <a class="nav-btn" href="project0003.html" title="Next">&#8594;</a>
+    </div>
+    
+<script>
+  const trailer = document.querySelector('.project-trailer');
+  if(trailer && trailer.tagName === "VIDEO") {
+    trailer.muted = true;
+    trailer.autoplay = true;
+    trailer.playsInline = true;
+    trailer.play().catch(function() {
+      // Try to play again on user interaction if autoplay was blocked
+      const tryPlay = function() {
+        trailer.play();
+        window.removeEventListener('click', tryPlay);
+      };
+      window.addEventListener('click', tryPlay);
+    });
+  }
+  if(trailer) {
+    trailer.addEventListener('click', function() {
+      if (trailer.requestFullscreen) trailer.requestFullscreen();
+      else if (trailer.webkitRequestFullscreen) trailer.webkitRequestFullscreen();
+      else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+    });
+  }
+</script>
 </body>
 </html>
