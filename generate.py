@@ -151,13 +151,10 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
         media_html_tag(src) for src in image_media
     )
 
-    # Title row (clickable)
+    # Title row (overlayed)
     title_html = f"""
-    <div class="project-header">
-      <a href="index.html" class="project-title-link">
-        <span class="project-number">{project_num}</span>
-        <span class="project-title">{title}</span>
-      </a>
+    <div class="project-header-overlay">
+      <span class="project-title">{title}</span>
     </div>
     """
 
@@ -180,6 +177,11 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     </div>
     """
 
+    # Fixed project number (top left)
+    number_fixed_html = f"""
+    <a href="index.html" class="project-number-fixed">{project_num}</a>
+    """
+
     # Full HTML
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -192,27 +194,11 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     body {{
       margin: 0; background: #fff; color: #111; font-family: Arial,sans-serif;
     }}
-    .project-header {{
+    .project-hero {{
       position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 32px 0 0 0;
-    }}
-    .project-title-link {{
-      text-decoration: none;
-      color: inherit;
-      font-size: 2.2rem;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: baseline;
-      gap: 16px;
-      cursor: pointer;
-    }}
-    .project-number {{
-      font-size: 1.3em;
-      font-weight: bold;
-      opacity: 0.7;
-      margin-right: 8px;
+      width: 100vw;
+      max-height: 340px;
+      overflow: hidden;
     }}
     .project-trailer {{
       display: block;
@@ -223,11 +209,48 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
       background: #000;
       cursor: pointer;
       z-index: 1;
-      position: absolute;
-      left: 0; top: 0; right: 0;
-    }}
-    .project-header, .project-trailer {{
       position: relative;
+    }}
+    .project-header-overlay {{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 2;
+      text-align: center;
+      padding: 32px 0 0 0;
+      background: linear-gradient(180deg,rgba(0,0,0,0.55) 0,rgba(0,0,0,0.05) 100%);
+    }}
+    .project-title {{
+      text-decoration: none;
+      color: #fff;
+      font-size: 2.2rem;
+      font-weight: bold;
+      display: inline-block;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      padding: 0 16px;
+    }}
+    .project-number-fixed {{
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 100;
+      background: rgba(0,0,0,0.72);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 6px 14px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.18s;
+      opacity: 0.92;
+    }}
+    .project-number-fixed:hover {{
+      background: #111;
+      color: #fff;
+      opacity: 1;
     }}
     .project-main {{
       display: flex;
@@ -316,7 +339,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
       }}
     }}
     @media (max-width: 600px) {{
-      .project-header {{
+      .project-header-overlay {{
         padding-top: 16px;
       }}
       .project-main {{
@@ -329,7 +352,8 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
   </style>
 </head>
 <body>
-  <div style="position:relative;">
+  {number_fixed_html}
+  <div class="project-hero">
     {trailer_html}
     {title_html}
   </div>
@@ -362,7 +386,6 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
 </body>
 </html>
 """
-
 def main():
     all_folders = [
         f for f in os.listdir(PROJECTS_DIR)
