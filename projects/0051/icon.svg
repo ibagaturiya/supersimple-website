@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1024 1024">
   <!-- Generator: Adobe Illustrator 29.3.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 146)  -->
   <defs>
     <style>
-      .st0 {
+      .st0, .st1 {
         fill: none;
+      }
+
+      .st0, .st1, .st2 {
         stroke: #000;
         stroke-miterlimit: 10;
+      }
+
+      .st1 {
         stroke-width: 10px;
       }
     </style>
   </defs>
-  <line class="st0" x1="48.8" y1="525.9" x2="960" y2="525.9"/>
-  <ellipse cx="646.6" cy="524.4" rx="110.6" ry="69.4" transform="translate(-113.7 185.2) rotate(-15)"/>
+  <polyline class="st1" points="192 609 283 452 439 372 603 363 745 429 815 549 877 675 940 760 937 608 872 458 725 323 522 280 303 337 162 462 119 561 162 462 283 452 303 337 439 372 522 280 603 363 725 323 745 429 872 458 815 549 937 608 877 675 938 754"/>
+  <line class="st1" x1="177" y1="609" x2="162" y2="462"/>
+  <path class="st0" d="M-278,315"/>
+  <polygon class="st2" points="282 592 57 538 57 780 282 780 282 592"/>
 </svg>
