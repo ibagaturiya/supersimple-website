@@ -159,10 +159,9 @@ canvas {
   height: 100%;
   object-fit: contain;
   border-radius: 50%;
-  borders: 2.5px solid #000000;
+  border: 2.5px solid #000;
   background: transparent;
   box-sizing: border-box;
-
   position: absolute;
   top: 0;
   left: 0;
@@ -194,12 +193,12 @@ canvas {
 }
 
 canvas {
-  background: transparent;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  background: transparent !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   z-index: 0;
 }
 
@@ -222,7 +221,7 @@ canvas {
   left: 0;
   right: 0;
   z-index: 9999;
-  display: flex;
+  display: fixed;
   justify-content: center;
   pointer-events: none;
 }
