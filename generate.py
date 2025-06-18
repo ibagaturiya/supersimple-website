@@ -414,10 +414,11 @@ def main():
         with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
             f.write(html)
 
-    index_html = generate_index_html(projects)
-    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(index_html)
-    print("Site generated!")
+    # index_html = generate_index_html(projects)
+    # with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
+    #     f.write(index_html)
+    # print("Site generated!")
+    print("Project pages generated!")
 
 if __name__ == "__main__":
     main()

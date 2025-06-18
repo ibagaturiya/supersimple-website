@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     projects = allProjects.filter((el) => el.style.display !== "none");
     storeOriginalPositions();
+    originalRects = projects.map((el) => el.getBoundingClientRect());
   }
 
   if (filterBar) {
@@ -69,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.width = "100%";
   }
+
   function unlockBodyScroll() {
     document.body.style.overflow = "";
     document.body.style.position = "";
@@ -76,8 +78,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.style.width = "";
     window.scrollTo(0, scrollPosition);
   }
+
   function preventTouchMove(e) {
-    // Allow touch events on the toggle
     if (!e.target.closest(".center-toggle")) {
       e.preventDefault();
     }
@@ -113,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
     grid.style.width = "100vw";
     grid.style.height = "100vh";
     grid.style.zIndex = "100";
-    //grid.style.pointerEvents = "none";
 
     engine = Matter.Engine.create();
     if (render && render.canvas && render.canvas.parentNode) {
@@ -200,11 +201,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     Matter.World.add(engine.world, mouseConstraint);
 
+    // --- ROTATION LOGIC ---
     Matter.Events.on(engine, "afterUpdate", () => {
       bodies.forEach((body) => {
         const r = body.circleRadius;
         body.el.style.left = body.position.x - r + "px";
         body.el.style.top = body.position.y - r + "px";
+        body.el.style.transform = `rotate(${body.angle}rad)`;
       });
     });
 
@@ -223,6 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
           x: Math.cos(angle) * force,
           y: Math.sin(angle) * force,
         });
+        // Give initial random angular velocity for visible rotation
+        Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.2);
       });
     }, 100);
 
@@ -250,12 +255,22 @@ document.addEventListener("DOMContentLoaded", function () {
     engine.events = {};
 
     // Animate back to grid
-    projects.forEach((el, i) => {
-      el.style.transition = "all 1s cubic-bezier(0.4,2,0.6,1)";
-      const rect = originalRects[i];
-      el.style.left = rect.left + "px";
-      el.style.top = rect.top + "px";
-    });
+    if (projects.length === originalRects.length) {
+      projects.forEach((el, i) => {
+        el.style.transition = "all 1s cubic-bezier(0.4,2,0.6,1)";
+        const rect = originalRects[i];
+        el.style.left = rect.left + "px";
+        el.style.top = rect.top + "px";
+        el.style.transform = ""; // Reset rotation
+      });
+    } else {
+      projects.forEach((el) => {
+        el.style.transition = "";
+        el.style.left = "";
+        el.style.top = "";
+        el.style.transform = ""; // Reset rotation
+      });
+    }
 
     setTimeout(() => {
       projects.forEach((el) => {
@@ -265,6 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.transition = "";
         el.style.zIndex = "";
         el.style.pointerEvents = "";
+        el.style.transform = ""; // Reset rotation
       });
       grid.classList.remove("bubble-mode");
       grid.style.position = "";
@@ -305,6 +321,9 @@ document.addEventListener("DOMContentLoaded", function () {
       startBubblePhysics();
     } else {
       stopBubblePhysics();
+      setTimeout(() => {
+        location.reload();
+      }, 1000); // Match the timeout in stopBubblePhysics
     }
   });
 });
