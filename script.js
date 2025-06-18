@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     grid.style.width = "100vw";
     grid.style.height = "100vh";
     grid.style.zIndex = "100";
-    grid.style.pointerEvents = "none";
+    //grid.style.pointerEvents = "none";
 
     engine = Matter.Engine.create();
     if (render && render.canvas && render.canvas.parentNode) {
