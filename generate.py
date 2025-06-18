@@ -1,15 +1,36 @@
 import os
+import re
 
 # --- CONFIGURATION ---
+PROJECTS_DIR = "projects"      # Folder where all project folders live
+OUTPUT_DIR = "."               # Where to write the generated HTML files
+CSS_FILE = "styles.css"        # CSS file for all pages
 
-PROJECTS_DIR = "projects"  # Folder where all project folders live
-OUTPUT_DIR = "."           # Where to write the generated HTML files
-CSS_FILE = "styles.css"    # Your CSS file for all pages
+# --- SECURITY HELPERS ---
+
+def is_safe_folder(name):
+    """
+    Allow only folder names that are 4+ digits (e.g., '0001', '0023').
+    Disallow any path traversal or slashes.
+    """
+    return re.fullmatch(r'\d{4,}', name) is not None
+
+def safe_join(base, *paths):
+    """
+    Join paths and ensure the result is inside the base directory.
+    """
+    final_path = os.path.abspath(os.path.join(base, *paths))
+    if not final_path.startswith(os.path.abspath(base)):
+        raise ValueError("Unsafe path detected!")
+    return final_path
 
 # --- HELPER FUNCTIONS ---
 
 def read_file(path):
-    """Read and return the contents of a text file, or an empty string if not found."""
+    """
+    Read and return the contents of a text file, or an empty string if not found.
+    Used for reading title.txt and description.txt in each project folder.
+    """
     try:
         with open(path, 'r', encoding='utf-8') as f:
             return f.read().strip()
@@ -17,12 +38,17 @@ def read_file(path):
         return ""
 
 def get_images(folder):
-    """Return a list of up to 5 image paths (image1.jpg to image5.jpg) in the given folder."""
+    """
+    Return a list of up to 5 image paths (image1.jpg to image5.jpg) in the given folder.
+    Used for displaying images in project pages and the grid.
+    """
     images = []
     for i in range(1, 6):
-        img_path = os.path.join(folder, f"image{i}.jpg")
+        img_path = safe_join(folder, f"image{i}.jpg")
         if os.path.exists(img_path):
-            images.append(img_path.replace("\\", "/"))  # For Windows compatibility
+            # Use relative path for HTML
+            rel_path = os.path.relpath(img_path, OUTPUT_DIR).replace("\\", "/")
+            images.append(rel_path)
     return images
 
 # --- HTML GENERATION FUNCTIONS ---
@@ -30,22 +56,14 @@ def get_images(folder):
 def generate_project_html(project_num, title, desc, images, next_project):
     """
     Generate the HTML for a single project page.
-    - project_num: e.g. "0001"
-    - title: project title
-    - desc: project description
-    - images: list of image paths
-    - next_project: number of the next project, or "" if last
     """
-    # Generate the HTML for the images
     images_html = "\n".join(
         f'<img src="{img}" alt="{title}" />' for img in images
     )
-    # Generate the "Next project" button if there is a next project
     next_btn = (
         f'<a class="next-btn" href="project{next_project}.html">Next project →</a>'
         if next_project else ""
     )
-    # Return the complete HTML page as a string
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,19 +170,24 @@ def generate_project_html(project_num, title, desc, images, next_project):
 
 def generate_index_html(projects):
     """
-    Generate the main grid HTML (index.html) with a tile for each project.
-    - projects: list of dictionaries with project info
+    Generate the HTML for the main index grid page.
     """
-    grid_items = []
-    for i, proj in enumerate(projects):
-        img = proj['images'][0] if proj['images'] else ""
-        grid_items.append(f"""
+    toggle_html = """
+  <div class="center-toggle">
+    <label class="switch">
+      <input type="checkbox" id="bubbleToggle" />
+      <span class="slider"></span>
+    </label>
+  </div>
+"""
+    grid_html = "\n".join(
+        f"""
         <a class="project" data-tags="" href="project{proj['num']}.html">
-          <img src="{img}" alt="{proj['num']}" class="project-img" />
+          <img src="{proj['images'][0] if proj['images'] else ''}" alt="{proj['num']}" class="project-img" />
           <span class="project-label">{proj['num']}</span>
         </a>
-        """)
-    grid_html = "\n".join(grid_items)
+        """ for proj in projects
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -173,12 +196,15 @@ def generate_index_html(projects):
   <title>Portfolio Grid</title>
   <link rel="stylesheet" href="{CSS_FILE}" />
 </head>
+{toggle_html}
 <body>
   <main class="main">
     <div class="grid" id="projectGrid">
       {grid_html}
     </div>
   </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
 """
@@ -186,19 +212,26 @@ def generate_index_html(projects):
 # --- MAIN SCRIPT ---
 
 def main():
-    # Get a sorted list of all project folders (e.g. ['0001', '0002', ...])
-    project_folders = sorted([f for f in os.listdir(PROJECTS_DIR) if os.path.isdir(os.path.join(PROJECTS_DIR, f))])
-    
+    """
+    Main script to generate all project pages and the index grid.
+    - Reads all project folders (highest number first)
+    - Generates project pages and index.html
+    - Validates folder names to prevent path injection
+    """
+    # Get all project folders, sorted highest number first, and validate names
+    all_folders = [
+        f for f in os.listdir(PROJECTS_DIR)
+        if os.path.isdir(safe_join(PROJECTS_DIR, f)) and is_safe_folder(f)
+    ]
+    project_folders = sorted(all_folders)[::-1]
+
     projects = []
-    # Loop through each project folder
     for idx, folder in enumerate(project_folders):
-        folder_path = os.path.join(PROJECTS_DIR, folder)
-        title = read_file(os.path.join(folder_path, "title.txt"))         # Read title
-        desc = read_file(os.path.join(folder_path, "description.txt"))   # Read description
-        images = get_images(folder_path)                                 # Get up to 5 images
-        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""  # Next project number, or "" if last
-        
-        # Store info for generating index.html
+        folder_path = safe_join(PROJECTS_DIR, folder)
+        title = read_file(safe_join(folder_path, "title.txt"))
+        desc = read_file(safe_join(folder_path, "description.txt"))
+        images = get_images(folder_path)
+        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
         projects.append({
             "num": folder,
             "title": title,
@@ -206,13 +239,10 @@ def main():
             "images": images,
             "next": next_project
         })
-        
-        # Generate the HTML for this project page and save it
         html = generate_project_html(folder, title, desc, images, next_project)
         with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
             f.write(html)
-    
-    # Generate the main grid (index.html)
+
     index_html = generate_index_html(projects)
     with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)

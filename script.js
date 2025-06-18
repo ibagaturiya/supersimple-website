@@ -115,6 +115,46 @@ document.addEventListener("DOMContentLoaded", function () {
         { isStatic: true }
       ),
     ];
+
+    const wallOptions = {
+      isStatic: true,
+      render: {
+        fillStyle: "transparent", // or "white"
+        strokeStyle: "transparent", // or "white"
+        lineWidth: 0,
+      },
+    };
+
+    walls = [
+      Matter.Bodies.rectangle(
+        window.innerWidth / 2,
+        -wallThickness / 2,
+        window.innerWidth,
+        wallThickness,
+        wallOptions
+      ), // top
+      Matter.Bodies.rectangle(
+        window.innerWidth / 2,
+        window.innerHeight + wallThickness / 2,
+        window.innerWidth,
+        wallThickness,
+        wallOptions
+      ), // bottom
+      Matter.Bodies.rectangle(
+        -wallThickness / 2,
+        window.innerHeight / 2,
+        wallThickness,
+        window.innerHeight,
+        wallOptions
+      ), // left
+      Matter.Bodies.rectangle(
+        window.innerWidth + wallThickness / 2,
+        window.innerHeight / 2,
+        wallThickness,
+        window.innerHeight,
+        wallOptions
+      ), // right
+    ];
     Matter.World.add(engine.world, walls);
 
     // Create bubbles for each project
