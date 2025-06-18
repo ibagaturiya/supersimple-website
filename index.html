@@ -1,113 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfolio Grid</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  
-  <div class="center-toggle">
-    <label class="switch">
-      <input type="checkbox" id="bubbleToggle" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn" data-filter="#selected">#SELECTED</button>
-    <div class="filter-group">
-      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
-      <div class="subfilters">
-        <button class="filter-btn subfilter" data-filter="#eth">#ETH</button>
-        <button class="filter-btn subfilter" data-filter="#nh">#NH</button>
-      </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portfolio Grid</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="center-toggle">
+      <label class="switch">
+        <input type="checkbox" id="bubbleToggle" />
+        <span class="slider"></span>
+      </label>
     </div>
-    <button class="filter-btn" data-filter="#art">#ART</button>
-    <button class="filter-btn" data-filter="#tech">#TECH</button>
-    <button class="filter-btn" data-filter="#photo">#PHOTO</button>
-    <button class="filter-btn" data-filter="#music">#MUSIC</button>
-  </div>
 
-  <main class="main">
-    <div class="grid" id="projectGrid">
-      
-        <a class="project" data-hashtags="#selected #architecture #eth #tech" href="project0053.html">
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn" data-filter="#selected">#SELECTED</button>
+      <div class="filter-group">
+        <button class="filter-btn" data-filter="#architecture">
+          #ARCHITECTURE
+        </button>
+        <div class="subfilters">
+          <button class="filter-btn subfilter" data-filter="#eth">#ETH</button>
+          <button class="filter-btn subfilter" data-filter="#nh">#NH</button>
+        </div>
+      </div>
+      <button class="filter-btn" data-filter="#art">#ART</button>
+      <button class="filter-btn" data-filter="#tech">#TECH</button>
+      <button class="filter-btn" data-filter="#photo">#PHOTO</button>
+      <button class="filter-btn" data-filter="#music">#MUSIC</button>
+    </div>
+
+    <main class="main">
+      <div class="grid" id="projectGrid">
+        <a
+          class="project"
+          data-hashtags="#selected #architecture #eth #tech"
+          href="project0053.html"
+        >
           <img src="projects/0053/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0053</span>
         </a>
-        
 
-        <a class="project" data-hashtags="#selected #architecture #eth #tech" href="project0051.html">
+        <a
+          class="project"
+          data-hashtags="#selected #architecture #eth #tech"
+          href="project0051.html"
+        >
           <img src="projects/0051/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0051</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0010.html">
           <img src="projects/0010/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0010</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0009.html">
           <img src="projects/0009/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0009</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0008.html">
           <img src="projects/0008/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0008</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0007.html">
           <img src="projects/0007/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0007</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0006.html">
           <img src="projects/0006/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0006</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0005.html">
           <img src="projects/0005/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0005</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0004.html">
           <img src="projects/0004/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0004</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0003.html">
           <img src="projects/0003/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0003</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0002.html">
           <img src="projects/0002/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0002</span>
         </a>
-        
 
         <a class="project" data-hashtags="" href="project0001.html">
           <img src="projects/0001/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0001</span>
         </a>
-        
-    </div>
-  </main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js"></script>
-</body>
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>

@@ -249,3 +249,17 @@ canvas {
     padding: 0;
   }
 }
+
+.center-toggle {
+  position: fixed;
+  top: 24px;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.switch {
+  pointer-events: auto;
+}
