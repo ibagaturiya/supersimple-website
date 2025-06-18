@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
     walls = [
       Matter.Bodies.rectangle(
         window.innerWidth / 2,
-        -wallThickness / 2,
+        -wallThickness / 30,
         window.innerWidth,
         wallThickness,
         wallOptions
