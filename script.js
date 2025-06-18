@@ -2,12 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const grid = document.getElementById("projectGrid");
   const allProjects = Array.from(document.querySelectorAll(".project"));
   let projects = allProjects.slice();
-  const styleToggle = document.getElementById("styleToggle");
-  const themeCss = document.getElementById("theme-css"); // <-- ADD THIS LINE
+  const toggle = document.getElementById("bubbleToggle");
   const filterBar = document.getElementById("filterBar");
   let activeFilter = null;
 
-  // --- FILTER LOGIC (unchanged) ---
+  if (!grid || !toggle) {
+    console.error("Missing #projectGrid or #bubbleToggle in the HTML.");
+    return;
+  }
+
+  // --- FILTER LOGIC ---
   function applyFilter(filter) {
     allProjects.forEach((el) => {
       const hashtags = (el.dataset.hashtags || "").toLowerCase();
@@ -25,11 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
     filterBar.addEventListener("click", function (e) {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
+
       if (btn.dataset.filter === "#architecture") {
         const group = btn.parentElement;
         group.classList.toggle("open");
         return;
       }
+
       if (btn.classList.contains("active")) {
         btn.classList.remove("active");
         activeFilter = null;
@@ -51,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // --- BUBBLE PHYSICS LOGIC (unchanged except for toggle logic) ---
+  // --- BUBBLE PHYSICS LOGIC ---
   let originalRects = [];
   let engine,
     render,
@@ -60,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mouseConstraint,
     walls = [];
   let scrollPosition = 0;
+  let inBubbleMode = false;
 
   function lockBodyScroll() {
     scrollPosition = window.pageYOffset;
@@ -90,12 +97,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function storeOriginalPositions() {
-    projects = allProjects.filter((el) => el.style.display !== "none");
-    originalRects = projects.map((el) => el.getBoundingClientRect());
+    if (!inBubbleMode) {
+      projects = allProjects.filter((el) => el.style.display !== "none");
+      originalRects = projects.map((el) => el.getBoundingClientRect());
+    }
   }
 
   function startBubblePhysics() {
-    document.querySelector(".center-toggle").style.pointerEvents = "auto";
+    inBubbleMode = true;
     lockBodyScroll();
     enableTouchLock();
 
@@ -227,6 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function stopBubblePhysics() {
+    inBubbleMode = false;
     document.querySelector(".center-toggle").style.pointerEvents = "auto";
     unlockBodyScroll();
     disableTouchLock();
@@ -249,7 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
       el.style.top = rect.top + "px";
     });
 
-    // Only after the animation, reset everything
     setTimeout(() => {
       projects.forEach((el) => {
         el.style.position = "";
@@ -259,7 +268,6 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.zIndex = "";
         el.style.pointerEvents = "";
       });
-      // Now remove bubble mode and reset grid styles
       grid.classList.remove("bubble-mode");
       grid.style.position = "";
       grid.style.left = "";
@@ -268,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
       grid.style.height = "";
       grid.style.zIndex = "";
       grid.style.pointerEvents = "";
-    }, 1000); // Match the transition duration
+    }, 1000);
   }
 
   function handleOrientation(event) {
@@ -285,41 +293,20 @@ document.addEventListener("DOMContentLoaded", function () {
     engine.world.gravity.y = y;
   }
 
+  // Only store positions when not in bubble mode
   window.addEventListener("resize", function () {
-    if (!grid.classList.contains("bubble-mode")) {
-      storeOriginalPositions();
-    }
+    if (!inBubbleMode) storeOriginalPositions();
   });
 
-  // --- SLIDER LOGIC: Map slider positions to modes ---
-  function setMode(val) {
-    stopBubblePhysics();
+  // Only store positions after everything is loaded
+  window.addEventListener("load", storeOriginalPositions);
 
-    if (val == "2") {
-      if (!themeCss.href.includes("soviet.css")) {
-        themeCss.href = "soviet.css";
-      }
-      // No bubble mode in soviet style
+  toggle.addEventListener("change", function () {
+    if (toggle.checked) {
+      storeOriginalPositions();
+      startBubblePhysics();
     } else {
-      if (!themeCss.href.includes("styles.css")) {
-        themeCss.href = "styles.css";
-        // Wait a short time to ensure CSS is applied, then start bubble mode if needed
-        setTimeout(function () {
-          if (val == "1") startBubblePhysics();
-        }, 100);
-      } else {
-        if (val == "1") startBubblePhysics();
-      }
+      stopBubblePhysics();
     }
-  }
-
-  if (styleToggle && themeCss) {
-    setMode(styleToggle.value);
-    styleToggle.addEventListener("input", function () {
-      setMode(this.value);
-    });
-  }
-
-  // Initial positions
-  storeOriginalPositions();
+  });
 });
