@@ -109,3 +109,11 @@ canvas {
 .project {
   pointer-events: auto !important;
 }
+
+.center-toggle {
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+.switch {
+  pointer-events: auto !important;
+}
