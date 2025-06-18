@@ -23,10 +23,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
+  background: rgba(242, 150, 108, 0.99);
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0px 100px rgba(255, 255, 255, 0.17);
+  box-shadow: 0 0px 100px rgba(242, 150, 108, 0);
   text-decoration: none;
   color: inherit;
   transition: transform 1s, box-shadow 0.5s;
@@ -40,7 +40,7 @@ body {
 
 .project:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 75px rgb(0, 0, 0);
+  box-shadow: 0 0 75px rgba(242, 150, 108, 0.99);
   border-radius: 50%;
 }
 
