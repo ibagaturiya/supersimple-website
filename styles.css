@@ -130,8 +130,8 @@ canvas {
 }
 
 .filter-btn {
-  background: #b6b6b6;
-  color: #fff;
+  background: #000000;
+  color: #b3b3b3;
   border: none;
   border-radius: 8px;
   font-family: inherit;
