@@ -83,6 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
     window.scrollTo(0, scrollPosition);
   }
   function preventTouchMove(e) {
+    // Allow touch events on the toggle
+    if (e.target.closest(".center-toggle")) return;
     e.preventDefault();
   }
   function enableTouchLock() {
