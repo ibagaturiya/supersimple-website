@@ -2,16 +2,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const grid = document.getElementById("projectGrid");
   const allProjects = Array.from(document.querySelectorAll(".project"));
   let projects = allProjects.slice();
-  const toggle = document.getElementById("bubbleToggle");
+  const styleToggle = document.getElementById("styleToggle");
+  const themeCss = document.getElementById("theme-css"); // <-- ADD THIS LINE
   const filterBar = document.getElementById("filterBar");
   let activeFilter = null;
 
-  if (!grid || !toggle) {
-    console.error("Missing #projectGrid or #bubbleToggle in the HTML.");
-    return;
-  }
-
-  // --- FILTER LOGIC ---
+  // --- FILTER LOGIC (unchanged) ---
   function applyFilter(filter) {
     allProjects.forEach((el) => {
       const hashtags = (el.dataset.hashtags || "").toLowerCase();
@@ -21,32 +17,26 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.display = "none";
       }
     });
-    // Update projects list for bubble physics (all visible)
     projects = allProjects.filter((el) => el.style.display !== "none");
     storeOriginalPositions();
   }
 
-  // Filter button click events
   if (filterBar) {
     filterBar.addEventListener("click", function (e) {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-
-      // Handle subfilter popout
       if (btn.dataset.filter === "#architecture") {
         const group = btn.parentElement;
         group.classList.toggle("open");
         return;
       }
-
-      // Toggle filter: if already active, remove filter; else, activate
       if (btn.classList.contains("active")) {
         btn.classList.remove("active");
         activeFilter = null;
         document
           .querySelectorAll(".filter-group")
           .forEach((g) => g.classList.remove("open"));
-        applyFilter(null); // Show all projects
+        applyFilter(null);
       } else {
         document
           .querySelectorAll(".filter-btn")
@@ -61,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // --- BUBBLE PHYSICS LOGIC ---
+  // --- BUBBLE PHYSICS LOGIC (unchanged except for toggle logic) ---
   let originalRects = [];
   let engine,
     render,
@@ -100,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function storeOriginalPositions() {
-    // Always use the current visible projects
     projects = allProjects.filter((el) => el.style.display !== "none");
     originalRects = projects.map((el) => el.getBoundingClientRect());
   }
@@ -175,7 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
     ];
     Matter.World.add(engine.world, walls);
 
-    // Only use visible projects for bubbles
     bodies = projects.map((el, i) => {
       el.style.position = "absolute";
       el.style.transition = "none";
@@ -302,14 +290,35 @@ document.addEventListener("DOMContentLoaded", function () {
       storeOriginalPositions();
     }
   });
-  toggle.addEventListener("change", function () {
-    storeOriginalPositions(); // Always update before bubble mode
-    if (toggle.checked) {
-      startBubblePhysics();
+
+  // --- SLIDER LOGIC: Map slider positions to modes ---
+  function setMode(val) {
+    stopBubblePhysics();
+
+    if (val == "2") {
+      if (!themeCss.href.includes("soviet.css")) {
+        themeCss.href = "soviet.css";
+      }
+      // No bubble mode in soviet style
     } else {
-      stopBubblePhysics();
+      if (!themeCss.href.includes("styles.css")) {
+        themeCss.href = "styles.css";
+        // Wait a short time to ensure CSS is applied, then start bubble mode if needed
+        setTimeout(function () {
+          if (val == "1") startBubblePhysics();
+        }, 100);
+      } else {
+        if (val == "1") startBubblePhysics();
+      }
     }
-  });
+  }
+
+  if (styleToggle && themeCss) {
+    setMode(styleToggle.value);
+    styleToggle.addEventListener("input", function () {
+      setMode(this.value);
+    });
+  }
 
   // Initial positions
   storeOriginalPositions();

@@ -62,7 +62,7 @@ def generate_index_html(projects):
     toggle_html = """
   <div class="center-toggle">
     <label class="switch">
-      <input type="checkbox" id="bubbleToggle" />
+      <input type="range" id="styleToggle" min="0" max="2" value="0" />
       <span class="slider"></span>
     </label>
   </div>
@@ -81,7 +81,6 @@ def generate_index_html(projects):
     <button class="filter-btn" data-filter="#tech">#TECH</button>
     <button class="filter-btn" data-filter="#photo">#PHOTO</button>
     <button class="filter-btn" data-filter="#music">#MUSIC</button>
-
   </div>
 """
     grid_html = "\n".join(
@@ -98,10 +97,10 @@ def generate_index_html(projects):
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portfolio Grid</title>
-  <link rel="stylesheet" href="{CSS_FILE}" />
+  <link id="theme-css" rel="stylesheet" href="{CSS_FILE}" />
 </head>
-{toggle_html}
 <body>
+  {toggle_html}
   {filter_html}
   <main class="main">
     <div class="grid" id="projectGrid">
@@ -386,6 +385,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
 </body>
 </html>
 """
+
 def main():
     all_folders = [
         f for f in os.listdir(PROJECTS_DIR)
