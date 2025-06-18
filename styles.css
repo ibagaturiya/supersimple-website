@@ -236,3 +236,16 @@ canvas {
   pointer-events: none;
   z-index: 0;
 }
+
+@media (max-width: 900px) {
+  .project-main {
+    flex-direction: row !important;
+    gap: 18px;
+    padding: 32px 4vw 16px 4vw;
+  }
+  .project-left,
+  .project-right {
+    max-width: 100%;
+    padding: 0;
+  }
+}
