@@ -263,3 +263,13 @@ canvas {
 .switch {
   pointer-events: auto;
 }
+
+/* Ensure pointer events for toggle and projects in bubble mode */
+.bubble-mode .project,
+.bubble-mode .center-toggle {
+  pointer-events: auto !important;
+  z-index: 10001;
+}
+.bubble-mode .center-toggle {
+  z-index: 10002;
+}
