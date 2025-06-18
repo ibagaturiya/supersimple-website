@@ -67,6 +67,8 @@ body {
   align-items: center;
   width: 52px;
   height: 32px;
+  z-index: 10000;
+  pointer-events: auto;
 }
 
 .switch input {
@@ -151,12 +153,6 @@ canvas {
   color: #111;
 }
 
-.subfilter {
-  background: #e8e8e8;
-  color: #fff;
-  font-size: 0.98rem;
-  padding: 5px 16px;
-}
 .project-logo {
   display: block;
   width: 100%;
@@ -169,7 +165,6 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  /* Remove margin and background */
   margin: 0;
   z-index: 2;
   pointer-events: none;
@@ -208,7 +203,7 @@ canvas {
   z-index: 0;
 }
 
-@media (max-width: 900px) {
+/* @media (max-width: 900px) {
   .project-main {
     flex-direction: row !important;
     gap: 18px;
@@ -219,7 +214,7 @@ canvas {
     max-width: 100%;
     padding: 0;
   }
-}
+} */
 
 .center-toggle {
   position: fixed;
@@ -230,7 +225,4 @@ canvas {
   display: flex;
   justify-content: center;
   pointer-events: none;
-}
-.switch {
-  pointer-events: auto;
 }

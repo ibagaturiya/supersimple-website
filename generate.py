@@ -263,7 +263,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     .project-left {{
       flex: 1 1 40%;
       max-width: 40%;
-      font-size: 1.15rem;
+      font-size: 0.7 rem;
       line-height: 1.7;
       padding-right: 24px;
       word-break: break-word;
