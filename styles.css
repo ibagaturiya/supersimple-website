@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #02000000;
+  background: #ffffff;
 }
 
 .main {
@@ -115,14 +115,6 @@ canvas {
   pointer-events: auto !important;
 }
 
-.center-toggle {
-  pointer-events: auto !important;
-  z-index: 9999 !important;
-}
-.switch {
-  pointer-events: auto !important;
-}
-
 /* Filter bar styles */
 .filter-bar {
   position: fixed;
@@ -159,8 +151,11 @@ canvas {
   color: #111;
 }
 
-.filter-group {
-  position: relative;
+.subfilter {
+  background: #e8e8e8;
+  color: #fff;
+  font-size: 0.98rem;
+  padding: 5px 16px;
 }
 .project-logo {
   display: block;
@@ -231,21 +226,11 @@ canvas {
   top: 24px;
   left: 0;
   right: 0;
-  z-index: 10001;
+  z-index: 9999;
   display: flex;
   justify-content: center;
-  /*pointer-events: none;
+  pointer-events: none;
 }
 .switch {
   pointer-events: auto;
-}
-
-/* Ensure pointer events for toggle and projects in bubble mode */
-.bubble-mode .project,
-.bubble-mode .center-toggle {
-  pointer-events: auto !important;
-  z-index: 10001;
-}
-.bubble-mode .center-toggle {
-  z-index: 10002;
 }
