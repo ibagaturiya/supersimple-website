@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #ffffff;
+  background: #02000000;
 }
 
 .main {
@@ -234,7 +234,7 @@ canvas {
   z-index: 10001;
   display: flex;
   justify-content: center;
-  pointer-events: none;
+  /*pointer-events: none;
 }
 .switch {
   pointer-events: auto;
