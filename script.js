@@ -30,12 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
 
-      if (btn.dataset.filter === "#architecture") {
-        const group = btn.parentElement;
-        group.classList.toggle("open");
-        return;
-      }
-
       if (btn.classList.contains("active")) {
         btn.classList.remove("active");
         activeFilter = null;
@@ -84,9 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   function preventTouchMove(e) {
     // Allow touch events on the toggle
-    if (e.target.closest(".center-toggle")) return;
-    e.preventDefault();
+    if (!e.target.closest(".center-toggle")) {
+      e.preventDefault();
+    }
   }
+
   function enableTouchLock() {
     document.body.addEventListener("touchmove", preventTouchMove, {
       passive: false,
