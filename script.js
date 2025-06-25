@@ -63,13 +63,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollPosition = 0;
   let inBubbleMode = false;
 
-  function lockBodyScroll() {
+  /*   function lockBodyScroll() {
     scrollPosition = window.pageYOffset;
     document.body.style.overflow = "hidden";
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.width = "100%";
-  }
+  } */
 
   function unlockBodyScroll() {
     document.body.style.overflow = "";
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function startBubblePhysics() {
     inBubbleMode = true;
-    lockBodyScroll();
+    /*   lockBodyScroll(); */
 
     grid.classList.add("bubble-mode");
     grid.style.position = "fixed";
