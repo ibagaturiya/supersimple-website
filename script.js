@@ -145,15 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function storeOriginalPositions() {
     if (!inBubbleMode) {
       projects = allProjects.filter((el) => el.style.display !== "none");
-      originalRects = projects.map((el) => {
-        const rect = el.getBoundingClientRect();
-        return {
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height
-        };
-      });
+      originalRects = projects.map((el) => el.getBoundingClientRect());
     }
   }
 
@@ -232,6 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Use stored originalRects instead of getBoundingClientRect()
       const rect = originalRects[i];
+      // These are already relative to the viewport
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
       const w = rect.width;

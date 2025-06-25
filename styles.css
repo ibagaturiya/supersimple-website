@@ -8,6 +8,7 @@ body {
 body.toggled {
   background: linear-gradient(120deg, #ff9d00 0%, #ffb347 100%);
   transition: background 0.5s;
+  background: #ff9500;
 }
 
 .main {
@@ -17,12 +18,13 @@ body.toggled {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(110px, 2fr));
   gap: 12px;
   width: 100%;
   max-width: 1000px; /* or your preferred width */
   margin: 0 auto;
-  margin-top: 90px;
+  /*   margin-top: 90px;
+ */
   position: relative;
   justify-items: center;
 }
