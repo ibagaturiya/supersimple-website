@@ -13,14 +13,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- FILTER LOGIC ---
   function applyFilter(filter) {
+    // 1. Record the first (current) positions
+    const firstRects = new Map();
+    allProjects.forEach((el) => {
+      firstRects.set(el, el.getBoundingClientRect());
+    });
+
+    // 2. Apply filter logic
     allProjects.forEach((el) => {
       const hashtags = (el.dataset.hashtags || "").toLowerCase();
-      if (!filter || hashtags.includes(filter)) {
-        el.style.display = "";
+      const shouldShow = !filter || hashtags.includes(filter);
+
+      if (shouldShow) {
+        // If hidden, show and animate in
+        if (el.style.display === "none") {
+          el.style.display = "";
+          el.classList.add("appearing");
+          // Force reflow to apply initial state
+          void el.offsetWidth;
+          el.classList.remove("vanish");
+          // Animate to visible
+          setTimeout(() => {
+            el.classList.remove("appearing");
+          }, 10); // Next tick
+        } else {
+          el.classList.remove("vanish");
+          el.classList.remove("appearing");
+        }
       } else {
-        el.style.display = "none";
+        // Animate out
+        el.classList.add("vanish");
+        setTimeout(() => {
+          el.style.display = "none";
+          el.classList.remove("vanish");
+        }, 400);
       }
     });
+
+    // 3. Wait for the DOM to update, then animate grid relocation
+    requestAnimationFrame(() => {
+      allProjects.forEach((el) => {
+        if (el.style.display === "none") return;
+        const lastRect = el.getBoundingClientRect();
+        const firstRect = firstRects.get(el);
+        const dx = firstRect.left - lastRect.left;
+        const dy = firstRect.top - lastRect.top;
+        el.style.transition = "none";
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => {
+          el.style.transition = "transform 0.5s cubic-bezier(0.4,0,0.2,1)";
+          el.style.transform = "";
+        });
+      });
+    });
+
     projects = allProjects.filter((el) => el.style.display !== "none");
     storeOriginalPositions();
     originalRects = projects.map((el) => el.getBoundingClientRect());
@@ -63,13 +109,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollPosition = 0;
   let inBubbleMode = false;
 
-  /*   function lockBodyScroll() {
+  function lockBodyScroll() {
     scrollPosition = window.pageYOffset;
     document.body.style.overflow = "hidden";
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.width = "100%";
-  } */
+  }
 
   function unlockBodyScroll() {
     document.body.style.overflow = "";
@@ -85,11 +131,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  /*   function enableTouchLock() {
+  function enableTouchLock() {
     document.body.addEventListener("touchmove", preventTouchMove, {
       passive: false,
     });
-  } */
+  }
   function disableTouchLock() {
     document.body.removeEventListener("touchmove", preventTouchMove, {
       passive: false,
@@ -99,13 +145,21 @@ document.addEventListener("DOMContentLoaded", function () {
   function storeOriginalPositions() {
     if (!inBubbleMode) {
       projects = allProjects.filter((el) => el.style.display !== "none");
-      originalRects = projects.map((el) => el.getBoundingClientRect());
+      originalRects = projects.map((el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height
+        };
+      });
     }
   }
 
   function startBubblePhysics() {
     inBubbleMode = true;
-    /*   lockBodyScroll(); */
+    lockBodyScroll();
 
     grid.classList.add("bubble-mode");
     grid.style.position = "fixed";
@@ -178,7 +232,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Use stored originalRects instead of getBoundingClientRect()
       const rect = originalRects[i];
-      // These are already relative to the viewport
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
       const w = rect.width;
@@ -323,9 +376,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   toggle.addEventListener("change", function () {
     if (toggle.checked) {
+      document.body.classList.add("toggled");
       storeOriginalPositions();
       startBubblePhysics();
     } else {
+      document.body.classList.remove("toggled");
       stopBubblePhysics();
       setTimeout(() => {
         location.reload();

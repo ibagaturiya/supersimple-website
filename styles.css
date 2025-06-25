@@ -5,18 +5,24 @@ body {
   background: #000000;
 }
 
+body.toggled {
+  background: linear-gradient(120deg, #ff9d00 0%, #ffb347 100%);
+  transition: background 0.5s;
+}
+
 .main {
   max-width: auto;
-  margin: 40px auto;
+  margin: 0px auto;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 24px;
+  gap: 12px;
   width: 100%;
   max-width: 1000px; /* or your preferred width */
   margin: 0 auto;
+  margin-top: 90px;
   position: relative;
   justify-items: center;
 }
@@ -65,39 +71,102 @@ body {
   display: flex;
   justify-content: center;
   pointer-events: none;
+  height: 3.5rem; /* Ensure enough height for the toggle to not be cut off */
+  align-items: flex-start;
 }
-
-.slider {
+.center-toggle .switch {
+  width: 4.5rem;
+  height: 2.2rem;
+  min-width: 0;
+  min-height: 0;
+  background: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.center-toggle .switch input {
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: background 0.3s;
-  border-radius: 32px;
+  z-index: 2;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
-
-.slider:before {
+.center-toggle .switch label {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.center-toggle .background {
+  z-index: 1;
   position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #fff;
-  transition: transform 0.3s;
+  width: 4.5rem;
+  height: 2.2rem;
+  border-radius: 1.2rem;
+  border: 0.25rem solid #202020;
+  background: linear-gradient(to right, #484848 0%, #202020 100%);
+  transition: all 0.3s;
+}
+.center-toggle .fill {
+  display: none; /* Prevents overlay from covering the grid */
+}
+
+.center-toggle .sun-moon {
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  height: 1.4rem;
+  width: 1.4rem;
+  margin: 0.4rem;
+  background: #fffdf2;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 0.18rem solid #dee2c6;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
-
-input:checked + .slider {
-  background-color: #ff9d00;
+.center-toggle .switch input:checked ~ .sun-moon {
+  left: calc(100% - 1.8rem);
+  background: #f5ec59;
+  border-color: #e7c65c;
+  transform: rotate(-25deg);
+  box-shadow: 0 0 10px #f5ec59, 0 0 15px #f5ec59, 0 0 20px #f5ec59;
+  border-radius: 50%;
 }
-
-input:checked + .slider:before {
-  transform: translateX(20px);
+.center-toggle .switch input:checked ~ .sun-moon .dots,
+.center-toggle .switch input:checked ~ .sun-moon .dots:after,
+.center-toggle .switch input:checked ~ .sun-moon .dots:before {
+  background: #ffffff;
+  border-color: #ffffff;
+  border-radius: 50%;
+}
+.center-toggle .switch input:checked ~ .sun-moon .dots {
+  height: 1.5rem;
+  width: 1.5rem;
+  top: 0px;
+  left: -20px;
+  transform: rotate(25deg);
+}
+.center-toggle .switch input:checked ~ .sun-moon .dots:after {
+  height: 0.65rem;
+  width: 0.65rem;
+  top: 2px;
+  left: -12px;
+}
+.center-toggle .switch input:checked ~ .sun-moon .dots:before {
+  height: 0.4rem;
+  width: 0.4rem;
+  top: 6px;
+  left: 14px;
+}
+.center-toggle .switch input:checked ~ .background {
+  border: 0.18rem solid #ff9d00;
+  background: linear-gradient(to right, #ff9d00 0%, #ffb347 100%);
 }
 
 /* Filter bar styles */
@@ -155,14 +224,4 @@ input:checked + .slider:before {
 
 .project:hover .project-label {
   opacity: 1;
-}
-
-canvas {
-  background: transparent;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
 }
