@@ -1,6 +1,7 @@
+/* main */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Courier New", Courier, monospace, sans-serif;
   background: #000000;
 }
 
@@ -24,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.99);
+  background: #282828;
   border-radius: 10%;
   overflow: hidden;
   text-decoration: none;
@@ -40,28 +41,12 @@ body {
 
 .project:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 75px rgba(255, 249, 170, 0.99);
+  box-shadow: 0 0 75px rgba(255, 223, 142, 0.956);
   /*   border-radius: 50%;
  */
 }
 
-.project-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.center-toggle {
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: top;
-  z-index: 9999;
-}
-
+/* switch toggle */
 .switch {
   position: fixed;
   justify-content: center;
@@ -71,11 +56,15 @@ body {
   z-index: 10000;
   pointer-events: auto;
 }
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.center-toggle {
+  position: fixed;
+  top: 24px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .slider {
@@ -111,10 +100,6 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-canvas {
-  pointer-events: none;
-}
-
 /* Filter bar styles */
 .filter-bar {
   position: fixed;
@@ -145,12 +130,11 @@ canvas {
   outline: none;
 }
 
-.filter-btn.active,
 .filter-btn:focus {
   background: #fff;
   color: #111;
 }
-
+/* project numbers when hovered */
 .project-label {
   position: absolute;
   left: 0;
@@ -162,7 +146,7 @@ canvas {
   justify-content: center;
   font-size: 2.2rem;
   font-weight: bold;
-  color: #ff7700;
+  color: #3a3a3a;
   opacity: 0;
   pointer-events: none;
   z-index: 3;
@@ -181,28 +165,4 @@ canvas {
   width: 100vw;
   height: 100vh;
   z-index: 0;
-}
-
-/* @media (max-width: 900px) {
-  .project-main {
-    flex-direction: row !important;
-    gap: 18px;
-    padding: 32px 4vw 16px 4vw;
-  }
-  .project-left,
-  .project-right {
-    max-width: 100%;
-    padding: 0;
-  }
-} */
-
-.center-toggle {
-  position: fixed;
-  top: 24px;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
 }
