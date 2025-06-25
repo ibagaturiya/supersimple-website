@@ -85,11 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function enableTouchLock() {
+  /*   function enableTouchLock() {
     document.body.addEventListener("touchmove", preventTouchMove, {
       passive: false,
     });
-  }
+  } */
   function disableTouchLock() {
     document.body.removeEventListener("touchmove", preventTouchMove, {
       passive: false,
@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function startBubblePhysics() {
     inBubbleMode = true;
     lockBodyScroll();
-    enableTouchLock();
 
     grid.classList.add("bubble-mode");
     grid.style.position = "fixed";
@@ -177,19 +176,25 @@ document.addEventListener("DOMContentLoaded", function () {
       el.style.transition = "none";
       el.style.zIndex = 10;
 
-      const rect = el.getBoundingClientRect();
+      // Use stored originalRects instead of getBoundingClientRect()
+      const rect = originalRects[i];
+      // These are already relative to the viewport
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
-      const r = rect.width / 2;
+      const w = rect.width;
+      const h = rect.height;
 
-      el.style.left = x - r + "px";
-      el.style.top = y - r + "px";
+      el.style.left = x - w / 2 + "px";
+      el.style.top = y - h / 2 + "px";
 
-      const body = Matter.Bodies.circle(x, y, r, {
+      const body = Matter.Bodies.rectangle(x, y, w, h, {
         restitution: 0.8,
         friction: 0.01,
-        frictionAir: 0.01,
+        frictionAir: 0.00002,
       });
+      Matter.Body.setVelocity(body, { x: 0, y: 0 });
+      Matter.Body.setAngularVelocity(body, 0);
+
       body.el = el;
       Matter.World.add(engine.world, body);
       return body;
@@ -204,9 +209,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- ROTATION LOGIC ---
     Matter.Events.on(engine, "afterUpdate", () => {
       bodies.forEach((body) => {
-        const r = body.circleRadius;
-        body.el.style.left = body.position.x - r + "px";
-        body.el.style.top = body.position.y - r + "px";
+        const w = body.bounds.max.x - body.bounds.min.x;
+        const h = body.bounds.max.y - body.bounds.min.y;
+        body.el.style.left = body.position.x - w / 2 + "px";
+        body.el.style.top = body.position.y - h / 2 + "px";
         body.el.style.transform = `rotate(${body.angle}rad)`;
       });
     });
