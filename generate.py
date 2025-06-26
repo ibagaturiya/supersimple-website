@@ -22,9 +22,10 @@ def read_file(path):
         return ""
 
 def get_icon(folder):
-    icon_path = safe_join(folder, "icon.svg")
-    if os.path.exists(icon_path):
-        return os.path.relpath(icon_path, OUTPUT_DIR).replace("\\", "/")
+    for ext in [".svg", ".png", ".jpg", ".jpeg", ".gif"]:
+        icon_path = safe_join(folder, f"icon{ext}")
+        if os.path.exists(icon_path):
+            return os.path.relpath(icon_path, OUTPUT_DIR).replace("\\", "/")
     return ""
 
 def get_media(folder):
@@ -59,59 +60,105 @@ def media_html_tag(src):
         return ''
 
 def generate_index_html(projects):
-    toggle_html = """
-  <div class="center-toggle">
-    <label class="switch">
-      <input type="checkbox" id="bubbleToggle" />
-      <span class="slider"></span>
-    </label>
-  </div>
-"""
-    filter_html = """
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn" data-filter="#selected">#SELECTED</button>
-    <div class="filter-group">
-      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
-      <div class="subfilters">
-        <button class="filter-btn subfilter" data-filter="#eth">#ETH</button>
-        <button class="filter-btn subfilter" data-filter="#nh">#NH</button>
+    toggle_html = '''
+    <div class="center-toggle">
+      <div class="switch">
+        <label for="bubbleToggle">
+          <input id="bubbleToggle" type="checkbox" />
+          <div class="sun-moon">
+            <div class="dots"></div>
+          </div>
+          <div class="background">
+            <div class="stars1"></div>
+            <div class="stars2"></div>
+          </div>
+          <div class="fill"></div>
+        </label>
       </div>
     </div>
-    <button class="filter-btn" data-filter="#art">#ART</button>
-    <button class="filter-btn" data-filter="#tech">#TECH</button>
-    <button class="filter-btn" data-filter="#photo">#PHOTO</button>
-    <button class="filter-btn" data-filter="#music">#MUSIC</button>
-  </div>
-"""
+    '''
+    filter_html = '''
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn" data-filter="#selected">#SELECTED</button>
+      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
+      <button class="filter-btn" data-filter="#tech">#TECH</button>
+      <button class="filter-btn" data-filter="#art">#ART</button>
+      <button class="filter-btn" data-filter="#music">#MUSIC</button>
+    </div>
+    '''
     grid_html = "\n".join(
-        f"""
-        <a class="project" data-hashtags="{' '.join(proj['hashtags'])}" href="project{proj['num']}.html">
-          {'<img src="' + proj['icon'] + '" alt="icon" class="project-logo" />' if proj['icon'] else ''}
+        f'''
+        <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="project{proj['num']}.html">
+          <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">{proj['num']}</span>
         </a>
-        """ for proj in projects
+        ''' for proj in projects
     )
-    return f"""<!DOCTYPE html>
+    dynamic_icon_js = '''
+    <script>
+      // Dynamically set icon file extension for each project
+      (function () {
+        const exts = ["svg", "png", "jpg", "jpeg", "gif", "pdf"];
+        document.querySelectorAll(".project").forEach((project) => {
+          const projectNum = project.getAttribute("data-project");
+          const img = project.querySelector("img.project-logo");
+          if (!projectNum || !img) return;
+          (function tryNext(i) {
+            if (i >= exts.length) return;
+            const url = `projects/${projectNum}/icon.${exts[i]}`;
+            fetch(url, { method: "HEAD" })
+              .then((r) => {
+                if (r.ok) img.src = url;
+                else tryNext(i + 1);
+              })
+              .catch(() => tryNext(i + 1));
+          })(0);
+        });
+      })();
+    </script>
+    '''
+    copyright = '''
+    <span
+      style="
+        position: fixed;
+        bottom: 2px;
+        right: 4px;
+        font-size: 9px;
+        opacity: 0.35;
+        color: #ffffff;
+        z-index: 99999;
+        pointer-events: none;
+      "
+    >
+      Ivan Bagaturiya &mdash;
+      <script>
+        document.write(document.lastModified);
+      </script>
+    </span>
+    '''
+    return f'''<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfolio Grid</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  {toggle_html}
-  {filter_html}
-  <main class="main">
-    <div class="grid" id="projectGrid">
-      {grid_html}
-    </div>
-  </main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script src="script.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ivan Bagaturiya</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    {toggle_html}
+    {filter_html}
+    <main class="main">
+      <div class="grid" id="projectGrid">
+        {grid_html}
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="script.js"></script>
+    {dynamic_icon_js}
+    {copyright}
+  </body>
 </html>
-"""
+'''
 def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project):
     # Find trailer (mp4 or gif)
     trailer = ""
@@ -414,11 +461,11 @@ def main():
         with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
             f.write(html)
 
-    # index_html = generate_index_html(projects)
-    # with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
-    #     f.write(index_html)
-    # print("Site generated!")
-    print("Project pages generated!")
+    index_html = generate_index_html(projects)
+    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
+    print("Site generated!")
+    # print("Project pages generated!")
 
 if __name__ == "__main__":
     main()

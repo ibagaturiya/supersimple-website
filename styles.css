@@ -22,8 +22,6 @@ body.toggled {
   gap: 12px;
   width: 100%;
   margin: 0 auto;
-  /*   margin-top: 90px;
- */
   position: relative;
   justify-items: center;
 }
@@ -69,7 +67,7 @@ body.toggled .project {
 }
 .center-toggle {
   position: fixed;
-  bottom: 50px;
+  top: 50px;
   top: auto;
   left: 0;
   right: 0;
@@ -253,3 +251,22 @@ body.toggled .project {
   }
 }
  */
+
+/* Media Queries */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 10px;
+  }
+  .project {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    min-height: 60px;
+    max-width: 60px;
+    max-height: 60px;
+  }
+  .project-label {
+    font-size: 1.1rem;
+  }
+}
