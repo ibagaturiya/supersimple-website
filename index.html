@@ -1,4 +1,4 @@
-<!DOCTYPE html>,
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    
     <div class="center-toggle">
       <div class="switch">
         <label for="bubbleToggle">
@@ -23,59 +22,83 @@
         </label>
       </div>
     </div>
-    
-    
+
     <div class="filter-bar" id="filterBar">
       <button class="filter-btn" data-filter="#selected">#SELECTED</button>
-      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
+      <button class="filter-btn" data-filter="#architecture">
+        #ARCHITECTURE
+      </button>
       <button class="filter-btn" data-filter="#tech">#TECH</button>
       <button class="filter-btn" data-filter="#art">#ART</button>
       <button class="filter-btn" data-filter="#music">#MUSIC</button>
     </div>
-    
+
     <main class="main">
       <div class="grid" id="projectGrid">
-        
-        <a class="project" data-project="0054" data-hashtags="#selected #architecture #eth #tech" href="project0054.html">
+        <a
+          class="project"
+          data-project="0054"
+          data-hashtags="#selected #architecture #eth #tech"
+          href="project0054.html"
+        >
           <img src="projects/0054/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0054</span>
         </a>
-        
 
-        <a class="project" data-project="0052" data-hashtags="#architecture #tech" href="project0052.html">
+        <a
+          class="project"
+          data-project="0052"
+          data-hashtags="#architecture #tech"
+          href="project0052.html"
+        >
           <img src="projects/0052/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0052</span>
         </a>
-        
 
-        <a class="project" data-project="0051" data-hashtags="#selected #architecture #tech" href="project0051.html">
+        <a
+          class="project"
+          data-project="0051"
+          data-hashtags="#selected #architecture #tech"
+          href="project0051.html"
+        >
           <img src="projects/0051/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0051</span>
         </a>
-        
 
-        <a class="project" data-project="0050" data-hashtags="#art" href="project0050.html">
+        <a
+          class="project"
+          data-project="0050"
+          data-hashtags="#art"
+          href="project0050.html"
+        >
           <img src="projects/0050/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0050</span>
         </a>
-        
 
-        <a class="project" data-project="0049" data-hashtags="" href="project0049.html">
+        <a
+          class="project"
+          data-project="0049"
+          data-hashtags=""
+          href="project0049.html"
+        >
           <img src="projects/0049/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0049</span>
         </a>
-        
 
-        <a class="project" data-project="0001" data-hashtags="" href="project0001.html">
+        <a
+          class="project"
+          data-project="0001"
+          data-hashtags=""
+          href="project0001.html"
+        >
           <img src="projects/0001/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0001</span>
         </a>
-        
       </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="script.js"></script>
-    
+
     <script>
       // Dynamically set icon file extension for each project
       (function () {
@@ -97,24 +120,24 @@
         });
       })();
     </script>
-    
+
     <div class="mouse-line-vertical"></div>
     <div class="mouse-line-horizontal"></div>
     <script>
       // Mouse-following lines animation (always visible)
-      const vLine = document.querySelector('.mouse-line-vertical');
-      const hLine = document.querySelector('.mouse-line-horizontal');
+      const vLine = document.querySelector(".mouse-line-vertical");
+      const hLine = document.querySelector(".mouse-line-horizontal");
       // Make lines more responsive by removing transition delay
       if (vLine && hLine) {
-        vLine.style.transition = 'none';
-        hLine.style.transition = 'none';
+        vLine.style.transition = "none";
+        hLine.style.transition = "none";
       }
-      document.addEventListener('mousemove', function(e) {
-        if (vLine) vLine.style.left = e.clientX + 'px';
-        if (hLine) hLine.style.top = e.clientY + 'px';
+      document.addEventListener("mousemove", function (e) {
+        if (vLine) vLine.style.left = e.clientX + "px";
+        if (hLine) hLine.style.top = e.clientY + "px";
       });
     </script>
-    
+
     <span
       style="
         position: fixed;
@@ -132,6 +155,5 @@
         document.write(document.lastModified);
       </script>
     </span>
-    
   </body>
 </html>

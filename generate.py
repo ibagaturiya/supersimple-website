@@ -5,6 +5,27 @@ PROJECTS_DIR = "projects"
 OUTPUT_DIR = "."
 CSS_FILE = "styles.css"
 
+# Copyright HTML (used in both index and project pages)
+copyright = '''
+<span
+  style="
+    position: fixed;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    opacity: 0.35;
+    color: #ffffff;
+    z-index: 99999;
+    pointer-events: none;
+  "
+>
+  Ivan Bagaturiya &mdash;
+  <script>
+    document.write(document.lastModified);
+  </script>
+</span>
+'''
+
 def is_safe_folder(name):
     return re.fullmatch(r'\d{4,}', name) is not None
 
@@ -31,14 +52,19 @@ def get_icon(folder):
 def get_media(folder):
     media = []
     exts = [".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"]
+    # Support both 'image1' and 'image 1' (with space)
     for i in range(1, 6):
         for ext in exts:
-            fname = f"image{i}{ext}"
-            media_path = safe_join(folder, fname)
-            if os.path.exists(media_path):
-                rel_path = os.path.relpath(media_path, OUTPUT_DIR).replace("\\", "/")
-                media.append(rel_path)
-                break
+            for prefix in [f"image{i}", f"image {i}"]:
+                fname = f"{prefix}{ext}"
+                media_path = safe_join(folder, fname)
+                if os.path.exists(media_path):
+                    rel_path = os.path.relpath(media_path, OUTPUT_DIR).replace("\\", "/")
+                    media.append(rel_path)
+                    break
+            else:
+                continue
+            break
     return media
 
 def get_hashtags(folder):
@@ -117,26 +143,7 @@ def generate_index_html(projects):
       })();
     </script>
     '''
-    copyright = '''
-    <span
-      style="
-        position: fixed;
-        bottom: 2px;
-        right: 4px;
-        font-size: 9px;
-        opacity: 0.35;
-        color: #ffffff;
-        z-index: 99999;
-        pointer-events: none;
-      "
-    >
-      Ivan Bagaturiya &mdash;
-      <script>
-        document.write(document.lastModified);
-      </script>
-    </span>
-    '''
-    return f'''<!DOCTYPE html>,
+    return f'''<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -177,246 +184,57 @@ def generate_index_html(projects):
 '''
 
 def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project):
+    # Read the template
+    with open("projectTEMPLATE.html", "r", encoding="utf-8") as f:
+        template = f.read()
+
     # Find trailer (mp4 or gif)
     trailer = ""
+    trailer_ext = ""
     for ext in [".mp4", ".gif"]:
         trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
         if os.path.exists(trailer_path):
             trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
+            trailer_ext = ext
             break
 
     # Images (exclude trailer)
     image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
+    images_html = "\n".join(f'<img src="{src}" alt="" />' for src in image_media)
 
-    # Navigation buttons
-    nav_html = f"""
-    <div class="project-nav">
-      {'<a class="nav-btn" href="project' + prev_project + '.html" title="Previous">&#8592;</a>' if prev_project else '<span class="nav-btn disabled">&#8592;</span>'}
-      <a class="nav-btn" href="index.html" title="Back to index">&#8593;</a>
-      {'<a class="nav-btn" href="project' + next_project + '.html" title="Next">&#8594;</a>' if next_project else '<span class="nav-btn disabled">&#8594;</span>'}
-    </div>
-    """
+    # Trailer HTML (if exists)
+    trailer_html = ""
+    if trailer:
+        if trailer_ext == ".mp4":
+            trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
+        elif trailer_ext == ".gif":
+            trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
-    # Project number (top left)
-    number_fixed_html = f"""
-    <a href="index.html" class="project-number-fixed">{project_num}</a>
-    """
-
-    # Project hero (trailer and overlay)
-    if trailer.endswith(".mp4"):
-        trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
-    elif trailer.endswith(".gif"):
-        trailer_html = f'<img class="project-trailer" src="{trailer}" alt="trailer" />'
+    # Navigation SVGs (same for all, just direction changes)
+    svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_up = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_right = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    nav_html = '<div class="project-nav" style="gap:0;">'
+    if prev_project:
+        nav_html += f'<a class="nav-btn" href="project{prev_project}.html" title="Previous" style="background:none;box-shadow:none;">{svg_left}</a>'
     else:
-        trailer_html = ""
-    title_overlay_html = f'''<div class="project-header-overlay">\n  <span class="project-title">{title}</span>\n</div>'''
-    hero_html = f'''<div class="project-hero">\n  {trailer_html}\n  {title_overlay_html}\n</div>'''
+        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
+    nav_html += f'<a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
+    if next_project:
+        nav_html += f'<a class="nav-btn" href="project{next_project}.html" title="Next" style="background:none;box-shadow:none;">{svg_right}</a>'
+    else:
+        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_right}</span>'
+    nav_html += '</div>'
 
-    # Main content split
-    desc_html = f'''<div class="project-desc">{desc.replace('\n', '<br />')}</div>'''
-    images_html = "\n".join(media_html_tag(src) for src in image_media)
-    main_html = f'''<div class="project-main">\n  <div class="project-left">\n    {desc_html}\n  </div>\n  <div class="project-right">\n    {images_html}\n  </div>\n</div>'''
-
-    # Full HTML
-    return f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{project_num} – {title}</title>
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {{
-      margin: 0; background: #fff; color: #111; font-family: Arial,sans-serif;
-    }}
-    .project-hero {{
-      position: relative;
-      width: 100vw;
-      max-height: 340px;
-      overflow: hidden;
-    }}
-    .project-trailer {{
-      display: block;
-      width: 100vw;
-      max-height: 340px;
-      object-fit: cover;
-      margin: 0 auto;
-      background: #000;
-      cursor: pointer;
-      z-index: 1;
-      position: relative;
-    }}
-    .project-header-overlay {{
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      z-index: 2;
-      text-align: center;
-      padding: 32px 0 0 0;
-      background: linear-gradient(180deg,rgba(0,0,0,0.55) 0,rgba(0,0,0,0.05) 100%);
-    }}
-    .project-title {{
-      text-decoration: none;
-      color: #fff;
-      font-size: 2.2rem;
-      font-weight: bold;
-      display: inline-block;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      padding: 0 16px;
-    }}
-    .project-number-fixed {{
-      position: fixed;
-      top: 18px;
-      left: 18px;
-      z-index: 100;
-      background: rgba(0,0,0,0.72);
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      padding: 6px 14px;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: background 0.18s;
-      opacity: 0.92;
-    }}
-    .project-number-fixed:hover {{
-      background: #111;
-      color: #fff;
-      opacity: 1;
-    }}
-    .project-main {{
-      display: flex;
-      flex-direction: row;
-      gap: 32px;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 48px 24px 24px 24px;
-      position: relative;
-      z-index: 2;
-    }}
-    .project-left {{
-      flex: 1 1 40%;
-      max-width: 40%;
-      font-size: 0.7 rem;
-      line-height: 1.7;
-      padding-right: 24px;
-      word-break: break-word;
-    }}
-    .project-right {{
-      flex: 1 1 60%;
-      max-width: 60%;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      align-items: flex-start;
-    }}
-    .project-right img, .project-right video, .project-right audio {{
-      width: 100%;
-      max-width: 100%;
-      border-radius: 12px;
-      background: #eee;
-    }}
-    hr {{
-      border: none;
-      border-top: 2px solid #eee;
-      margin: 0 0 0 0;
-      height: 0;
-      width: 100%;
-      position: relative;
-      z-index: 2;
-    }}
-    .project-nav {{
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin: 48px 0 24px 0;
-      z-index: 2;
-      position: relative;
-    }}
-    .nav-btn {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #111;
-      color: #fff;
-      font-size: 2rem;
-      border: none;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.18s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      user-select: none;
-    }}
-    .nav-btn:hover:not(.disabled) {{
-      background: #333;
-    }}
-    .nav-btn.disabled {{
-      background: #bbb;
-      color: #fff;
-      cursor: default;
-      pointer-events: none;
-    }}
-    @media (max-width: 900px) {{
-      .project-main {{
-        flex-direction: column;
-        gap: 18px;
-        padding: 32px 4vw 16px 4vw;
-      }}
-      .project-left, .project-right {{
-        max-width: 100%;
-        padding: 0;
-      }}
-    }}
-    @media (max-width: 600px) {{
-      .project-header-overlay {{
-        padding-top: 16px;
-      }}
-      .project-main {{
-        padding: 16px 2vw 8px 2vw;
-      }}
-      .nav-btn {{
-        width: 38px; height: 38px; font-size: 1.3rem;
-      }}
-    }}
-  </style>
-</head>
-<body>
-  {number_fixed_html}
-  {hero_html}
-  <hr />
-  {main_html}
-  {nav_html}
-<script>
-  const trailer = document.querySelector('.project-trailer');
-  if(trailer && trailer.tagName === "VIDEO") {{
-    trailer.muted = true;
-    trailer.autoplay = true;
-    trailer.playsInline = true;
-    trailer.play().catch(function() {{
-      // Try to play again on user interaction if autoplay was blocked
-      const tryPlay = function() {{
-        trailer.play();
-        window.removeEventListener('click', tryPlay);
-      }};
-      window.addEventListener('click', tryPlay);
-    }});
-  }}
-  if(trailer) {{
-    trailer.addEventListener('click', function() {{
-      if (trailer.requestFullscreen) trailer.requestFullscreen();
-      else if (trailer.webkitRequestFullscreen) trailer.webkitRequestFullscreen();
-      else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
-    }});
-  }}
-</script>
-</body>
-</html>'''
+    # Replace placeholders in template
+    html = template
+    html = html.replace("{{PROJECT_NUM}}", project_num)
+    html = html.replace("{{TITLE}}", title)
+    html = html.replace("{{DESC}}", desc.replace('\n', '<br />'))
+    html = html.replace("{{TRAILER}}", trailer_html)
+    html = html.replace("{{IMAGES}}", images_html)
+    html = html.replace("{{NAV}}", nav_html)
+    return html
 
 def main():
     all_folders = [

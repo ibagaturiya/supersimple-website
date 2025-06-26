@@ -6,7 +6,7 @@
 /* main */
 body {
   margin: 0;
-  font-family: "Courier New", Courier, monospace, sans-serif;
+  font-family: "Futura", sans-serif;
   background: #000000;
 }
 
@@ -59,7 +59,7 @@ body.toggled .project {
 
 .project:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 75px rgba(255, 223, 142, 0.956);
+  box-shadow: 0 0 75px rgba(174, 174, 174, 0.956);
 }
 
 /* switch toggle */
@@ -231,9 +231,9 @@ body.toggled .project {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #3a3a3a;
+  font-size: 3em;
+  font-weight: regular;
+  color: #ffffff;
   opacity: 0;
   pointer-events: none;
   z-index: 3;
