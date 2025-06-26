@@ -136,7 +136,7 @@ def generate_index_html(projects):
       </script>
     </span>
     '''
-    return f'''<!DOCTYPE html>
+    return f'''<!DOCTYPE html>,
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -155,10 +155,27 @@ def generate_index_html(projects):
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="script.js"></script>
     {dynamic_icon_js}
+    <div class="mouse-line-vertical"></div>
+    <div class="mouse-line-horizontal"></div>
+    <script>
+      // Mouse-following lines animation (always visible)
+      const vLine = document.querySelector('.mouse-line-vertical');
+      const hLine = document.querySelector('.mouse-line-horizontal');
+      // Make lines more responsive by removing transition delay
+      if (vLine && hLine) {{
+        vLine.style.transition = 'none';
+        hLine.style.transition = 'none';
+      }}
+      document.addEventListener('mousemove', function(e) {{
+        if (vLine) vLine.style.left = e.clientX + 'px';
+        if (hLine) hLine.style.top = e.clientY + 'px';
+      }});
+    </script>
     {copyright}
   </body>
 </html>
 '''
+
 def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project):
     # Find trailer (mp4 or gif)
     trailer = ""
@@ -180,61 +197,34 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     </div>
     """
 
-    # Trailer HTML
-    trailer_html = ""
-    if trailer.endswith(".mp4"):
-        trailer_html = f"""
-        <video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>
-        """
-    elif trailer.endswith(".gif"):
-        trailer_html = f"""
-        <img class="project-trailer" src="{trailer}" alt="trailer" />
-        """
-
-    # Images column
-    images_html = "\n".join(
-        media_html_tag(src) for src in image_media
-    )
-
-    # Title row (overlayed)
-    title_html = f"""
-    <div class="project-header-overlay">
-      <span class="project-title">{title}</span>
-    </div>
-    """
-
-    # Description (left column)
-    desc_html = f"""
-    <div class="project-desc">
-      {desc.replace('\n', '<br />')}
-    </div>
-    """
-
-    # Main content split
-    main_html = f"""
-    <div class="project-main">
-      <div class="project-left">
-        {desc_html}
-      </div>
-      <div class="project-right">
-        {images_html}
-      </div>
-    </div>
-    """
-
-    # Fixed project number (top left)
+    # Project number (top left)
     number_fixed_html = f"""
     <a href="index.html" class="project-number-fixed">{project_num}</a>
     """
 
+    # Project hero (trailer and overlay)
+    if trailer.endswith(".mp4"):
+        trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
+    elif trailer.endswith(".gif"):
+        trailer_html = f'<img class="project-trailer" src="{trailer}" alt="trailer" />'
+    else:
+        trailer_html = ""
+    title_overlay_html = f'''<div class="project-header-overlay">\n  <span class="project-title">{title}</span>\n</div>'''
+    hero_html = f'''<div class="project-hero">\n  {trailer_html}\n  {title_overlay_html}\n</div>'''
+
+    # Main content split
+    desc_html = f'''<div class="project-desc">{desc.replace('\n', '<br />')}</div>'''
+    images_html = "\n".join(media_html_tag(src) for src in image_media)
+    main_html = f'''<div class="project-main">\n  <div class="project-left">\n    {desc_html}\n  </div>\n  <div class="project-right">\n    {images_html}\n  </div>\n</div>'''
+
     # Full HTML
-    return f"""<!DOCTYPE html>
+    return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{project_num} – {title}</title>
-  <link rel="stylesheet" href="{CSS_FILE}" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
     body {{
       margin: 0; background: #fff; color: #111; font-family: Arial,sans-serif;
@@ -398,10 +388,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
 </head>
 <body>
   {number_fixed_html}
-  <div class="project-hero">
-    {trailer_html}
-    {title_html}
-  </div>
+  {hero_html}
   <hr />
   {main_html}
   {nav_html}
@@ -429,8 +416,8 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
   }}
 </script>
 </body>
-</html>
-"""
+</html>'''
+
 def main():
     all_folders = [
         f for f in os.listdir(PROJECTS_DIR)
@@ -465,7 +452,6 @@ def main():
     with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
     print("Site generated!")
-    # print("Project pages generated!")
 
 if __name__ == "__main__":
     main()

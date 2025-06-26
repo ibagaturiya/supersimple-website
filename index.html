@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>,
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -98,6 +98,22 @@
       })();
     </script>
     
+    <div class="mouse-line-vertical"></div>
+    <div class="mouse-line-horizontal"></div>
+    <script>
+      // Mouse-following lines animation (always visible)
+      const vLine = document.querySelector('.mouse-line-vertical');
+      const hLine = document.querySelector('.mouse-line-horizontal');
+      // Make lines more responsive by removing transition delay
+      if (vLine && hLine) {
+        vLine.style.transition = 'none';
+        hLine.style.transition = 'none';
+      }
+      document.addEventListener('mousemove', function(e) {
+        if (vLine) vLine.style.left = e.clientX + 'px';
+        if (hLine) hLine.style.top = e.clientY + 'px';
+      });
+    </script>
     
     <span
       style="

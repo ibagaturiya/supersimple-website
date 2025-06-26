@@ -16,17 +16,10 @@ document.addEventListener("DOMContentLoaded", function () {
     allProjects.forEach((el) => {
       const hashtags = (el.dataset.hashtags || "").toLowerCase();
       const shouldShow = !filter || hashtags.includes(filter);
-      if (shouldShow) {
-        el.style.pointerEvents = "";
-        el.style.opacity = "1";
-        el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
-      } else {
-        el.style.pointerEvents = "none";
-        el.style.opacity = "0.12";
-        el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
-      }
+      el.style.pointerEvents = shouldShow ? "" : "none";
+      el.style.opacity = shouldShow ? "1" : "0.12";
+      el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
     });
-    // No grid reorganization, no display:none, just opacity
     projects = allProjects;
     storeOriginalPositions();
     originalRects = projects.map((el) => el.getBoundingClientRect());
@@ -36,9 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     filterBar.addEventListener("click", function (e) {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-      // Only toggle this button's active state
       btn.classList.toggle("active");
-      // If active, filter by this button; if not, remove filter
       if (btn.classList.contains("active")) {
         applyFilter(btn.dataset.filter.toLowerCase());
       } else {
@@ -101,7 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function startBubblePhysics() {
     inBubbleMode = true;
     lockBodyScroll();
-
     grid.classList.add("bubble-mode");
     grid.style.position = "fixed";
     grid.style.left = "0";
@@ -109,7 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
     grid.style.width = "100vw";
     grid.style.height = "100vh";
     grid.style.zIndex = "100";
-
     engine = Matter.Engine.create();
     if (render && render.canvas && render.canvas.parentNode) {
       render.canvas.parentNode.removeChild(render.canvas);
@@ -124,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
         background: "transparent",
       },
     });
-
     const wallThickness = 100;
     const wallOptions = {
       isStatic: true,
@@ -165,43 +153,33 @@ document.addEventListener("DOMContentLoaded", function () {
       ),
     ];
     Matter.World.add(engine.world, walls);
-
     bodies = projects.map((el, i) => {
       el.style.position = "absolute";
       el.style.transition = "none";
       el.style.zIndex = 10;
-
-      // Use stored originalRects instead of getBoundingClientRect()
       const rect = originalRects[i];
-      // These are already relative to the viewport
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
       const w = rect.width;
       const h = rect.height;
-
       el.style.left = x - w / 2 + "px";
       el.style.top = y - h / 2 + "px";
-
       const body = Matter.Bodies.rectangle(x, y, w, h, {
         restitution: 0.8,
-        friction: 0.01,
-        frictionAir: 0.00002,
+        friction: 0.15,
+        frictionAir: 0.02,
       });
       Matter.Body.setVelocity(body, { x: 0, y: 0 });
       Matter.Body.setAngularVelocity(body, 0);
-
       body.el = el;
       Matter.World.add(engine.world, body);
       return body;
     });
-
     mouseConstraint = Matter.MouseConstraint.create(engine, {
       element: document.body,
       constraint: { stiffness: 0.2, render: { visible: false } },
     });
     Matter.World.add(engine.world, mouseConstraint);
-
-    // --- ROTATION LOGIC ---
     Matter.Events.on(engine, "afterUpdate", () => {
       bodies.forEach((body) => {
         const w = body.bounds.max.x - body.bounds.min.x;
@@ -211,14 +189,11 @@ document.addEventListener("DOMContentLoaded", function () {
         body.el.style.transform = `rotate(${body.angle}rad)`;
       });
     });
-
     window.addEventListener("deviceorientation", handleOrientation);
     window.addEventListener("mousemove", handleMouseMove);
-
     Matter.Render.run(render);
     runner = Matter.Runner.create();
     Matter.Runner.run(runner, engine);
-
     setTimeout(() => {
       bodies.forEach((body) => {
         const angle = Math.random() * 2 * Math.PI;
@@ -227,11 +202,9 @@ document.addEventListener("DOMContentLoaded", function () {
           x: Math.cos(angle) * force,
           y: Math.sin(angle) * force,
         });
-        // Give initial random angular velocity for visible rotation
         Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.2);
       });
     }, 100);
-
     setTimeout(() => {
       if (render.canvas) {
         render.canvas.style.pointerEvents = "none";
@@ -244,35 +217,30 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".center-toggle").style.pointerEvents = "auto";
     unlockBodyScroll();
     disableTouchLock();
-
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("mousemove", handleMouseMove);
-
     Matter.Render.stop(render);
     Matter.Runner.stop(runner);
     if (render && render.canvas && render.canvas.parentNode) {
       render.canvas.parentNode.removeChild(render.canvas);
     }
     engine.events = {};
-
-    // Animate back to grid
     if (projects.length === originalRects.length) {
       projects.forEach((el, i) => {
         el.style.transition = "all 1s cubic-bezier(0.4,2,0.6,1)";
         const rect = originalRects[i];
         el.style.left = rect.left + "px";
         el.style.top = rect.top + "px";
-        el.style.transform = ""; // Reset rotation
+        el.style.transform = "";
       });
     } else {
       projects.forEach((el) => {
         el.style.transition = "";
         el.style.left = "";
         el.style.top = "";
-        el.style.transform = ""; // Reset rotation
+        el.style.transform = "";
       });
     }
-
     setTimeout(() => {
       projects.forEach((el) => {
         el.style.position = "";
@@ -281,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.transition = "";
         el.style.zIndex = "";
         el.style.pointerEvents = "";
-        el.style.transform = ""; // Reset rotation
+        el.style.transform = "";
       });
       grid.classList.remove("bubble-mode");
       grid.style.position = "";
@@ -308,19 +276,14 @@ document.addEventListener("DOMContentLoaded", function () {
     engine.world.gravity.y = y;
   }
 
-  // Only store positions when not in bubble mode
   window.addEventListener("resize", function () {
     if (!inBubbleMode) storeOriginalPositions();
   });
-
-  // Only store positions after everything is loaded
   window.addEventListener("load", storeOriginalPositions);
 
   toggle.addEventListener("change", function () {
     if (toggle.checked) {
       document.body.classList.add("toggled");
-      // Do NOT hide filter bar anymore
-      // storeOriginalPositions and startBubblePhysics as before
       storeOriginalPositions();
       startBubblePhysics();
     } else {
@@ -328,7 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
       stopBubblePhysics();
       setTimeout(() => {
         location.reload();
-      }, 1000); // Match the timeout in stopBubblePhysics
+      }, 1000);
     }
   });
 });

@@ -11,9 +11,9 @@ body {
 }
 
 body.toggled {
-  background: linear-gradient(120deg, #ff9d00 0%, #ffb347 100%);
+  background: linear-gradient(120deg, #e87b06 100%);
   transition: background 0.5s;
-  background: #ff9500;
+  background: #ffffff;
 }
 
 .main {
@@ -36,7 +36,7 @@ body.toggled {
   flex-direction: column;
   align-items: center;
   background: #595959;
-  border-radius: 0%;
+  border-radius: 19%;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
@@ -60,8 +60,6 @@ body.toggled .project {
 .project:hover {
   transform: scale(1.1);
   box-shadow: 0 0 75px rgba(255, 223, 142, 0.956);
-  /*   border-radius: 50%;
- */
 }
 
 /* switch toggle */
@@ -76,7 +74,6 @@ body.toggled .project {
 }
 .center-toggle {
   position: fixed;
-  top: auto;
   top: 10px;
   left: 0;
   right: 0;
@@ -196,8 +193,8 @@ body.toggled .project {
   flex-direction: column;
   gap: 2px;
   z-index: 10000;
-  background: #00000000; /* Solid black background */
-  padding: px 16px 16px 10px; /* Adjust padding as needed */
+  background: #0000; /* Solid black background */
+  padding: 16px 16px 16px 10px; /* Adjust padding as needed */
   border-radius: 16px 24px 24px 0; /* Optional: round only top-right and bottom-right */
 }
 
@@ -221,7 +218,7 @@ body.toggled .project {
   color: #111;
 }
 .filter-btn:focus {
-  background: #ff7b00;
+  background: #ffb347;
   color: #111;
 }
 /* project numbers when hovered */
@@ -247,24 +244,40 @@ body.toggled .project {
   opacity: 1;
 }
 
-/* --- FILTER BAR HIDE ANIMATION --- */
-/* .filter-bar.hide {
+/* Logo styles */
+.project-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+}
+
+/* Mouse lines */
+.mouse-line-vertical,
+.mouse-line-horizontal {
+  position: fixed;
   pointer-events: none;
+  z-index: 0; /* Lower z-index to appear behind all content */
+  background: #fff;
+  transition: none; /* Remove transition for instant response */
 }
-.filter-bar.hide .filter-btn {
-  animation: filter-slide-left-smooth 1s cubic-bezier(0.77,0,0.175,1) forwards;
+.mouse-line-vertical {
+  width: 1px; /* Thinner line */
+  height: 100vh;
+  left: 0;
+  top: 0;
 }
-@keyframes filter-slide-left-smooth {
-  0% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-400px);
-  }
+.mouse-line-horizontal {
+  height: 1px; /* Thinner line */
+  width: 100vw;
+  left: 0;
+  top: 0;
 }
- */
+body.toggled .mouse-line-vertical,
+body.toggled .mouse-line-horizontal {
+  background: #222;
+}
 
 /* Media Queries */
 @media (max-width: 600px) {
@@ -275,7 +288,7 @@ body.toggled .project {
   .grid {
     display: grid;
     grid-template-columns: repeat(4, var(--project-size));
-    gap: flex;
+    gap: var(--project-gap);
     justify-content: center;
   }
   .project-label {
