@@ -18,10 +18,9 @@ body.toggled {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 2fr));
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
   gap: 12px;
   width: 100%;
-  max-width: 1000px; /* or your preferred width */
   margin: 0 auto;
   /*   margin-top: 90px;
  */
@@ -33,18 +32,22 @@ body.toggled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #282828;
-  border-radius: 10%;
+  background: #595959;
+  border-radius: 0%;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  transition: transform 1s, box-shadow 0.5s;
+  transition: transform 1s, box-shadow 0.5s, border-radius 1.5s;
   aspect-ratio: 1/1;
   width: 120px;
   height: 120px;
   justify-content: center;
   position: relative;
   z-index: 1;
+}
+
+body.toggled .project {
+  border-radius: 50% !important;
 }
 
 .project:hover {
@@ -66,7 +69,8 @@ body.toggled {
 }
 .center-toggle {
   position: fixed;
-  top: 24px;
+  bottom: 50px;
+  top: auto;
   left: 0;
   right: 0;
   z-index: 9999;
@@ -74,7 +78,7 @@ body.toggled {
   justify-content: center;
   pointer-events: none;
   height: 3.5rem; /* Ensure enough height for the toggle to not be cut off */
-  align-items: flex-start;
+  align-items: flex-end;
 }
 .center-toggle .switch {
   width: 4.5rem;
@@ -186,7 +190,7 @@ body.toggled {
 }
 
 .filter-btn {
-  background: #000000;
+  background: #171717;
   color: #b3b3b3;
   border: none;
   border-radius: 8px;
@@ -200,9 +204,12 @@ body.toggled {
   text-align: left;
   outline: none;
 }
-
-.filter-btn:focus {
+.filter-btn:hover {
   background: #fff;
+  color: #111;
+}
+.filter-btn:focus {
+  background: #ff7b00;
   color: #111;
 }
 /* project numbers when hovered */
@@ -227,3 +234,22 @@ body.toggled {
 .project:hover .project-label {
   opacity: 1;
 }
+
+/* --- FILTER BAR HIDE ANIMATION --- */
+/* .filter-bar.hide {
+  pointer-events: none;
+}
+.filter-bar.hide .filter-btn {
+  animation: filter-slide-left-smooth 1s cubic-bezier(0.77,0,0.175,1) forwards;
+}
+@keyframes filter-slide-left-smooth {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-400px);
+  }
+}
+ */

@@ -13,61 +13,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- FILTER LOGIC ---
   function applyFilter(filter) {
-    // 1. Record the first (current) positions
-    const firstRects = new Map();
-    allProjects.forEach((el) => {
-      firstRects.set(el, el.getBoundingClientRect());
-    });
-
-    // 2. Apply filter logic
     allProjects.forEach((el) => {
       const hashtags = (el.dataset.hashtags || "").toLowerCase();
       const shouldShow = !filter || hashtags.includes(filter);
-
       if (shouldShow) {
-        // If hidden, show and animate in
-        if (el.style.display === "none") {
-          el.style.display = "";
-          el.classList.add("appearing");
-          // Force reflow to apply initial state
-          void el.offsetWidth;
-          el.classList.remove("vanish");
-          // Animate to visible
-          setTimeout(() => {
-            el.classList.remove("appearing");
-          }, 10); // Next tick
-        } else {
-          el.classList.remove("vanish");
-          el.classList.remove("appearing");
-        }
+        el.style.pointerEvents = "";
+        el.style.opacity = "1";
+        el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
       } else {
-        // Animate out
-        el.classList.add("vanish");
-        setTimeout(() => {
-          el.style.display = "none";
-          el.classList.remove("vanish");
-        }, 400);
+        el.style.pointerEvents = "none";
+        el.style.opacity = "0.12";
+        el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
       }
     });
-
-    // 3. Wait for the DOM to update, then animate grid relocation
-    requestAnimationFrame(() => {
-      allProjects.forEach((el) => {
-        if (el.style.display === "none") return;
-        const lastRect = el.getBoundingClientRect();
-        const firstRect = firstRects.get(el);
-        const dx = firstRect.left - lastRect.left;
-        const dy = firstRect.top - lastRect.top;
-        el.style.transition = "none";
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
-        requestAnimationFrame(() => {
-          el.style.transition = "transform 0.5s cubic-bezier(0.4,0,0.2,1)";
-          el.style.transform = "";
-        });
-      });
-    });
-
-    projects = allProjects.filter((el) => el.style.display !== "none");
+    // No grid reorganization, no display:none, just opacity
+    projects = allProjects;
     storeOriginalPositions();
     originalRects = projects.map((el) => el.getBoundingClientRect());
   }
@@ -76,24 +36,13 @@ document.addEventListener("DOMContentLoaded", function () {
     filterBar.addEventListener("click", function (e) {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-
+      // Only toggle this button's active state
+      btn.classList.toggle("active");
+      // If active, filter by this button; if not, remove filter
       if (btn.classList.contains("active")) {
-        btn.classList.remove("active");
-        activeFilter = null;
-        document
-          .querySelectorAll(".filter-group")
-          .forEach((g) => g.classList.remove("open"));
-        applyFilter(null);
+        applyFilter(btn.dataset.filter.toLowerCase());
       } else {
-        document
-          .querySelectorAll(".filter-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        activeFilter = btn.dataset.filter.toLowerCase();
-        document
-          .querySelectorAll(".filter-group")
-          .forEach((g) => g.classList.remove("open"));
-        applyFilter(activeFilter);
+        applyFilter(null);
       }
     });
   }
@@ -370,6 +319,8 @@ document.addEventListener("DOMContentLoaded", function () {
   toggle.addEventListener("change", function () {
     if (toggle.checked) {
       document.body.classList.add("toggled");
+      // Do NOT hide filter bar anymore
+      // storeOriginalPositions and startBubblePhysics as before
       storeOriginalPositions();
       startBubblePhysics();
     } else {

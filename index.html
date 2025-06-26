@@ -37,6 +37,7 @@
       <div class="grid" id="projectGrid">
         <a
           class="project"
+          data-project="0053"
           data-hashtags="#selected #architecture #eth #tech"
           href="project0053.html"
         >
@@ -46,6 +47,7 @@
 
         <a
           class="project"
+          data-project="0051"
           data-hashtags="#selected #architecture #eth #tech"
           href="project0051.html"
         >
@@ -53,52 +55,52 @@
           <span class="project-label">0051</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0010.html">
+        <a class="project" data-project="0010" data-hashtags="" href="project0010.html">
           <img src="projects/0010/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0010</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0009.html">
+        <a class="project" data-project="0009" data-hashtags="" href="project0009.html">
           <img src="projects/0009/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0009</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0008.html">
+        <a class="project" data-project="0008" data-hashtags="" href="project0008.html">
           <img src="projects/0008/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0008</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0007.html">
+        <a class="project" data-project="0007" data-hashtags="" href="project0007.html">
           <img src="projects/0007/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0007</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0006.html">
+        <a class="project" data-project="0006" data-hashtags="" href="project0006.html">
           <img src="projects/0006/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0006</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0005.html">
+        <a class="project" data-project="0005" data-hashtags="" href="project0005.html">
           <img src="projects/0005/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0005</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0004.html">
+        <a class="project" data-project="0004" data-hashtags="" href="project0004.html">
           <img src="projects/0004/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0004</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0003.html">
+        <a class="project" data-project="0003" data-hashtags="" href="project0003.html">
           <img src="projects/0003/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0003</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0002.html">
+        <a class="project" data-project="0002" data-hashtags="" href="project0002.html">
           <img src="projects/0002/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0002</span>
         </a>
 
-        <a class="project" data-hashtags="" href="project0001.html">
+        <a class="project" data-project="0001" data-hashtags="" href="project0001.html">
           <img src="projects/0001/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0001</span>
         </a>
@@ -106,6 +108,25 @@
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="script.js"></script>
+    <script>
+      // Dynamically set icon file extension for each project
+      (function() {
+        const exts = ["svg", "png", "jpg", "jpeg", "gif", "pdf"];
+        document.querySelectorAll('.project').forEach(project => {
+          const projectNum = project.getAttribute('data-project');
+          const img = project.querySelector('img.project-logo');
+          if (!projectNum || !img) return;
+          (function tryNext(i) {
+            if (i >= exts.length) return;
+            const url = `projects/${projectNum}/icon.${exts[i]}`;
+            fetch(url, { method: 'HEAD' }).then(r => {
+              if (r.ok) img.src = url;
+              else tryNext(i+1);
+            }).catch(() => tryNext(i+1));
+          })(0);
+        });
+      })();
+    </script>
     <span
       style="
         position: fixed;
