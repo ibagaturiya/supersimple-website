@@ -1,3 +1,8 @@
+:root {
+  --project-size: 120px;
+  --project-gap: 16px;
+}
+
 /* main */
 body {
   margin: 0;
@@ -17,13 +22,13 @@ body.toggled {
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--project-gap);
   width: 100%;
   margin: 0 auto;
-  position: relative;
-  justify-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .project {
@@ -37,8 +42,12 @@ body.toggled {
   color: inherit;
   transition: transform 1s, box-shadow 0.5s, border-radius 1.5s;
   aspect-ratio: 1/1;
-  width: 120px;
-  height: 120px;
+  width: var(--project-size);
+  height: var(--project-size);
+  min-width: var(--project-size);
+  min-height: var(--project-size);
+  max-width: var(--project-size);
+  max-height: var(--project-size);
   justify-content: center;
   position: relative;
   z-index: 1;
@@ -67,16 +76,21 @@ body.toggled .project {
 }
 .center-toggle {
   position: fixed;
-  top: 50px;
   top: auto;
+  top: 10px;
   left: 0;
   right: 0;
   z-index: 9999;
   display: flex;
   justify-content: center;
-  pointer-events: none;
+  pointer-events: none; /* disables pointer events for the container */
   height: 3.5rem; /* Ensure enough height for the toggle to not be cut off */
   align-items: flex-end;
+}
+.center-toggle .switch,
+.center-toggle .switch *,
+.center-toggle .switch label {
+  pointer-events: auto !important; /* ensures all children are interactive */
 }
 .center-toggle .switch {
   width: 4.5rem;
@@ -254,17 +268,15 @@ body.toggled .project {
 
 /* Media Queries */
 @media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 10px;
+  :root {
+    --project-size: 80px;
+    --project-gap: 10px;
   }
-  .project {
-    width: 60px;
-    height: 60px;
-    min-width: 60px;
-    min-height: 60px;
-    max-width: 60px;
-    max-height: 60px;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, var(--project-size));
+    gap: flex;
+    justify-content: center;
   }
   .project-label {
     font-size: 1.1rem;
