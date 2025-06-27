@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function handleOrientation(event) {
     if (!engine) return;
     engine.world.gravity.x = event.gamma / 45;
-    engine.world.gravity.y = event.beta / 45;
+    engine.world.gravity.y = -event.beta / 45;
   }
 
   function handleMouseMove(event) {
