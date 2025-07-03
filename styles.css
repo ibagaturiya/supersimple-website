@@ -21,17 +21,23 @@ body.toggled {
   margin: 0px auto;
 }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(4, var(--project-size));
-    gap: var(--project-gap);
-    justify-content: center;
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--project-gap);
+  width: 100%;
+  margin: 0 auto;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 30px;
+  box-sizing: border-box;
+}
 
 .project {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #595959;
+  background: #ffffff;
   border-radius: 19%;
   overflow: hidden;
   text-decoration: none;
@@ -229,7 +235,7 @@ body.toggled .project {
   justify-content: center;
   font-size: 3em;
   font-weight: regular;
-  color: #ffffff;
+  color: #7a7a7a;
   opacity: 0;
   pointer-events: none;
   z-index: 3;
