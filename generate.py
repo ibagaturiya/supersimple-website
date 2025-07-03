@@ -53,7 +53,7 @@ def get_media(folder):
     media = []
     exts = [".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"]
     # Support both 'image1' and 'image 1' (with space)
-    for i in range(1, 6):
+    for i in range(1, 10):
         for ext in exts:
             for prefix in [f"image{i}", f"image {i}"]:
                 fname = f"{prefix}{ext}"
