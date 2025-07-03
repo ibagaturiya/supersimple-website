@@ -1,6 +1,6 @@
 :root {
   --project-size: 120px;
-  --project-gap: 16px;
+  --project-gap: 30px;
 }
 
 /* main */
@@ -21,15 +21,11 @@ body.toggled {
   margin: 0px auto;
 }
 
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--project-gap);
-  width: 100%;
-  margin: 0 auto;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, var(--project-size));
+    gap: var(--project-gap);
+    justify-content: center;
 
 .project {
   display: flex;
@@ -55,22 +51,6 @@ body.toggled {
 
 body.toggled .project {
   border-radius: 50% !important;
-  animation: fly-up 0.7s cubic-bezier(0.4, 1.4, 0.6, 1.0);
-}
-
-@keyframes fly-up {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-  60% {
-    transform: translateY(-60px) scale(1.08);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(-120px) scale(0.92);
-    opacity: 0.5;
-  }
 }
 
 .project:hover {
@@ -90,16 +70,15 @@ body.toggled .project {
 }
 .center-toggle {
   position: fixed;
-  top: 50%;
+  top: 300px;
   left: 0;
   right: 0;
   z-index: 9999;
   display: flex;
   justify-content: center;
-  align-items: center;
   pointer-events: none; /* disables pointer events for the container */
   height: 3.5rem; /* Ensure enough height for the toggle to not be cut off */
-  transform: translateY(-50%);
+  align-items: flex-end;
 }
 .center-toggle .switch,
 .center-toggle .switch *,
