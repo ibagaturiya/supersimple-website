@@ -188,27 +188,30 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     with open("projectTEMPLATE.html", "r", encoding="utf-8") as f:
         template = f.read()
 
-    # Find trailer (mp4 or gif)
+    # Find trailer (mp4, gif, or txt for embed)
     trailer = ""
     trailer_ext = ""
-    for ext in [".mp4", ".gif"]:
-        trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
-        if os.path.exists(trailer_path):
-            trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
-            trailer_ext = ext
-            break
+    trailer_html = ""
+    # Check for trailer.txt (embed code)
+    trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
+    if os.path.exists(trailer_txt_path):
+        trailer_html = read_file(trailer_txt_path)
+    else:
+        for ext in [".mp4", ".gif"]:
+            trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
+            if os.path.exists(trailer_path):
+                trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
+                trailer_ext = ext
+                break
+        if trailer:
+            if trailer_ext == ".mp4":
+                trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
+            elif trailer_ext == ".gif":
+                trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
     # Images (exclude trailer)
     image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
     images_html = "\n".join(f'<img src="{src}" alt="" />' for src in image_media)
-
-    # Trailer HTML (if exists)
-    trailer_html = ""
-    if trailer:
-        if trailer_ext == ".mp4":
-            trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
-        elif trailer_ext == ".gif":
-            trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
     # Navigation SVGs (same for all, just direction changes)
     svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
