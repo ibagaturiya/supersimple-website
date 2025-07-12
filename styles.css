@@ -4,7 +4,7 @@
 }
 
 /* main */
-body, * {
+body {
   margin: 0;
   font-family: "Menlo", monospace !important;
   background: #000000;
@@ -280,7 +280,6 @@ body.toggled .mouse-line-vertical,
 body.toggled .mouse-line-horizontal {
   background: #222;
 }
-
 
 /* Trailer and embed display for project pages */
 .project-trailer {
