@@ -188,7 +188,7 @@ def generate_index_html(projects):
 </html>
 '''
 
-def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project):
+def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project, all_projects=None):
     # Read the template
     with open("projectTEMPLATE.html", "r", encoding="utf-8") as f:
         template = f.read()
@@ -234,6 +234,28 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
         nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_right}</span>'
     nav_html += '</div>'
 
+    # Generate "You might also like" section
+    also_like_html = ""
+    if all_projects:
+        import random
+        # Get current project hashtags
+        current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_num)))
+        # Find projects with shared hashtags
+        related_projects = [p for p in all_projects if p['num'] != project_num and set(p['hashtags']) & current_hashtags]
+        if related_projects:
+            random_project = random.choice(related_projects)
+            icon_src = random_project['icon'] if random_project['icon'] else f"projects/{random_project['num']}/icon.svg"
+            also_like_html = f'''<div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project{random_project['num']}.html">
+          <img src="{icon_src}" alt="icon" class="also-like-img" />
+          <span class="also-like-label">{random_project['num']}</span>
+        </a>
+      </div>
+    </div>
+    '''
+
     # Replace placeholders in template
     html = template
     html = html.replace("{{PROJECT_NUM}}", project_num)
@@ -242,6 +264,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     html = html.replace("{{TRAILER}}", trailer_html)
     html = html.replace("{{IMAGES}}", images_html)
     html = html.replace("{{NAV}}", nav_html)
+    html = html.replace("{{ALSO_LIKE}}", also_like_html)
     return html
 
 def main():
@@ -251,6 +274,7 @@ def main():
     ]
     project_folders = sorted(all_folders)[::-1]
 
+    # First pass: collect all project metadata
     projects = []
     for idx, folder in enumerate(project_folders):
         folder_path = safe_join(PROJECTS_DIR, folder)
@@ -270,7 +294,17 @@ def main():
             "hashtags": hashtags,
             "next": next_project
         })
-        html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project)
+
+    # Second pass: generate HTML files with complete projects list
+    for idx, folder in enumerate(project_folders):
+        folder_path = safe_join(PROJECTS_DIR, folder)
+        title = read_file(safe_join(folder_path, "title.txt"))
+        desc = read_file(safe_join(folder_path, "description.txt"))
+        icon = get_icon(folder_path)
+        media = get_media(folder_path)
+        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
+        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
+        html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project, projects)
         with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
             f.write(html)
 

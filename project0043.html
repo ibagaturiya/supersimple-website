@@ -214,6 +214,97 @@
           height: 38px;
         }
       }
+      .also-like-section {
+        padding: 80px 30px 120px 30px;
+        text-align: center;
+      }
+      .also-like-title {
+        font-size: 0.75rem;
+        color: #999;
+        margin: 0 0 30px 0;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .also-like-container {
+        display: flex;
+        justify-content: center;
+      }
+      .also-like-project {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #ffffff;
+        border-radius: 19%;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          transform 1s,
+          box-shadow 0.5s,
+          border-radius 1.5s;
+        aspect-ratio: 1/1;
+        width: 120px;
+        height: 120px;
+        min-width: 120px;
+        min-height: 120px;
+        max-width: 120px;
+        max-height: 120px;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+      .also-like-project:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 75px rgba(174, 174, 174, 0.956);
+      }
+      .also-like-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3em;
+        font-weight: regular;
+        color: #7a7a7a;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 3;
+        transition: opacity 0.25s;
+      }
+      .also-like-project:hover .also-like-label {
+        opacity: 1;
+      }
+      .also-like-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+        margin: auto;
+      }
+      @media (max-width: 900px) {
+        .also-like-section {
+          padding: 60px 20px 100px 20px;
+        }
+      }
+      @media (max-width: 600px) {
+        .also-like-section {
+          padding: 40px 15px 80px 15px;
+        }
+        .also-like-project {
+          width: 80px;
+          height: 80px;
+          min-width: 80px;
+          min-height: 80px;
+          max-width: 80px;
+          max-height: 80px;
+        }
+        .also-like-label {
+          font-size: 1.1rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -236,6 +327,7 @@
 <img src="projects/0043/image5.jpg" alt="" /></div>
     </div>
     <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0044.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0042.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    
     <script>
       const trailer = document.querySelector(".project-trailer");
       if (trailer && trailer.tagName === "VIDEO") {
