@@ -5,6 +5,11 @@ PROJECTS_DIR = "projects"
 OUTPUT_DIR = "."
 CSS_FILE = "styles.css"
 
+
+#generates the index.html and project pages based on the contents of the projects folder
+#it is neededadd new projects at teh end.
+
+
 # Copyright HTML (used in both index and project pages)
 copyright = '''
 <span
