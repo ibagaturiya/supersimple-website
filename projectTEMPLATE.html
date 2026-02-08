@@ -15,8 +15,9 @@
       .project-hero {
         position: relative;
         width: 100vw;
-        height: 100vh;
-        max-height: none;
+        height: 70vh;
+        min-height: 320px;
+        max-height: 640px;
         overflow: hidden;
       }
       .project-trailer {
@@ -25,11 +26,12 @@
         height: 90%;
         max-height: none;
         object-fit: cover;
+        object-position: center;
         margin: 0 auto;
         background: #000;
         cursor: pointer;
         z-index: 1;
-        position: relative;
+        position: absolute;
       }
       .project-header-overlay {
         position: absolute;
