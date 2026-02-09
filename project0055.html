@@ -15,8 +15,9 @@
       .project-hero {
         position: relative;
         width: 100vw;
-        height: 100vh;
-        max-height: none;
+        height: 70vh;
+        min-height: 320px;
+        max-height: 640px;
         overflow: hidden;
       }
       .project-trailer {
@@ -25,11 +26,25 @@
         height: 90%;
         max-height: none;
         object-fit: cover;
+        object-position: center;
         margin: 0 auto;
         background: #000;
         cursor: pointer;
         z-index: 1;
-        position: relative;
+        position: absolute;
+      }
+      .project-trailer::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 120px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        z-index: 2;
+        pointer-events: none;
       }
       .project-header-overlay {
         position: absolute;
@@ -314,7 +329,7 @@
   <body>
     <a href="index.html" class="project-number-fixed">0055</a>
     <div class="project-hero">
-      <iframe width="100%" height="100%" frameborder="0" allowfullscreen src="https://scaniverse.com/scan/m7mlfusg4gobdw6m?embed=1"></iframe>
+      
       <div class="project-header-overlay">
         <span class="project-title">_der Leuchtturm</span>
       </div>
@@ -324,23 +339,22 @@
       <div class="project-left">
         <div class="project-desc">with <br />10 slats<br />20m rope<br />4 m2 textile <br /><br />and <br /><br />45 mins</div>
       </div>
-      <div class="project-right"><img src="projects/0055/image1.jpeg" alt="" />
-<img src="projects/0055/image2.jpeg" alt="" />
-<img src="projects/0055/image3.gif" alt="" />
-<img src="projects/0055/image4.jpeg" alt="" />
-<img src="projects/0055/image5.jpeg" alt="" />
-<img src="projects/0055/image6.jpeg" alt="" /></div>
+      <div class="project-right"><img src="projects/0055/icon.jpeg" alt="icon" />
+<img src="projects/0055/icon.jpeg.backup" alt="icon.jpeg" />
+<img src="projects/0055/image1.jpeg" alt="image1" />
+<img src="projects/0055/image1.jpeg.backup" alt="image1.jpeg" />
+<img src="projects/0055/image2.jpeg" alt="image2" />
+<img src="projects/0055/image2.jpeg.backup" alt="image2.jpeg" />
+<img src="projects/0055/image3.gif" alt="image3" />
+<img src="projects/0055/image3.gif.backup" alt="image3.gif" />
+<img src="projects/0055/image4.jpeg" alt="image4" />
+<img src="projects/0055/image4.jpeg.backup" alt="image4.jpeg" />
+<img src="projects/0055/image5.jpeg" alt="image5" />
+<img src="projects/0055/image5.jpeg.backup" alt="image5.jpeg" />
+<img src="projects/0055/image6.jpeg" alt="image6" />
+<img src="projects/0055/image6.jpeg.backup" alt="image6.jpeg" /></div>
     </div>
-    <div class="project-nav" style="gap:0;"><span class="nav-btn disabled" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></span><a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0054.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
-      <p class="also-like-title">u might also like</p>
-      <div class="also-like-container">
-        <a class="also-like-project" href="project0052.html">
-          <img src="projects/0052/icon.gif" alt="icon" class="also-like-img" />
-          <span class="also-like-label">0052</span>
-        </a>
-      </div>
-    </div>
-    
+    <nav class="project-nav"><a class="nav-prev" href="project0054.html">◀ Prev</a> </nav> <section class="also-like-section"><div class="also-like-container"><a class="also-like-project" href="project0050.html"><img class="also-like-img" src="projects/0050/icon.jpg"/></a><a class="also-like-project" href="project0051.html"><img class="also-like-img" src="projects/0051/icon.png"/></a><a class="also-like-project" href="project0052.html"><img class="also-like-img" src="projects/0052/icon.gif"/></a><a class="also-like-project" href="project0054.html"><img class="also-like-img" src="projects/0054/icon.jpeg"/></a></div></section>
     <script>
       const trailer = document.querySelector(".project-trailer");
       if (trailer && trailer.tagName === "VIDEO") {
