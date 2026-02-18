@@ -6,7 +6,24 @@ PROJECT OVERVIEW:
 This is a portfolio website that automatically generates HTML pages from project
 metadata stored in the projects/ folder. Instead of manually editing HTML, you
 organize project files in folders and run generate.py to create the site.
+IMAGE OPTIMIZATION (optional)
+--------------------------------------------------------------------------------
+To shrink and recompress project images for faster page loads, there's a helper
+script at `tools/optimize_images.py`.
 
+Quick start (dry-run, won't modify files):
+  python3 tools/optimize_images.py --dry-run
+
+To actually overwrite JPEGs with optimized versions (backup with .bak):
+  python3 tools/optimize_images.py --no-dry-run --backup --max-width 1200 --quality 75
+
+Notes:
+- Change `--max-width` / `--max-height` and `--quality` to control size/quality.
+- Use `--convert-png-webp` to produce .webp files from PNGs (modern browsers prefer webp).
+- The script only touches .jpg/.jpeg by default; PNGs are skipped unless converting.
+- Always run with `--dry-run` first to inspect proposed changes.
+
+END OF GUIDE
 ================================================================================
 FOLDER STRUCTURE:
 ================================================================================
