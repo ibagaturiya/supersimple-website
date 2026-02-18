@@ -204,19 +204,21 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     # Check for trailer.txt (embed code)
     trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
     if os.path.exists(trailer_txt_path):
-        trailer_html = read_file(trailer_txt_path)
+      trailer_html = read_file(trailer_txt_path)
     else:
-        for ext in [".mp4", ".gif"]:
-            trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
-            if os.path.exists(trailer_path):
-                trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
-                trailer_ext = ext
-                break
-        if trailer:
-            if trailer_ext == ".mp4":
-                trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
-            elif trailer_ext == ".gif":
-                trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
+      for ext in [".mp4", ".gif"]:
+        trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
+        if os.path.exists(trailer_path):
+          # compute path relative to where project html files will live
+          project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+          trailer = os.path.relpath(trailer_path, project_base).replace("\\", "/")
+          trailer_ext = ext
+          break
+      if trailer:
+        if trailer_ext == ".mp4":
+          trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
+        elif trailer_ext == ".gif":
+          trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
     # Images (exclude trailer)
     image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
