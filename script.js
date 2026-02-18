@@ -153,26 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
       },
     });
 
-    // Make canvas touch-friendly on iOS: disable default touch actions
-    // and ensure pointer events are available for dragging.
-    if (render && render.canvas) {
-      try {
-        render.canvas.style.touchAction = "none";
-        render.canvas.style.cursor = "grab";
-      } catch (e) {}
-      // Prevent default passive touch behavior which can block dragging.
-      const touchPrevent = function (ev) {
-        if (ev.cancelable) ev.preventDefault();
-      };
-      try {
-        render.canvas.addEventListener("touchstart", touchPrevent, { passive: false });
-        render.canvas.addEventListener("touchmove", touchPrevent, { passive: false });
-        render.canvas.addEventListener("touchend", touchPrevent, { passive: false });
-      } catch (e) {
-        // ignore if browser doesn't support options
-      }
-    }
-
     const wallThickness = 100;
     const wallOptions = {
       isStatic: true,
@@ -252,16 +232,6 @@ document.addEventListener("DOMContentLoaded", function () {
       constraint: { stiffness: 0.2, render: { visible: false } },
     });
     Matter.World.add(engine.world, mouseConstraint);
-
-    // update canvas cursor while dragging for better UX
-    try {
-      Matter.Events.on(mouseConstraint, "startdrag", function () {
-        if (render && render.canvas) render.canvas.style.cursor = "grabbing";
-      });
-      Matter.Events.on(mouseConstraint, "enddrag", function () {
-        if (render && render.canvas) render.canvas.style.cursor = "grab";
-      });
-    } catch (e) {}
 
     Matter.Events.on(engine, "afterUpdate", () => {
       if (!rafPending) {
