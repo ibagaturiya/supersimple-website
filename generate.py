@@ -1,346 +1,317 @@
-// FULL FIXED SCRIPT (mobile-safe)
-// - null-safe center-toggle access
-// - toggle always clickable (forced z-index + pointer events)
-// - MouseConstraint bound to render.canvas (better on touch devices)
-// - no "pointer-events:none" on canvas for touch devices (prevents “can’t toggle back”)
-// - safe cleanup (guards if render/runner/engine are undefined)
-// - DOM updates throttled to requestAnimationFrame (helps phone “freeze” feeling)
+import os
+import re
 
-document.addEventListener("DOMContentLoaded", function () {
-  const grid = document.getElementById("projectGrid");
-  const allProjects = Array.from(document.querySelectorAll(".project"));
-  let projects = allProjects.slice();
-  const toggle = document.getElementById("bubbleToggle");
-  const filterBar = document.getElementById("filterBar");
+PROJECTS_DIR = "projects"
+OUTPUT_DIR = "."
+CSS_FILE = "styles.css"
 
-  const isTouch = matchMedia("(pointer: coarse)").matches;
 
-  if (!grid || !toggle) {
-    console.error("Missing #projectGrid or #bubbleToggle in the HTML.");
-    return;
-  }
+#generates the index.html and project pages based on the contents of the projects folder
+#it is neededadd new projects at teh end.
 
-  // Keep toggle clickable above everything (mobile stacking contexts are weird)
-  function ensureToggleOnTop() {
-    const toggleWrap = document.querySelector(".center-toggle") || toggle.closest(".center-toggle");
-    if (!toggleWrap) return;
-    toggleWrap.style.position = "fixed";
-    toggleWrap.style.zIndex = "9999";
-    toggleWrap.style.pointerEvents = "auto";
-  }
-  ensureToggleOnTop();
-  window.addEventListener("resize", ensureToggleOnTop);
 
-  // --- FILTER LOGIC ---
-  function applyFilter(filter) {
-    allProjects.forEach((el) => {
-      const hashtags = (el.dataset.hashtags || "").toLowerCase();
-      const shouldShow = !filter || hashtags.includes(filter);
-      el.style.pointerEvents = shouldShow ? "" : "none";
-      el.style.opacity = shouldShow ? "1" : "0.12";
-      el.style.transition = "opacity 0.4s cubic-bezier(0.4,0,0.2,1)";
-    });
+# Copyright HTML (used in both index and project pages)
+copyright = '''
+<span
+  style="
+    position: fixed;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    opacity: 0.35;
+    color: #ffffff;
+    z-index: 99999;
+    pointer-events: none;
+  "
+>
+  Ivan Bagaturiya &mdash;
+  <script>
+    document.write(document.lastModified);
+  </script>
+</span>
+'''
 
-    projects = allProjects;
-    storeOriginalPositions();
-    originalRects = projects.map((el) => el.getBoundingClientRect());
-  }
+def is_safe_folder(name):
+    return re.fullmatch(r'\d{4,}', name) is not None
 
-  if (filterBar) {
-    filterBar.addEventListener("click", function (e) {
-      const btn = e.target.closest(".filter-btn");
-      if (!btn) return;
-      btn.classList.toggle("active");
-      if (btn.classList.contains("active")) {
-        applyFilter((btn.dataset.filter || "").toLowerCase());
-      } else {
-        applyFilter(null);
-      }
-    });
-  }
+def safe_join(base, *paths):
+    final_path = os.path.abspath(os.path.join(base, *paths))
+    if not final_path.startswith(os.path.abspath(base)):
+        raise ValueError("Unsafe path detected!")
+    return final_path
 
-  // --- BUBBLE PHYSICS LOGIC ---
-  let originalRects = [];
-  let engine = null,
-    render = null,
-    runner = null,
-    bodies = [],
-    mouseConstraint = null,
-    walls = [];
-  let scrollPosition = 0;
-  let inBubbleMode = false;
+def read_file(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    except Exception:
+        return ""
 
-  function lockBodyScroll() {
-    scrollPosition = window.pageYOffset || document.documentElement.scrollTop || 0;
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollPosition}px`;
-    document.body.style.width = "100%";
-  }
+def get_icon(folder):
+    for ext in [".svg", ".png", ".jpg", ".jpeg", ".gif"]:
+        icon_path = safe_join(folder, f"icon{ext}")
+        if os.path.exists(icon_path):
+            return os.path.relpath(icon_path, OUTPUT_DIR).replace("\\", "/")
+    return ""
 
-  function unlockBodyScroll() {
-    document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.width = "";
-    window.scrollTo(0, scrollPosition);
-  }
+def get_media(folder):
+    media = []
+    exts = [".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"]
+    # Support both 'image1' and 'image 1' (with space)
+    for i in range(1, 10):
+        for ext in exts:
+            for prefix in [f"image{i}", f"image {i}"]:
+                fname = f"{prefix}{ext}"
+                media_path = safe_join(folder, fname)
+                if os.path.exists(media_path):
+                    rel_path = os.path.relpath(media_path, OUTPUT_DIR).replace("\\", "/")
+                    media.append(rel_path)
+                    break
+            else:
+                continue
+            break
+    return media
 
-  function storeOriginalPositions() {
-    if (!inBubbleMode) {
-      projects = allProjects.filter((el) => el.style.display !== "none");
-      originalRects = projects.map((el) => el.getBoundingClientRect());
-    }
-  }
+def get_hashtags(folder):
+    hashtags_path = safe_join(folder, "hashtags.txt")
+    hashtags = read_file(hashtags_path)
+    tags = re.findall(r'#\w+', hashtags)
+    return [tag.lower() for tag in tags]
 
-  function handleOrientation(event) {
-    if (!engine) return;
-    // event.gamma / beta can be null on some devices
-    const gx = typeof event.gamma === "number" ? event.gamma / 45 : 0;
-    const gy = typeof event.beta === "number" ? event.beta / 45 : 0;
-    engine.world.gravity.x = gx;
-    engine.world.gravity.y = gy;
-  }
+def media_html_tag(src):
+    if src.lower().endswith(('.jpg', '.jpeg', '.gif', '.png', '.svg')):
+        return f'<img src="{src}" alt="" />'
+    elif src.lower().endswith('.mp4'):
+        return f'<video src="{src}" controls loop muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:120px;max-height:340px;"></video>'
+    elif src.lower().endswith('.mp3'):
+        return f'<audio src="{src}" controls style="width:100%;margin-top:8px;"></audio>'
+    elif src.lower().endswith('.pdf'):
+        return f'<a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a>'
+    else:
+        return ''
 
-  function handleMouseMove(event) {
-    if (!engine) return;
-    const x = (event.clientX / window.innerWidth - 0.5) * 2;
-    const y = (event.clientY / window.innerHeight - 0.5) * 2;
-    engine.world.gravity.x = x;
-    engine.world.gravity.y = y;
-  }
-
-  // Throttle DOM writes to one per animation frame (huge for mobile)
-  let rafPending = false;
-  function syncDomFromBodies() {
-    rafPending = false;
-    bodies.forEach((body) => {
-      const w = body.bounds.max.x - body.bounds.min.x;
-      const h = body.bounds.max.y - body.bounds.min.y;
-
-      // Use translate3d to reduce layout thrash vs left/top
-      const x = body.position.x - w / 2;
-      const y = body.position.y - h / 2;
-
-      body.el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
-    });
-  }
-
-  function startBubblePhysics() {
-    inBubbleMode = true;
-    ensureToggleOnTop();
-
-    lockBodyScroll();
-
-    grid.classList.add("bubble-mode");
-    grid.style.position = "fixed";
-    grid.style.left = "0";
-    grid.style.top = "0";
-    grid.style.width = "100vw";
-    grid.style.height = "100vh";
-    grid.style.zIndex = "100";
-
-    engine = Matter.Engine.create();
-
-    // Clean old canvas if any
-    if (render && render.canvas && render.canvas.parentNode) {
-      render.canvas.parentNode.removeChild(render.canvas);
-    }
-
-    render = Matter.Render.create({
-      element: document.body,
-      engine: engine,
-      options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false,
-        background: "transparent",
-      },
-    });
-
-    const wallThickness = 100;
-    const wallOptions = {
-      isStatic: true,
-      render: { fillStyle: "transparent", strokeStyle: "transparent", lineWidth: 0 },
-    };
-
-    walls = [
-      Matter.Bodies.rectangle(window.innerWidth / 2, -wallThickness / 2, window.innerWidth, wallThickness, wallOptions),
-      Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + wallThickness / 2, window.innerWidth, wallThickness, wallOptions),
-      Matter.Bodies.rectangle(-wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, wallOptions),
-      Matter.Bodies.rectangle(window.innerWidth + wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, wallOptions),
-    ];
-
-    Matter.World.add(engine.world, walls);
-
-    bodies = projects.map((el, i) => {
-      el.style.position = "absolute";
-      el.style.transition = "none";
-      el.style.zIndex = 10;
-
-      const rect = originalRects[i];
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      const w = rect.width;
-      const h = rect.height;
-
-      // Reset to transform-based positioning for bubble mode
-      el.style.left = "0px";
-      el.style.top = "0px";
-      el.style.transform = `translate3d(${x - w / 2}px, ${y - h / 2}px, 0)`;
-
-      const body = Matter.Bodies.rectangle(x, y, w, h, {
-        restitution: 0.8,
-        friction: 0.15,
-        frictionAir: 0.02,
-      });
-
-      Matter.Body.setVelocity(body, { x: 0, y: 0 });
-      Matter.Body.setAngularVelocity(body, 0);
-
-      body.el = el;
-      Matter.World.add(engine.world, body);
-      return body;
-    });
-
-    // IMPORTANT: bind mouse/touch constraint to the canvas (best practice on mobile)
-    mouseConstraint = Matter.MouseConstraint.create(engine, {
-      element: render.canvas,
-      constraint: { stiffness: 0.2, render: { visible: false } },
-    });
-    Matter.World.add(engine.world, mouseConstraint);
-
-    Matter.Events.on(engine, "afterUpdate", () => {
-      if (!rafPending) {
-        rafPending = true;
-        requestAnimationFrame(syncDomFromBodies);
-      }
-    });
-
-    // Input: orientation for touch devices, mouse for desktop
-    if (isTouch) {
-      window.addEventListener("deviceorientation", handleOrientation);
-    } else {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    Matter.Render.run(render);
-    runner = Matter.Runner.create();
-    Matter.Runner.run(runner, engine);
-
-    // Kick bodies slightly
-    setTimeout(() => {
-      bodies.forEach((body) => {
-        const angle = Math.random() * 2 * Math.PI;
-        const force = 0.06 + Math.random() * 0.05; // slightly lower -> smoother on phones
-        Matter.Body.applyForce(body, body.position, {
-          x: Math.cos(angle) * force,
-          y: Math.sin(angle) * force,
+def generate_index_html(projects):
+    toggle_html = '''
+    <div class="center-toggle">
+      <div class="switch">
+        <label for="bubbleToggle">
+          <input id="bubbleToggle" type="checkbox" />
+          <div class="sun-moon">
+            <div class="dots"></div>
+          </div>
+          <div class="background">
+            <div class="stars1"></div>
+            <div class="stars2"></div>
+          </div>
+          <div class="fill"></div>
+        </label>
+      </div>
+    </div>
+    '''
+    filter_html = '''
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn" data-filter="#selected">#SELECTED</button>
+      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
+      <button class="filter-btn" data-filter="#tech">#TECH</button>
+      <button class="filter-btn" data-filter="#art">#ART</button>
+      <button class="filter-btn" data-filter="#music">#MUSIC</button>
+    </div>
+    '''
+    grid_html = "\n".join(
+        f'''
+        <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="project{proj['num']}.html">
+          <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
+          <span class="project-label">{proj['num']}</span>
+        </a>
+        ''' for proj in projects
+    )
+    dynamic_icon_js = '''
+    <script>
+      // Dynamically set icon file extension for each project
+      (function () {
+        const exts = ["svg", "png", "jpg", "jpeg", "gif", "pdf"];
+        document.querySelectorAll(".project").forEach((project) => {
+          const projectNum = project.getAttribute("data-project");
+          const img = project.querySelector("img.project-logo");
+          if (!projectNum || !img) return;
+          (function tryNext(i) {
+            if (i >= exts.length) return;
+            const url = `projects/${projectNum}/icon.${exts[i]}`;
+            fetch(url, { method: "HEAD" })
+              .then((r) => {
+                if (r.ok) img.src = url;
+                else tryNext(i + 1);
+              })
+              .catch(() => tryNext(i + 1));
+          })(0);
         });
-        Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.15);
-      });
-    }, 100);
+      })();
+    </script>
+    '''
+    return f'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ivan Bagaturiya</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    {toggle_html}
+    {filter_html}
+    <main class="main">
+      <div class="grid" id="projectGrid">
+        {grid_html}
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="script.js"></script>
+    {dynamic_icon_js}
+    <div class="mouse-line-vertical"></div>
+    <div class="mouse-line-horizontal"></div>
+    <script>
+      // Mouse-following lines animation (always visible)
+      const vLine = document.querySelector('.mouse-line-vertical');
+      const hLine = document.querySelector('.mouse-line-horizontal');
+      // Make lines more responsive by removing transition delay
+      if (vLine && hLine) {{
+        vLine.style.transition = 'none';
+        hLine.style.transition = 'none';
+      }}
+      document.addEventListener('mousemove', function(e) {{
+        if (vLine) vLine.style.left = e.clientX + 'px';
+        if (hLine) hLine.style.top = e.clientY + 'px';
+      }});
+    </script>
+    {copyright}
+  </body>
+</html>
+'''
 
-    // DO NOT disable canvas pointer events on touch devices
-    if (!isTouch && render.canvas) {
-      setTimeout(() => {
-        render.canvas.style.pointerEvents = "none";
-      }, 200);
-    }
-  }
+def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project, all_projects=None):
+    # Read the template
+    with open("projectTEMPLATE.html", "r", encoding="utf-8") as f:
+        template = f.read()
 
-  function stopBubblePhysics() {
-    inBubbleMode = false;
-    ensureToggleOnTop(); // keep it clickable during teardown
+    # Find trailer (mp4, gif, or txt for embed)
+    trailer = ""
+    trailer_ext = ""
+    trailer_html = ""
+    # Check for trailer.txt (embed code)
+    trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
+    if os.path.exists(trailer_txt_path):
+        trailer_html = read_file(trailer_txt_path)
+    else:
+        for ext in [".mp4", ".gif"]:
+            trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
+            if os.path.exists(trailer_path):
+                trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
+                trailer_ext = ext
+                break
+        if trailer:
+            if trailer_ext == ".mp4":
+                trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
+            elif trailer_ext == ".gif":
+                trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
-    unlockBodyScroll();
+    # Images (exclude trailer)
+    image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
+    images_html = "\n".join(f'<img src="{src}" alt="" />' for src in image_media)
 
-    // Remove listeners
-    window.removeEventListener("deviceorientation", handleOrientation);
-    window.removeEventListener("mousemove", handleMouseMove);
+    # Navigation SVGs (same for all, just direction changes)
+    svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_up = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_right = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    nav_html = '<div class="project-nav" style="gap:0;">'
+    if prev_project:
+        nav_html += f'<a class="nav-btn" href="project{prev_project}.html" title="Previous" style="background:none;box-shadow:none;">{svg_left}</a>'
+    else:
+        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
+    nav_html += f'<a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
+    if next_project:
+        nav_html += f'<a class="nav-btn" href="project{next_project}.html" title="Next" style="background:none;box-shadow:none;">{svg_right}</a>'
+    else:
+        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_right}</span>'
+    nav_html += '</div>'
 
-    // Stop matter safely
-    try {
-      if (render) Matter.Render.stop(render);
-      if (runner) Matter.Runner.stop(runner);
-    } catch (e) {
-      console.warn("Matter stop warning:", e);
-    }
+    # Generate "You might also like" section
+    also_like_html = ""
+    if all_projects:
+        import random
+        # Get current project hashtags
+        current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_num)))
+        # Find projects with shared hashtags
+        related_projects = [p for p in all_projects if p['num'] != project_num and set(p['hashtags']) & current_hashtags]
+        if related_projects:
+            random_project = random.choice(related_projects)
+            icon_src = random_project['icon'] if random_project['icon'] else f"projects/{random_project['num']}/icon.svg"
+            also_like_html = f'''<div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project{random_project['num']}.html">
+          <img src="{icon_src}" alt="icon" class="also-like-img" />
+          <span class="also-like-label">{random_project['num']}</span>
+        </a>
+      </div>
+    </div>
+    '''
 
-    // Remove canvas
-    if (render && render.canvas && render.canvas.parentNode) {
-      render.canvas.parentNode.removeChild(render.canvas);
-    }
+    # Replace placeholders in template
+    html = template
+    html = html.replace("{{PROJECT_NUM}}", project_num)
+    html = html.replace("{{TITLE}}", title)
+    html = html.replace("{{DESC}}", desc.replace('\n', '<br />'))
+    html = html.replace("{{TRAILER}}", trailer_html)
+    html = html.replace("{{IMAGES}}", images_html)
+    html = html.replace("{{NAV}}", nav_html)
+    html = html.replace("{{ALSO_LIKE}}", also_like_html)
+    return html
 
-    // Clear engine refs
-    try {
-      if (engine && engine.events) engine.events = {};
-    } catch (e) {}
+def main():
+    all_folders = [
+        f for f in os.listdir(PROJECTS_DIR)
+        if os.path.isdir(safe_join(PROJECTS_DIR, f)) and is_safe_folder(f)
+    ]
+    project_folders = sorted(all_folders)[::-1]
 
-    engine = null;
-    render = null;
-    runner = null;
-    walls = [];
-    bodies = [];
-    mouseConstraint = null;
+    # First pass: collect all project metadata
+    projects = []
+    for idx, folder in enumerate(project_folders):
+        folder_path = safe_join(PROJECTS_DIR, folder)
+        title = read_file(safe_join(folder_path, "title.txt"))
+        desc = read_file(safe_join(folder_path, "description.txt"))
+        icon = get_icon(folder_path)
+        media = get_media(folder_path)
+        hashtags = get_hashtags(folder_path)
+        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
+        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
+        projects.append({
+            "num": folder,
+            "title": title,
+            "desc": desc,
+            "icon": icon,
+            "media": media,
+            "hashtags": hashtags,
+            "next": next_project
+        })
 
-    // Restore project elements
-    // If originalRects matches projects, animate back; otherwise reset
-    if (projects.length === originalRects.length) {
-      projects.forEach((el, i) => {
-        el.style.transition = "transform 1s cubic-bezier(0.4,2,0.6,1)";
-        const rect = originalRects[i];
-        el.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) rotate(0rad)`;
-      });
-    } else {
-      projects.forEach((el) => {
-        el.style.transition = "";
-        el.style.transform = "";
-      });
-    }
+    # Second pass: generate HTML files with complete projects list
+    for idx, folder in enumerate(project_folders):
+        folder_path = safe_join(PROJECTS_DIR, folder)
+        title = read_file(safe_join(folder_path, "title.txt"))
+        desc = read_file(safe_join(folder_path, "description.txt"))
+        icon = get_icon(folder_path)
+        media = get_media(folder_path)
+        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
+        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
+        html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project, projects)
+        with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
+            f.write(html)
 
-    setTimeout(() => {
-      projects.forEach((el) => {
-        el.style.position = "";
-        el.style.left = "";
-        el.style.top = "";
-        el.style.transition = "";
-        el.style.zIndex = "";
-        el.style.pointerEvents = "";
-        el.style.transform = "";
-      });
+    index_html = generate_index_html(projects)
+    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
+    print("Site generated!")
 
-      grid.classList.remove("bubble-mode");
-      grid.style.position = "";
-      grid.style.left = "";
-      grid.style.top = "";
-      grid.style.width = "";
-      grid.style.height = "";
-      grid.style.zIndex = "";
-      grid.style.pointerEvents = "";
-    }, 1000);
-  }
-
-  window.addEventListener("resize", function () {
-    if (!inBubbleMode) storeOriginalPositions();
-  });
-  window.addEventListener("load", storeOriginalPositions);
-
-  toggle.addEventListener("change", function () {
-    ensureToggleOnTop();
-
-    if (toggle.checked) {
-      document.body.classList.add("toggled");
-      storeOriginalPositions();
-      startBubblePhysics();
-    } else {
-      document.body.classList.remove("toggled");
-      stopBubblePhysics();
-
-      // If you *must* reload, keep it, but it’s usually not needed after proper cleanup.
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    }
-  });
-});
+if __name__ == "__main__":
+    main()
