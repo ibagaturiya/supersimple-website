@@ -294,3 +294,33 @@ body.toggled .mouse-line-horizontal {
     font-size: 1.1rem;
   }
 }
+/* iOS Safari tap-freeze fix — VISUALLY NEUTRAL */
+.center-toggle {
+  z-index: 2147483647; /* ensure it stays on top */
+  transform: translateZ(0); /* create its own layer */
+  -webkit-transform: translateZ(0);
+  isolation: isolate; /* own stacking context */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.center-toggle .switch,
+.center-toggle label {
+  pointer-events: auto;
+}
+
+/* Safari sometimes stops tapping fully transparent inputs */
+.center-toggle .switch input {
+  opacity: 0.001; /* was 0; keep invisible but tappable */
+  pointer-events: auto;
+}
+
+/* IMPORTANT: only disable pointer events on DECORATION,
+   NOT on the label/input. This does not change visuals. */
+.center-toggle .background,
+.center-toggle .sun-moon,
+.center-toggle .fill,
+.center-toggle .dots,
+.center-toggle .stars1,
+.center-toggle .stars2 {
+  pointer-events: none;
+}
