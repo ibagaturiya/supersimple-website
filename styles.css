@@ -3,22 +3,26 @@
   --project-gap: 30px;
 }
 
-/* main */
+/* ===== MAIN ===== */
 body {
   margin: 0;
   font-family: "Menlo", monospace !important;
-  background: #000000;
+  background: #000;
+  transition: background 0.5s;
 }
 
 body.toggled {
+  /* Pick ONE background. Keeping your gradient here. */
   background: linear-gradient(120deg, #e87b06 100%);
-  transition: background 0.5s;
-  background: #ffffff;
+  /* If you want plain white instead, replace the line above with:
+     background: #fff;
+  */
 }
 
 .main {
-  max-width: auto;
-  margin: 0px auto;
+  /* max-width: auto; is invalid -> use none or a real value */
+  max-width: none;
+  margin: 0 auto;
 }
 
 .grid {
@@ -37,23 +41,24 @@ body.toggled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
+  justify-content: center;
+
+  background: #fff;
   border-radius: 19%;
   overflow: hidden;
+
   text-decoration: none;
   color: inherit;
+
   transition:
     transform 1s,
     box-shadow 0.5s,
     border-radius 1.5s;
-  aspect-ratio: 1/1;
+
+  aspect-ratio: 1 / 1;
   width: var(--project-size);
   height: var(--project-size);
-  min-width: var(--project-size);
-  min-height: var(--project-size);
-  max-width: var(--project-size);
-  max-height: var(--project-size);
-  justify-content: center;
+
   position: relative;
   z-index: 1;
 }
@@ -67,13 +72,14 @@ body.toggled .project {
   box-shadow: 0 0 75px rgba(174, 174, 174, 0.956);
 }
 
-/* switch toggle */
+/* ===== SWITCH TOGGLE ===== */
 .center-toggle {
   position: fixed;
   bottom: 24px;
   left: 24px;
-  z-index: 9999;
+  z-index: 100000; /* higher than everything */
   pointer-events: auto;
+  touch-action: manipulation; /* helps iOS taps */
 }
 
 .center-toggle .switch {
@@ -106,7 +112,9 @@ body.toggled .project {
   border-radius: 1.6rem;
   border: 0.12rem solid #202020;
   background: linear-gradient(to right, #484848 0%, #202020 100%);
-  transition: all 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
   z-index: 1;
 }
 
@@ -131,7 +139,7 @@ body.toggled .project {
   height: 0.9rem;
   background: #f5ec59;
   border-color: #e7c65c;
-  transform: translateY(-37%) rotate(-0deg);
+  transform: translateY(-37%);
   box-shadow:
     0 0 4px #f5ec59,
     0 0 7px #f5ec59,
@@ -143,28 +151,36 @@ body.toggled .project {
   background: linear-gradient(to right, #ff9d00 0%, #ffb347 100%);
 }
 
-.center-toggle .fill {
-  display: none;
-}
-
+.center-toggle .fill,
 .center-toggle .dots,
 .center-toggle .dots:after,
 .center-toggle .dots:before {
   display: none;
 }
 
-/* Filter bar styles */
+/* ===== FILTER BAR ===== */
 .filter-bar {
   position: fixed;
   left: -15px;
   bottom: 24px;
+
   display: flex;
   flex-direction: column;
   gap: 2px;
+
   z-index: 10000;
-  background: #0000; /* Solid black background */
-  padding: 16px 16px 16px 10px; /* Adjust padding as needed */
-  border-radius: 16px 24px 24px 0; /* Optional: round only top-right and bottom-right */
+
+  /* Your original was #0000 (transparent). Keeping it transparent. */
+  background: #0000;
+  padding: 16px 16px 16px 10px;
+  border-radius: 16px 24px 24px 0;
+
+  /* FIX: don't let the transparent wrapper block clicks */
+  pointer-events: none;
+}
+
+.filter-bar .filter-btn {
+  pointer-events: auto;
 }
 
 .filter-btn {
@@ -184,27 +200,30 @@ body.toggled .project {
   text-align: left;
   outline: none;
 }
+
 .filter-btn:hover {
   background: #fff;
   color: #111;
 }
+
 .filter-btn:focus {
   background: #ffb347;
   color: #111;
 }
-/* project numbers when hovered */
+
+/* ===== PROJECT LABELS / LOGOS ===== */
 .project-label {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
+  inset: 0; /* top/right/bottom/left = 0 */
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-size: 3em;
-  font-weight: regular;
+  font-weight: 400; /* was "regular" (invalid) */
   color: #7a7a7a;
+
   opacity: 0;
   pointer-events: none;
   z-index: 3;
@@ -215,7 +234,6 @@ body.toggled .project {
   opacity: 1;
 }
 
-/* Logo styles */
 .project-logo {
   max-width: 100%;
   max-height: 100%;
@@ -224,40 +242,46 @@ body.toggled .project {
   margin: auto;
 }
 
-/* Mouse lines */
+/* ===== MOUSE LINES ===== */
 .mouse-line-vertical,
 .mouse-line-horizontal {
   position: fixed;
   pointer-events: none;
-  z-index: 0; /* Lower z-index to appear behind all content */
+  z-index: 0; /* behind all content */
   background: #fff;
-  transition: none; /* Remove transition for instant response */
+  transition: none;
 }
+
 .mouse-line-vertical {
-  width: 1px; /* Thinner line */
+  width: 1px;
   height: 100vh;
   left: 0;
   top: 0;
 }
+
 .mouse-line-horizontal {
-  height: 1px; /* Thinner line */
+  height: 1px;
   width: 100vw;
   left: 0;
   top: 0;
 }
+
 body.toggled .mouse-line-vertical,
 body.toggled .mouse-line-horizontal {
   background: #222;
 }
 
-/* Trailer and embed display for project pages */
+/* ===== TRAILER / EMBED (PROJECT PAGES) ===== */
 .project-trailer {
   display: block;
   width: 90vw;
   max-width: 900px;
+
   height: 48vh;
   max-height: 60vh;
+
   min-height: 600px;
+
   margin: 40px auto 30px auto;
   background: #000;
   object-fit: contain;
@@ -272,31 +296,21 @@ body.toggled .mouse-line-horizontal {
   }
 }
 
-/* Media Queries */
+/* ===== MOBILE GRID ===== */
 @media (max-width: 600px) {
   :root {
     --project-size: 80px;
     --project-gap: 10px;
   }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(4, var(--project-size));
     gap: var(--project-gap);
     justify-content: center;
   }
+
   .project-label {
     font-size: 1.1rem;
   }
-}
-/* FIX: don't let the filter bar's transparent box block the toggle */
-.filter-bar {
-  pointer-events: none;
-}
-.filter-bar .filter-btn {
-  pointer-events: auto;
-}
-
-/* optional safety: ensure toggle is above everything */
-.center-toggle {
-  z-index: 10001;
 }

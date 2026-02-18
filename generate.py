@@ -1,317 +1,201 @@
-import os
+#!/usr/bin/env python3
+"""
+generate.py
+
+Generates `projectNNNN.html` files at the repository root from
+`projectTEMPLATE.html` and the contents of `projects/<id>/`.
+
+Behavior:
+- For each folder under `projects/` (e.g. `0050`) create or replace
+  `project0050.html` in the repo root.
+- Any existing `projectNNNN.html` in the repo root that does NOT match a
+  folder under `projects/` will be deleted.
+
+Usage:
+  python3 generate.py
+
+This script is intentionally simple and avoids external dependencies.
+"""
+
+from pathlib import Path
 import re
-
-PROJECTS_DIR = "projects"
-OUTPUT_DIR = "."
-CSS_FILE = "styles.css"
+import shutil
+import html
 
 
-#generates the index.html and project pages based on the contents of the projects folder
-#it is neededadd new projects at teh end.
+ROOT = Path(__file__).parent
+PROJECTS_DIR = ROOT / "projects"
+TEMPLATE_PATH = ROOT / "projectTEMPLATE.html"
 
 
-# Copyright HTML (used in both index and project pages)
-copyright = '''
-<span
-  style="
-    position: fixed;
-    bottom: 2px;
-    right: 4px;
-    font-size: 9px;
-    opacity: 0.35;
-    color: #ffffff;
-    z-index: 99999;
-    pointer-events: none;
-  "
->
-  Ivan Bagaturiya &mdash;
-  <script>
-    document.write(document.lastModified);
-  </script>
-</span>
-'''
-
-def is_safe_folder(name):
-    return re.fullmatch(r'\d{4,}', name) is not None
-
-def safe_join(base, *paths):
-    final_path = os.path.abspath(os.path.join(base, *paths))
-    if not final_path.startswith(os.path.abspath(base)):
-        raise ValueError("Unsafe path detected!")
-    return final_path
-
-def read_file(path):
+def read_text(file_path: Path) -> str:
     try:
-        with open(path, 'r', encoding='utf-8') as f:
-            return f.read().strip()
+        return file_path.read_text(encoding="utf-8").strip()
     except Exception:
         return ""
 
-def get_icon(folder):
-    for ext in [".svg", ".png", ".jpg", ".jpeg", ".gif"]:
-        icon_path = safe_join(folder, f"icon{ext}")
-        if os.path.exists(icon_path):
-            return os.path.relpath(icon_path, OUTPUT_DIR).replace("\\", "/")
+
+def make_trailer_html(folder: Path) -> str:
+    # look for trailer.* (gif, mp4, webm, jpg, png)
+    for ext in (".mp4", ".webm", ".gif", ".jpg", ".jpeg", ".png"):
+        for p in folder.glob(f"trailer*{ext}"):
+            rel = f"projects/{folder.name}/{p.name}"
+            if ext in (".mp4", ".webm"):
+                return f'<video class="project-trailer" muted loop playsinline src="{rel}"></video>'
+            else:
+                return f'<img class="project-trailer" src="{rel}" alt="trailer" />'
     return ""
 
-def get_media(folder):
-    media = []
-    exts = [".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"]
-    # Support both 'image1' and 'image 1' (with space)
-    for i in range(1, 10):
-        for ext in exts:
-            for prefix in [f"image{i}", f"image {i}"]:
-                fname = f"{prefix}{ext}"
-                media_path = safe_join(folder, fname)
-                if os.path.exists(media_path):
-                    rel_path = os.path.relpath(media_path, OUTPUT_DIR).replace("\\", "/")
-                    media.append(rel_path)
+
+def make_images_html(folder: Path) -> str:
+    imgs = []
+    # include image*. and icon.* as available
+    for pattern in ("icon.*", "image*.*"):
+        for p in sorted(folder.glob(pattern)):
+            if p.is_file():
+                rel = f"projects/{folder.name}/{p.name}"
+                alt = html.escape(p.stem)
+                imgs.append(f"<img src=\"{rel}\" alt=\"{alt}\" />")
+    return "\n".join(imgs)
+
+
+def make_nav_html(ids, idx):
+    prev_html = ""
+    next_html = ""
+    if idx > 0:
+        prev_id = ids[idx - 1]
+        prev_html = f'<a class="nav-prev" href="project{prev_id}.html">◀ Prev</a>'
+    if idx < len(ids) - 1:
+        next_id = ids[idx + 1]
+        next_html = f'<a class="nav-next" href="project{next_id}.html">Next ▶</a>'
+    if prev_html or next_html:
+        return f'<nav class="project-nav">{prev_html} {next_html}</nav>'
+    return ""
+
+
+def make_also_like_html(ids, current_id):
+    blocks = []
+    for pid in ids:
+        if pid == current_id:
+            continue
+        icon = ROOT / "projects" / pid / "icon.png"
+        if not icon.exists():
+            # try common extensions
+            for ext in (".jpg", ".jpeg", ".gif", ".svg"):
+                if (ROOT / "projects" / pid / ("icon" + ext)).exists():
+                    icon = ROOT / "projects" / pid / ("icon" + ext)
                     break
-            else:
-                continue
-            break
-    return media
+        if icon.exists():
+            rel = f"projects/{pid}/{icon.name}"
+            blocks.append(f'<a class="also-like-project" href="project{pid}.html"><img class="also-like-img" src="{rel}"/></a>')
+        else:
+            blocks.append(f'<a class="also-like-project" href="project{pid}.html">{pid}</a>')
+    if not blocks:
+        return ""
+    return f'<section class="also-like-section"><div class="also-like-container">{"".join(blocks)}</div></section>'
 
-def get_hashtags(folder):
-    hashtags_path = safe_join(folder, "hashtags.txt")
-    hashtags = read_file(hashtags_path)
-    tags = re.findall(r'#\w+', hashtags)
-    return [tag.lower() for tag in tags]
 
-def media_html_tag(src):
-    if src.lower().endswith(('.jpg', '.jpeg', '.gif', '.png', '.svg')):
-        return f'<img src="{src}" alt="" />'
-    elif src.lower().endswith('.mp4'):
-        return f'<video src="{src}" controls loop muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:120px;max-height:340px;"></video>'
-    elif src.lower().endswith('.mp3'):
-        return f'<audio src="{src}" controls style="width:100%;margin-top:8px;"></audio>'
-    elif src.lower().endswith('.pdf'):
-        return f'<a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a>'
+def generate_for(folder: Path, ids: list, idx: int, template: str) -> str:
+    pid = folder.name
+    title = html.escape(read_text(folder / "title.txt")) or ""
+    desc_raw = read_text(folder / "description.txt") or ""
+    desc = html.escape(desc_raw).replace("\n", "<br />")
+    trailer = make_trailer_html(folder)
+    images = make_images_html(folder)
+    nav = make_nav_html(ids, idx)
+    also_like = make_also_like_html(ids, pid)
+
+    out = template.replace("{{PROJECT_NUM}}", pid)
+    out = out.replace("{{TITLE}}", title)
+    out = out.replace("{{DESC}}", desc)
+    out = out.replace("{{TRAILER}}", trailer)
+    out = out.replace("{{IMAGES}}", images)
+    out = out.replace("{{NAV}}", nav)
+    out = out.replace("{{ALSO_LIKE}}", also_like)
+    return out
+
+
+def update_index_html(ids: list):
+    """Replace the project grid in index.html to reflect `ids`.
+
+    Keeps the rest of index.html intact when possible.
+    """
+    index_path = ROOT / "index.html"
+    if not index_path.exists():
+        print("index.html not found; skipping index update")
+        return
+
+    html_text = index_path.read_text(encoding="utf-8")
+
+    # build anchors
+    anchors = []
+    for pid in ids:
+        anchors.append(
+            f"        <a class=\"project\" data-project=\"{pid}\" data-hashtags=\"\" href=\"project{pid}.html\">\n"
+            f"          <img src=\"projects/{pid}/icon.svg\" alt=\"icon\" class=\"project-logo\" />\n"
+            f"          <span class=\"project-label\">{pid}</span>\n"
+            f"        </a>\n\n"
+        )
+
+    anchors_html = "".join(anchors)
+
+    # replace inner content of <div class="grid" id="projectGrid">...</div>
+    grid_re = re.compile(r'(<div class="grid" id="projectGrid">)(.*?)(</div>)', re.DOTALL)
+    if grid_re.search(html_text):
+        new_html = grid_re.sub(r"\1\n" + anchors_html + r"      \3", html_text)
+        index_path.write_text(new_html, encoding="utf-8")
+        print("Updated index.html project grid")
     else:
-        return ''
+        print("Could not find project grid in index.html; skipping update")
 
-def generate_index_html(projects):
-    toggle_html = '''
-    <div class="center-toggle">
-      <div class="switch">
-        <label for="bubbleToggle">
-          <input id="bubbleToggle" type="checkbox" />
-          <div class="sun-moon">
-            <div class="dots"></div>
-          </div>
-          <div class="background">
-            <div class="stars1"></div>
-            <div class="stars2"></div>
-          </div>
-          <div class="fill"></div>
-        </label>
-      </div>
-    </div>
-    '''
-    filter_html = '''
-    <div class="filter-bar" id="filterBar">
-      <button class="filter-btn" data-filter="#selected">#SELECTED</button>
-      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
-      <button class="filter-btn" data-filter="#tech">#TECH</button>
-      <button class="filter-btn" data-filter="#art">#ART</button>
-      <button class="filter-btn" data-filter="#music">#MUSIC</button>
-    </div>
-    '''
-    grid_html = "\n".join(
-        f'''
-        <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="project{proj['num']}.html">
-          <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
-          <span class="project-label">{proj['num']}</span>
-        </a>
-        ''' for proj in projects
-    )
-    dynamic_icon_js = '''
-    <script>
-      // Dynamically set icon file extension for each project
-      (function () {
-        const exts = ["svg", "png", "jpg", "jpeg", "gif", "pdf"];
-        document.querySelectorAll(".project").forEach((project) => {
-          const projectNum = project.getAttribute("data-project");
-          const img = project.querySelector("img.project-logo");
-          if (!projectNum || !img) return;
-          (function tryNext(i) {
-            if (i >= exts.length) return;
-            const url = `projects/${projectNum}/icon.${exts[i]}`;
-            fetch(url, { method: "HEAD" })
-              .then((r) => {
-                if (r.ok) img.src = url;
-                else tryNext(i + 1);
-              })
-              .catch(() => tryNext(i + 1));
-          })(0);
-        });
-      })();
-    </script>
-    '''
-    return f'''<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ivan Bagaturiya</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    {toggle_html}
-    {filter_html}
-    <main class="main">
-      <div class="grid" id="projectGrid">
-        {grid_html}
-      </div>
-    </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="script.js"></script>
-    {dynamic_icon_js}
-    <div class="mouse-line-vertical"></div>
-    <div class="mouse-line-horizontal"></div>
-    <script>
-      // Mouse-following lines animation (always visible)
-      const vLine = document.querySelector('.mouse-line-vertical');
-      const hLine = document.querySelector('.mouse-line-horizontal');
-      // Make lines more responsive by removing transition delay
-      if (vLine && hLine) {{
-        vLine.style.transition = 'none';
-        hLine.style.transition = 'none';
-      }}
-      document.addEventListener('mousemove', function(e) {{
-        if (vLine) vLine.style.left = e.clientX + 'px';
-        if (hLine) hLine.style.top = e.clientY + 'px';
-      }});
-    </script>
-    {copyright}
-  </body>
-</html>
-'''
-
-def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project, all_projects=None):
-    # Read the template
-    with open("projectTEMPLATE.html", "r", encoding="utf-8") as f:
-        template = f.read()
-
-    # Find trailer (mp4, gif, or txt for embed)
-    trailer = ""
-    trailer_ext = ""
-    trailer_html = ""
-    # Check for trailer.txt (embed code)
-    trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
-    if os.path.exists(trailer_txt_path):
-        trailer_html = read_file(trailer_txt_path)
-    else:
-        for ext in [".mp4", ".gif"]:
-            trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
-            if os.path.exists(trailer_path):
-                trailer = os.path.relpath(trailer_path, OUTPUT_DIR).replace("\\", "/")
-                trailer_ext = ext
-                break
-        if trailer:
-            if trailer_ext == ".mp4":
-                trailer_html = f'<video class="project-trailer" src="{trailer}" autoplay loop muted playsinline></video>'
-            elif trailer_ext == ".gif":
-                trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
-
-    # Images (exclude trailer)
-    image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
-    images_html = "\n".join(f'<img src="{src}" alt="" />' for src in image_media)
-
-    # Navigation SVGs (same for all, just direction changes)
-    svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    svg_up = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    svg_right = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    nav_html = '<div class="project-nav" style="gap:0;">'
-    if prev_project:
-        nav_html += f'<a class="nav-btn" href="project{prev_project}.html" title="Previous" style="background:none;box-shadow:none;">{svg_left}</a>'
-    else:
-        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
-    nav_html += f'<a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
-    if next_project:
-        nav_html += f'<a class="nav-btn" href="project{next_project}.html" title="Next" style="background:none;box-shadow:none;">{svg_right}</a>'
-    else:
-        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_right}</span>'
-    nav_html += '</div>'
-
-    # Generate "You might also like" section
-    also_like_html = ""
-    if all_projects:
-        import random
-        # Get current project hashtags
-        current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_num)))
-        # Find projects with shared hashtags
-        related_projects = [p for p in all_projects if p['num'] != project_num and set(p['hashtags']) & current_hashtags]
-        if related_projects:
-            random_project = random.choice(related_projects)
-            icon_src = random_project['icon'] if random_project['icon'] else f"projects/{random_project['num']}/icon.svg"
-            also_like_html = f'''<div class="also-like-section">
-      <p class="also-like-title">u might also like</p>
-      <div class="also-like-container">
-        <a class="also-like-project" href="project{random_project['num']}.html">
-          <img src="{icon_src}" alt="icon" class="also-like-img" />
-          <span class="also-like-label">{random_project['num']}</span>
-        </a>
-      </div>
-    </div>
-    '''
-
-    # Replace placeholders in template
-    html = template
-    html = html.replace("{{PROJECT_NUM}}", project_num)
-    html = html.replace("{{TITLE}}", title)
-    html = html.replace("{{DESC}}", desc.replace('\n', '<br />'))
-    html = html.replace("{{TRAILER}}", trailer_html)
-    html = html.replace("{{IMAGES}}", images_html)
-    html = html.replace("{{NAV}}", nav_html)
-    html = html.replace("{{ALSO_LIKE}}", also_like_html)
-    return html
 
 def main():
-    all_folders = [
-        f for f in os.listdir(PROJECTS_DIR)
-        if os.path.isdir(safe_join(PROJECTS_DIR, f)) and is_safe_folder(f)
-    ]
-    project_folders = sorted(all_folders)[::-1]
+    if not PROJECTS_DIR.exists():
+        print(f"projects/ folder not found: {PROJECTS_DIR}")
+        return
 
-    # First pass: collect all project metadata
-    projects = []
-    for idx, folder in enumerate(project_folders):
-        folder_path = safe_join(PROJECTS_DIR, folder)
-        title = read_file(safe_join(folder_path, "title.txt"))
-        desc = read_file(safe_join(folder_path, "description.txt"))
-        icon = get_icon(folder_path)
-        media = get_media(folder_path)
-        hashtags = get_hashtags(folder_path)
-        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
-        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
-        projects.append({
-            "num": folder,
-            "title": title,
-            "desc": desc,
-            "icon": icon,
-            "media": media,
-            "hashtags": hashtags,
-            "next": next_project
-        })
+    # load template
+    if TEMPLATE_PATH.exists():
+        template = TEMPLATE_PATH.read_text(encoding="utf-8")
+    else:
+        print("projectTEMPLATE.html not found; aborting")
+        return
 
-    # Second pass: generate HTML files with complete projects list
-    for idx, folder in enumerate(project_folders):
-        folder_path = safe_join(PROJECTS_DIR, folder)
-        title = read_file(safe_join(folder_path, "title.txt"))
-        desc = read_file(safe_join(folder_path, "description.txt"))
-        icon = get_icon(folder_path)
-        media = get_media(folder_path)
-        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
-        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
-        html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project, projects)
-        with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
-            f.write(html)
+    # gather project ids (folders)
+    ids = [p.name for p in sorted(PROJECTS_DIR.iterdir()) if p.is_dir()]
+    if not ids:
+        print("No project folders found in projects/")
+        return
 
-    index_html = generate_index_html(projects)
-    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(index_html)
-    print("Site generated!")
+    # generate each projectNNNN.html (create or replace)
+    for idx, pid in enumerate(ids):
+        folder = PROJECTS_DIR / pid
+        out_html = generate_for(folder, ids, idx, template)
+        target = ROOT / f"project{pid}.html"
+        target.write_text(out_html, encoding="utf-8")
+        print(f"WROTE {target.name}")
 
-if __name__ == "__main__":
+    # delete any projectNNNN.html files in root that don't match ids
+    pattern = re.compile(r'^project(\d{3,}).html$')
+    for p in ROOT.iterdir():
+        if not p.is_file():
+            continue
+        m = pattern.match(p.name)
+        if m:
+            pid = m.group(1)
+            if pid not in ids and p.name != TEMPLATE_PATH.name:
+                try:
+                    p.unlink()
+                    print(f"DELETED {p.name}")
+                except Exception as e:
+                    print(f"FAILED to delete {p.name}: {e}")
+
+    # update index.html grid to match current projects
+    update_index_html(ids)
+
+    print("Done.")
+
+
+if __name__ == '__main__':
     main()
+
