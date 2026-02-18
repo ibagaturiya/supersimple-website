@@ -3,6 +3,7 @@ import re
 
 PROJECTS_DIR = "projects"
 OUTPUT_DIR = "."
+PROJECT_HTML_DIR = "projecthtml"
 CSS_FILE = "styles.css"
 
 
@@ -51,7 +52,9 @@ def get_icon(folder):
     for ext in [".svg", ".png", ".jpg", ".jpeg", ".gif"]:
         icon_path = safe_join(folder, f"icon{ext}")
         if os.path.exists(icon_path):
-            return os.path.relpath(icon_path, OUTPUT_DIR).replace("\\", "/")
+            # compute path relative to where project html files will live
+            project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+            return os.path.relpath(icon_path, project_base).replace("\\", "/")
     return ""
 
 def get_media(folder):
@@ -64,7 +67,8 @@ def get_media(folder):
                 fname = f"{prefix}{ext}"
                 media_path = safe_join(folder, fname)
                 if os.path.exists(media_path):
-                    rel_path = os.path.relpath(media_path, OUTPUT_DIR).replace("\\", "/")
+                    project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+                    rel_path = os.path.relpath(media_path, project_base).replace("\\", "/")
                     media.append(rel_path)
                     break
             else:
@@ -119,7 +123,7 @@ def generate_index_html(projects):
     '''
     grid_html = "\n".join(
         f'''
-        <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="project{proj['num']}.html">
+        <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="{PROJECT_HTML_DIR}/project{proj['num']}.html">
           <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">{proj['num']}</span>
         </a>
@@ -226,8 +230,9 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     if prev_project:
         nav_html += f'<a class="nav-btn" href="project{prev_project}.html" title="Previous" style="background:none;box-shadow:none;">{svg_left}</a>'
     else:
-        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
-    nav_html += f'<a class="nav-btn" href="index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
+      nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
+    # when project pages live in a subfolder, link back to root index
+    nav_html += f'<a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
     if next_project:
         nav_html += f'<a class="nav-btn" href="project{next_project}.html" title="Next" style="background:none;box-shadow:none;">{svg_right}</a>'
     else:
@@ -305,8 +310,11 @@ def main():
         next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
         prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
         html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project, projects)
-        with open(os.path.join(OUTPUT_DIR, f"project{folder}.html"), "w", encoding="utf-8") as f:
-            f.write(html)
+        # ensure output directory exists
+        out_dir = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, f"project{folder}.html"), "w", encoding="utf-8") as f:
+          f.write(html)
 
     index_html = generate_index_html(projects)
     with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:

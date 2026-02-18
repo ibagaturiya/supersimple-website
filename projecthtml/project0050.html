@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0050 – _panoramortraits</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../project-styles.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="project-number-fixed">0050</a>
+    <div class="project-hero">
+      <video class="project-trailer" src="projects/0050/trailer.mp4" autoplay loop muted playsinline></video>
+      <div class="project-header-overlay">
+        <span class="project-title">_panoramortraits</span>
+      </div>
+    </div>
+    <hr />
+    <div class="project-main">
+      <div class="project-left">
+        <div class="project-desc"></div>
+      </div>
+      <div class="project-right"><img src="../projects/0050/image1.jpeg" alt="" />
+<img src="../projects/0050/image2.jpeg" alt="" />
+<img src="../projects/0050/image3.jpeg" alt="" /></div>
+    </div>
+    <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0051.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="nav-btn disabled" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div> 
+    <script>
+      const trailer = document.querySelector(".project-trailer");
+      if (trailer && trailer.tagName === "VIDEO") {
+        trailer.muted = true;
+        trailer.autoplay = true;
+        trailer.playsInline = true;
+        trailer.play().catch(function () {
+          // Try to play again on user interaction if autoplay was blocked
+          const tryPlay = function () {
+            trailer.play();
+            window.removeEventListener("click", tryPlay);
+          };
+          window.addEventListener("click", tryPlay);
+        });
+      }
+      if (trailer) {
+        trailer.addEventListener("click", function () {
+          if (trailer.requestFullscreen) trailer.requestFullscreen();
+          else if (trailer.webkitRequestFullscreen)
+            trailer.webkitRequestFullscreen();
+          else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+        });
+      }
+    </script>
+  </body>
+</html>

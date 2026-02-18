@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0051 – _the CABRIO</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../project-styles.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="project-number-fixed">0051</a>
+    <div class="project-hero">
+      <video class="project-trailer" src="projects/0051/trailer.mp4" autoplay loop muted playsinline></video>
+      <div class="project-header-overlay">
+        <span class="project-title">_the CABRIO</span>
+      </div>
+    </div>
+    <hr />
+    <div class="project-main">
+      <div class="project-left">
+        <div class="project-desc">LOCATION<br />Obere Letten is a highly attractive destination for young people, particularly during the summer months. The Letten Promenade owes its popularity to a variety of uses, including a swimming pool, trendy bars and restaurants, sports fields, and temporary installations that allow individuals to personalize the space.<br />The “Parkplatz” plays a central role in this context. Beyond operating as a bar, the owners manage the entire lot and encourage people to realize their own ideas there, following prior agreement. However, the current design of the space does not fully support these diverse activities, resulting in a somewhat chaotic and improvised atmosphere. Additionally, many activities are limited to daytime hours or are not possible at all, as noise often disturbs nearby residents.<br /><br />OBJECTIVE<br />The aim of this project is to create an adaptable architecture that supports a range of uses while allowing the parking lot to maintain its function as an “overseer”—now from the vantage point of the old station. At the same time, the design seeks to provide residents with a peaceful environment, with the new structure acting as a protective cocoon that keeps noise and activity contained.<br /><br />DESIGN CONCEPT: THE MAGIC BOX<br />To achieve these goals, the “Magic Box” was developed.<br /><br />SOUNDPROOFING AND FLEXIBILITY<br />The first feature is revealed as soon as the lid opens: the roof extends, providing both shelter and soundproofing for residents. For example, if a rock concert at 120 dB is held, approximately 80 dB would typically reach the residents—comparable to the noise of a blender. However, with the roof extended and an 8 cm thick wooden panel of medium density installed, the noise level is reduced to around 40 dB, similar to the quiet of a library.<br /><br />MODULAR FURNITURE AND ACTIVITY SUPPORT<br />With noise concerns addressed, the second feature supports the site’s activities. Perforated benches and tables double as removable walls, which can be used as climbing walls, pull-up bars, or ladder walls as needed.<br /><br />STORAGE AND FUNCTIONALITY<br />Removing these walls reveals the third feature: the area behind the benches and tables serves as storage space, providing the necessary materials to support various activities and functioning as the backbone of the site.<br /><br />EXTENDABLE ROOF<br />The fourth and final feature is the extendable roof, which creates flexible spaces and offers protection from rain and sun. The roof is composed of a scissor structure made of wooden beams with a rotational axis to define the curvature, and steel cables that function both as the opening/closing mechanism and as structural reinforcement. The design and load-bearing capacity were verified using the IGS tool and in collaboration with Professur Block.<br />The membrane stretched between the beams presented a unique challenge, as it needed to stretch and tension along two axes to accommodate different roof shapes. The solution involved a non-elastic membrane with rhombus-shaped cutouts, connected by elastic bands that tension the fabric and ensure the roof’s flexibility.</div>
+      </div>
+      <div class="project-right"><img src="../projects/0051/image1.gif" alt="" />
+<img src="../projects/0051/image2.jpeg" alt="" />
+<img src="../projects/0051/image3.gif" alt="" />
+<img src="../projects/0051/image4.jpeg" alt="" />
+<img src="../projects/0051/image5.jpeg" alt="" />
+<img src="../projects/0051/image6.jpeg" alt="" />
+<img src="../projects/0051/image7.gif" alt="" /></div>
+    </div>
+    <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0052.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0050.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project0052.html">
+          <img src="../projects/0052/icon.gif" alt="icon" class="also-like-img" />
+          <span class="also-like-label">0052</span>
+        </a>
+      </div>
+    </div>
+    
+    <script>
+      const trailer = document.querySelector(".project-trailer");
+      if (trailer && trailer.tagName === "VIDEO") {
+        trailer.muted = true;
+        trailer.autoplay = true;
+        trailer.playsInline = true;
+        trailer.play().catch(function () {
+          // Try to play again on user interaction if autoplay was blocked
+          const tryPlay = function () {
+            trailer.play();
+            window.removeEventListener("click", tryPlay);
+          };
+          window.addEventListener("click", tryPlay);
+        });
+      }
+      if (trailer) {
+        trailer.addEventListener("click", function () {
+          if (trailer.requestFullscreen) trailer.requestFullscreen();
+          else if (trailer.webkitRequestFullscreen)
+            trailer.webkitRequestFullscreen();
+          else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+        });
+      }
+    </script>
+  </body>
+</html>

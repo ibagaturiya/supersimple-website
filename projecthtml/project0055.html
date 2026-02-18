@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0055 – _der Leuchtturm</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../project-styles.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="project-number-fixed">0055</a>
+    <div class="project-hero">
+      <iframe width="100%" height="100%" frameborder="0" allowfullscreen src="https://scaniverse.com/scan/m7mlfusg4gobdw6m?embed=1"></iframe>
+      <div class="project-header-overlay">
+        <span class="project-title">_der Leuchtturm</span>
+      </div>
+    </div>
+    <hr />
+    <div class="project-main">
+      <div class="project-left">
+        <div class="project-desc">with <br />10 slats<br />20m rope<br />4 m2 textile <br /><br />and <br /><br />45 mins</div>
+      </div>
+      <div class="project-right"><img src="../projects/0055/image1.jpeg" alt="" />
+<img src="../projects/0055/image2.jpeg" alt="" />
+<img src="../projects/0055/image3.gif" alt="" />
+<img src="../projects/0055/image4.jpeg" alt="" />
+<img src="../projects/0055/image5.jpeg" alt="" />
+<img src="../projects/0055/image6.jpeg" alt="" /></div>
+    </div>
+    <div class="project-nav" style="gap:0;"><span class="nav-btn disabled" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></span><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0054.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project0054.html">
+          <img src="../projects/0054/icon.jpeg" alt="icon" class="also-like-img" />
+          <span class="also-like-label">0054</span>
+        </a>
+      </div>
+    </div>
+    
+    <script>
+      const trailer = document.querySelector(".project-trailer");
+      if (trailer && trailer.tagName === "VIDEO") {
+        trailer.muted = true;
+        trailer.autoplay = true;
+        trailer.playsInline = true;
+        trailer.play().catch(function () {
+          // Try to play again on user interaction if autoplay was blocked
+          const tryPlay = function () {
+            trailer.play();
+            window.removeEventListener("click", tryPlay);
+          };
+          window.addEventListener("click", tryPlay);
+        });
+      }
+      if (trailer) {
+        trailer.addEventListener("click", function () {
+          if (trailer.requestFullscreen) trailer.requestFullscreen();
+          else if (trailer.webkitRequestFullscreen)
+            trailer.webkitRequestFullscreen();
+          else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+        });
+      }
+    </script>
+  </body>
+</html>

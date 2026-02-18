@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0054 – _the NOTE</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../project-styles.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="project-number-fixed">0054</a>
+    <div class="project-hero">
+      <video class="project-trailer" src="projects/0054/trailer.mp4" autoplay loop muted playsinline></video>
+      <div class="project-header-overlay">
+        <span class="project-title">_the NOTE</span>
+      </div>
+    </div>
+    <hr />
+    <div class="project-main">
+      <div class="project-left">
+        <div class="project-desc">LOCATION<br />Dornacherplatz is situated at the edge of Solothurn’s old town, directly beside the Aare River and in close proximity to the main train station. For many years, this central square functioned as a surface parking lot. To free up space above ground, parking was relocated to a new underground garage positioned 16 meters below the surface.<br /><br />CONSTRUCTION<br />The construction of the underground garage involved several key steps. First, a thick slurry wall was installed around the excavation site to absorb all horizontal forces from the surrounding soil and water, creating a dry, watertight “bucket” in which construction could proceed from the bottom up. As a result, the internal structure—such as the ramp—remained structurally independent from the exterior retaining walls.<br /><br />NEEDS<br />Today, Dornacherplatz remains largely unused and covered with asphalt. Solothurn identifies as a city of culture and actively supports cultural initiatives. While there is sufficient affordable housing—with new developments underway—the Solothurn Symphony Orchestra currently lacks a dedicated rehearsal and concert venue within the city.<br /><br />FEASIBILITY<br />After conducting in-depth acoustical research and comparing the sizes of various concert halls, it became clear that the dimensions of the existing underground parking structure are sufficient to accommodate a concert hall.<br /><br />PROJECT<br />The project proposes converting the existing underground parking facility into a concert hall. The first step would be to return the site to its original “bucket” state by removing all internal structures and ramps, leaving only the sealed, empty underground volume.<br />Once cleared, a new concert hall can be constructed from the bottom up within this watertight shell. The concert hall is designed as a free-standing structure, independent from the outer retaining walls, to minimize vibration and ensure optimal sound isolation.<br />The interior features a shifted vineyard-style seating arrangement, bringing the audience closer to the performers, while acoustic extensions help distribute sound evenly throughout the space. The negative space created between the compact elliptical form of the concert hall and the outer retaining wall generates a series of unique spatial sequences.<br />Named “The Note” for its elliptical form set diagonally within the site, the concert hall is divided into two nearly equal zones—one for the audience and one for the musicians. A helical ramp spirals down through both zones, allowing visitors and musicians to experience the full journey through the building. Throughout this descent, the audience and musicians remain separated, with their only visual meeting point at the stage—creating a sense of anticipation and dynamic interplay until they finally come together for the performance in “The Note.”</div>
+      </div>
+      <div class="project-right"><img src="../projects/0054/image1.jpeg" alt="" />
+<img src="../projects/0054/image2.jpeg" alt="" />
+<img src="../projects/0054/image3.jpeg" alt="" />
+<img src="../projects/0054/image4.jpeg" alt="" />
+<img src="../projects/0054/image5.jpg" alt="" /></div>
+    </div>
+    <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0055.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0052.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project0052.html">
+          <img src="../projects/0052/icon.gif" alt="icon" class="also-like-img" />
+          <span class="also-like-label">0052</span>
+        </a>
+      </div>
+    </div>
+    
+    <script>
+      const trailer = document.querySelector(".project-trailer");
+      if (trailer && trailer.tagName === "VIDEO") {
+        trailer.muted = true;
+        trailer.autoplay = true;
+        trailer.playsInline = true;
+        trailer.play().catch(function () {
+          // Try to play again on user interaction if autoplay was blocked
+          const tryPlay = function () {
+            trailer.play();
+            window.removeEventListener("click", tryPlay);
+          };
+          window.addEventListener("click", tryPlay);
+        });
+      }
+      if (trailer) {
+        trailer.addEventListener("click", function () {
+          if (trailer.requestFullscreen) trailer.requestFullscreen();
+          else if (trailer.webkitRequestFullscreen)
+            trailer.webkitRequestFullscreen();
+          else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+        });
+      }
+    </script>
+  </body>
+</html>
