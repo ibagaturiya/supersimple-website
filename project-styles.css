@@ -2,7 +2,8 @@ body {
   margin: 0;
   background: #fff;
   color: #111;
-  font-family: Arial, sans-serif;
+  font-family: Menlo, monospace !important;
+  font-size: 9px;
 }
 .project-hero {
   position: relative;
