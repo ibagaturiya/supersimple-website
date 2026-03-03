@@ -1,55 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- SEO basics -->
-    <title>Ivan Bagaturiya — Architecture & Computational Design</title>
-    <meta
-      name="description"
-      content="Portfolio of Ivan Bagaturiya: architecture, computational design, Rhino/Grasshopper, BIM automation, and digital fabrication. Zurich / ETH."
-    />
-    <link rel="canonical" href="https://iab.best/" />
-    <meta name="robots" content="index,follow" />
-
-    <!-- Social previews -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Ivan Bagaturiya — Portfolio" />
-    <meta
-      property="og:description"
-      content="Architecture + computational design projects (Rhino/Grasshopper, BIM automation, digital fabrication)."
-    />
-    <meta property="og:url" content="https://iab.best/" />
-    <meta property="og:image" content="https://iab.best/og.jpg" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Ivan Bagaturiya — Portfolio" />
-    <meta
-      name="twitter:description"
-      content="Architecture + computational design projects."
-    />
-    <meta name="twitter:image" content="https://iab.best/og.jpg" />
-
-    <!-- Structured data -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Ivan Bagaturiya",
-        "url": "https://iab.best/",
-        "jobTitle": "Architect / Computational Designer",
-        "affiliation": { "@type": "Organization", "name": "ETH Zurich" },
-        "sameAs": [
-          "https://www.linkedin.com/in/YOURPROFILE",
-          "https://github.com/YOURPROFILE"
-        ]
-      }
-    </script>
-
+    <title>Ivan Bagaturiya</title>
     <link rel="stylesheet" href="index-styles.css" />
   </head>
   <body>
+    
     <div class="center-toggle">
       <div class="switch">
         <label for="bubbleToggle">
@@ -65,73 +23,53 @@
         </label>
       </div>
     </div>
-
+    
+    
     <div class="filter-bar" id="filterBar">
       <button class="filter-btn" data-filter="#selected">#SELECTED</button>
-      <button class="filter-btn" data-filter="#architecture">
-        #ARCHITECTURE
-      </button>
+      <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
       <button class="filter-btn" data-filter="#tech">#TECH</button>
       <button class="filter-btn" data-filter="#art">#ART</button>
       <button class="filter-btn" data-filter="#music">#MUSIC</button>
     </div>
-
+    
     <main class="main">
       <div class="grid" id="projectGrid">
-        <a
-          class="project"
-          data-project="0055"
-          data-hashtags="#architecture"
-          href="projecthtml/project0055.html"
-        >
+        
+        <a class="project" data-project="0055" data-hashtags="#architecture" href="projecthtml/project0055.html">
           <img src="projects/0055/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0055</span>
         </a>
+        
 
-        <a
-          class="project"
-          data-project="0054"
-          data-hashtags="#selected #architecture #eth #tech"
-          href="projecthtml/project0054.html"
-        >
+        <a class="project" data-project="0054" data-hashtags="#selected #architecture #eth #tech" href="projecthtml/project0054.html">
           <img src="projects/0054/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0054</span>
         </a>
+        
 
-        <a
-          class="project"
-          data-project="0052"
-          data-hashtags="#architecture #tech"
-          href="projecthtml/project0052.html"
-        >
+        <a class="project" data-project="0052" data-hashtags="#architecture #tech" href="projecthtml/project0052.html">
           <img src="projects/0052/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0052</span>
         </a>
+        
 
-        <a
-          class="project"
-          data-project="0051"
-          data-hashtags="#selected #architecture #tech"
-          href="projecthtml/project0051.html"
-        >
+        <a class="project" data-project="0051" data-hashtags="#selected #architecture #tech" href="projecthtml/project0051.html">
           <img src="projects/0051/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0051</span>
         </a>
+        
 
-        <a
-          class="project"
-          data-project="0050"
-          data-hashtags="#art"
-          href="projecthtml/project0050.html"
-        >
+        <a class="project" data-project="0050" data-hashtags="#art" href="projecthtml/project0050.html">
           <img src="projects/0050/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">0050</span>
         </a>
+        
       </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="script.js"></script>
-
+    
     <script>
       // Dynamically set icon file extension for each project
       (function () {
@@ -153,40 +91,41 @@
         });
       })();
     </script>
-
+    
     <div class="mouse-line-vertical"></div>
     <div class="mouse-line-horizontal"></div>
     <script>
       // Mouse-following lines animation (always visible)
-      const vLine = document.querySelector(".mouse-line-vertical");
-      const hLine = document.querySelector(".mouse-line-horizontal");
+      const vLine = document.querySelector('.mouse-line-vertical');
+      const hLine = document.querySelector('.mouse-line-horizontal');
       // Make lines more responsive by removing transition delay
       if (vLine && hLine) {
-        vLine.style.transition = "none";
-        hLine.style.transition = "none";
+        vLine.style.transition = 'none';
+        hLine.style.transition = 'none';
       }
-      document.addEventListener("mousemove", function (e) {
-        if (vLine) vLine.style.left = e.clientX + "px";
-        if (hLine) hLine.style.top = e.clientY + "px";
+      document.addEventListener('mousemove', function(e) {
+        if (vLine) vLine.style.left = e.clientX + 'px';
+        if (hLine) hLine.style.top = e.clientY + 'px';
       });
     </script>
+    
+<span
+  style="
+    position: fixed;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    opacity: 0.35;
+    color: #ffffff;
+    z-index: 99999;
+    pointer-events: none;
+  "
+>
+  Ivan Bagaturiya &mdash;
+  <script>
+    document.write(document.lastModified);
+  </script>
+</span>
 
-    <span
-      style="
-        position: fixed;
-        bottom: 2px;
-        right: 4px;
-        font-size: 9px;
-        opacity: 0.35;
-        color: #ffffff;
-        z-index: 99999;
-        pointer-events: none;
-      "
-    >
-      Ivan Bagaturiya &mdash;
-      <script>
-        document.write(document.lastModified);
-      </script>
-    </span>
   </body>
 </html>

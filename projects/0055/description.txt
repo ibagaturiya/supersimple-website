@@ -1,8 +1,6 @@
-with 
-10 slats
-20m rope
-4 m2 textile 
+iab is developing the first task for the first year architecture students at ETH zurich.
 
-and 
+given: 
+10 slats, 20m rope, 4m2 textile and 45 mins.
 
-45 mins
+a lightower was created.

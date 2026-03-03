@@ -4,7 +4,7 @@ import re
 PROJECTS_DIR = "projects"
 OUTPUT_DIR = "."
 PROJECT_HTML_DIR = "projecthtml"
-CSS_FILE = "styles.css"
+CSS_FILE = "index-styles.css"
 
 
 #generates the index.html and project pages based on the contents of the projects folder
@@ -158,7 +158,7 @@ def generate_index_html(projects):
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ivan Bagaturiya</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="index-styles.css" />
   </head>
   <body>
     {toggle_html}
