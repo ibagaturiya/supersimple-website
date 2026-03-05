@@ -224,13 +224,18 @@ body.toggled .project {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.9rem;
+  /* scale text to fill available box while preventing overflow
+     using the project size variable; clamp keeps it reasonable */
+  font-size: clamp(1rem, calc(var(--project-size) * 0.45), 3rem);
+  line-height: 1;
   font-weight: 400;
   color: #ffffff;
   opacity: 0;
   pointer-events: none;
   z-index: 3;
   transition: opacity 0.25s;
+  max-width: 90%;
+  word-wrap: break-word;
 }
 
 .project:hover .project-label {
