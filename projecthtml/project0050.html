@@ -26,6 +26,15 @@
 <img src="../projects/0050/image4.jpeg" alt="" /></div>
     </div>
     <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0051.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="nav-btn disabled" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div> 
+
+    <!-- slideshow overlay used when clicking project images -->
+    <div id="slideshow-overlay">
+      <span id="slideshow-close">&times;</span>
+      <img id="slideshow-img" src="" alt="" />
+      <div id="slideshow-prev" class="slideshow-nav">&#10094;</div>
+      <div id="slideshow-next" class="slideshow-nav">&#10095;</div>
+    </div>
+
     <script>
       const trailer = document.querySelector(".project-trailer");
       if (trailer && trailer.tagName === "VIDEO") {
@@ -49,6 +58,52 @@
           else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
         });
       }
+
+      // slideshow logic for clickable images
+      (function () {
+        const images = Array.from(document.querySelectorAll('.project-right img'));
+        if (!images.length) return;
+        images.forEach((img, idx) => {
+          img.style.cursor = 'pointer';
+          img.dataset.index = idx;
+        });
+        const overlay = document.getElementById('slideshow-overlay');
+        const slideshowImg = document.getElementById('slideshow-img');
+        const closeBtn = document.getElementById('slideshow-close');
+        const prevBtn = document.getElementById('slideshow-prev');
+        const nextBtn = document.getElementById('slideshow-next');
+        let currentIndex = 0;
+        const showSlide = (i) => {
+          currentIndex = (i + images.length) % images.length;
+          slideshowImg.src = images[currentIndex].src;
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        };
+        const hideSlide = () => {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        };
+        images.forEach(img => img.addEventListener('click', () => showSlide(parseInt(img.dataset.index))));
+        closeBtn.addEventListener('click', hideSlide);
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex - 1); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex + 1); });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) hideSlide(); });
+        document.addEventListener('keydown', (e) => {
+          if (!overlay.classList.contains('active')) return;
+          if (e.key === 'ArrowRight') showSlide(currentIndex + 1);
+          else if (e.key === 'ArrowLeft') showSlide(currentIndex - 1);
+          else if (e.key === 'Escape') hideSlide();
+        });
+        let touchStartX = 0;
+        overlay.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; });
+        overlay.addEventListener('touchend', e => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) showSlide(currentIndex + 1);
+            else showSlide(currentIndex - 1);
+          }
+        });
+      })();
     </script>
   </body>
 </html>

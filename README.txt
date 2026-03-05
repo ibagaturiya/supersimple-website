@@ -80,6 +80,7 @@ STEP-BY-STEP: ADDING A NEW PROJECT BEFORE PUSHING TO GITHUB
    • Numbering must be consecutive (1, 2, 3...)
    • Supported formats: .jpg, .jpeg, .png, .gif, .svg, .pdf
    • Images appear in order on project page
+   • clicking any image (desktop or mobile) opens a fullscreen slideshow with next/prev controls
 
 4. EXAMPLE PROJECT STRUCTURE
    projects/0056/

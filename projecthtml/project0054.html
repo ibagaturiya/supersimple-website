@@ -20,15 +20,14 @@
       <div class="project-left">
         <div class="project-desc">IAB develops “The Note” as his diploma project<br />supervised by Jacqueline Pauli and Charbonnet Heiz.<br /><br /><br /><br /><br /><br /><br />The project transforms <br />an underground parking garage beneath Dornacherplatz in Solothurn <br />into a concert hall for the city’s symphony orchestra. <br />Inside the 16-meter-deep concrete “bucket” of the former garage, <br />IAB inserts a free-standing elliptical concert hall. <br />A spiraling ramp guides visitors down through the structure <br />until audience and musicians finally meet at the stage.<br /><br /><br /><br /><br /><br /><br />“The Note” marks a turning point in IAB’s work <br />— the first project fully designed and generated through Grasshopper, <br />using visual programming to control geometry, structure, and spatial organization.</div>
       </div>
-      <div class="project-right"><img src="../projects/0054/image00002.png" alt="" />
+      <div class="project-right"><img src="../projects/0054/image00001.png" alt="" />
 <img src="../projects/0054/image00003.png" alt="" />
-<img src="../projects/0054/image00004.png" alt="" />
-<img src="../projects/0054/image00005.gif" alt="" />
-<img src="../projects/0054/image00006.jpg" alt="" />
-<img src="../projects/0054/image00007.gif" alt="" />
-<img src="../projects/0054/image00008.jpg" alt="" />
-<img src="../projects/0054/image00009.gif" alt="" />
-<img src="../projects/0054/image00010.png" alt="" />
+<img src="../projects/0054/image00004.gif" alt="" />
+<img src="../projects/0054/image00005.jpg" alt="" />
+<img src="../projects/0054/image00006.gif" alt="" />
+<img src="../projects/0054/image00007.jpg" alt="" />
+<img src="../projects/0054/image00008.gif" alt="" />
+<img src="../projects/0054/image00009.png" alt="" />
 <img src="../projects/0054/image00011.png" alt="" />
 <img src="../projects/0054/image00012.png" alt="" />
 <img src="../projects/0054/image00013.gif" alt="" />
@@ -49,6 +48,15 @@
       </div>
     </div>
     
+
+    <!-- slideshow overlay used when clicking project images -->
+    <div id="slideshow-overlay">
+      <span id="slideshow-close">&times;</span>
+      <img id="slideshow-img" src="" alt="" />
+      <div id="slideshow-prev" class="slideshow-nav">&#10094;</div>
+      <div id="slideshow-next" class="slideshow-nav">&#10095;</div>
+    </div>
+
     <script>
       const trailer = document.querySelector(".project-trailer");
       if (trailer && trailer.tagName === "VIDEO") {
@@ -72,6 +80,52 @@
           else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
         });
       }
+
+      // slideshow logic for clickable images
+      (function () {
+        const images = Array.from(document.querySelectorAll('.project-right img'));
+        if (!images.length) return;
+        images.forEach((img, idx) => {
+          img.style.cursor = 'pointer';
+          img.dataset.index = idx;
+        });
+        const overlay = document.getElementById('slideshow-overlay');
+        const slideshowImg = document.getElementById('slideshow-img');
+        const closeBtn = document.getElementById('slideshow-close');
+        const prevBtn = document.getElementById('slideshow-prev');
+        const nextBtn = document.getElementById('slideshow-next');
+        let currentIndex = 0;
+        const showSlide = (i) => {
+          currentIndex = (i + images.length) % images.length;
+          slideshowImg.src = images[currentIndex].src;
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        };
+        const hideSlide = () => {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        };
+        images.forEach(img => img.addEventListener('click', () => showSlide(parseInt(img.dataset.index))));
+        closeBtn.addEventListener('click', hideSlide);
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex - 1); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex + 1); });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) hideSlide(); });
+        document.addEventListener('keydown', (e) => {
+          if (!overlay.classList.contains('active')) return;
+          if (e.key === 'ArrowRight') showSlide(currentIndex + 1);
+          else if (e.key === 'ArrowLeft') showSlide(currentIndex - 1);
+          else if (e.key === 'Escape') hideSlide();
+        });
+        let touchStartX = 0;
+        overlay.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; });
+        overlay.addEventListener('touchend', e => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) showSlide(currentIndex + 1);
+            else showSlide(currentIndex - 1);
+          }
+        });
+      })();
     </script>
   </body>
 </html>

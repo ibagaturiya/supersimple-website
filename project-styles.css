@@ -299,3 +299,45 @@ hr {
     font-size: 1.1rem;
   }
 }
+/* slideshow overlay styles ------------------------------------------------ */
+#slideshow-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+#slideshow-overlay.active {
+  display: flex;
+}
+#slideshow-overlay img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+}
+#slideshow-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 2.2rem;
+  cursor: pointer;
+  user-select: none;
+}
+.slideshow-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 3rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0 20px;
+}
+#slideshow-prev { left: 10px; }
+#slideshow-next { right: 10px; }
