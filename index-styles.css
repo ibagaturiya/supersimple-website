@@ -204,7 +204,7 @@ body.toggled .project {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3em;
+  font-size: 1.9rem;
   font-weight: 400;
   color: #ffffff;
   opacity: 0;

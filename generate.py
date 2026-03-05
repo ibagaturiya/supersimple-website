@@ -59,21 +59,30 @@ def get_icon(folder):
 
 def get_media(folder):
     media = []
-    exts = [".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"]
-    # Support both 'image1' and 'image 1' (with space)
-    for i in range(1, 10):
-        for ext in exts:
-            for prefix in [f"image{i}", f"image {i}"]:
-                fname = f"{prefix}{ext}"
-                media_path = safe_join(folder, fname)
-                if os.path.exists(media_path):
-                    project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
-                    rel_path = os.path.relpath(media_path, project_base).replace("\\", "/")
-                    media.append(rel_path)
-                    break
-            else:
-                continue
-            break
+    exts = {".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"}
+
+    try:
+        files = os.listdir(folder)
+    except FileNotFoundError:
+        return media
+
+    # sort by the numeric portion after "image"; leading zeros are ignored
+    def sort_key(name):
+        m = re.search(r'image\s*(\d+)', name, re.I)
+        return int(m.group(1)) if m else float('inf')
+
+    for fname in sorted(files, key=sort_key):
+        base, ext = os.path.splitext(fname)
+
+        # accept any "image" name followed by one or more digits (e.g. image1,
+        # image01, image00001).  This keeps old single-digit names working while
+        # allowing longer numbers with leading zeros.
+        if ext.lower() in exts and re.search(r'^image\s*\d+$', base, re.I):
+            media_path = safe_join(folder, fname)
+            project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+            rel_path = os.path.relpath(media_path, project_base).replace("\\", "/")
+            media.append(rel_path)
+
     return media
 
 def get_hashtags(folder):
