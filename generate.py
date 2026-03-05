@@ -130,11 +130,13 @@ def generate_index_html(projects):
       <button class="filter-btn" data-filter="#music">#MUSIC</button>
     </div>
     '''
+    import html as _html
     grid_html = "\n".join(
         f'''
         <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="{PROJECT_HTML_DIR}/project{proj['num']}.html">
           <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">{proj['num']}</span>
+          <span class="project-tooltip">{_html.escape(proj.get('titledesc','')).replace('\n','<br />')}</span>
         </a>
         ''' for proj in projects
     )
@@ -306,6 +308,8 @@ def main():
         folder_path = safe_join(PROJECTS_DIR, folder)
         title = read_file(safe_join(folder_path, "title.txt"))
         desc = read_file(safe_join(folder_path, "description.txt"))
+        # new file containing short description used on index hover tooltip
+        titledesc = read_file(safe_join(folder_path, "titledescription.txt"))
         icon = get_icon(folder_path)
         media = get_media(folder_path)
         hashtags = get_hashtags(folder_path)
@@ -315,6 +319,7 @@ def main():
             "num": folder,
             "title": title,
             "desc": desc,
+            "titledesc": titledesc,
             "icon": icon,
             "media": media,
             "hashtags": hashtags,

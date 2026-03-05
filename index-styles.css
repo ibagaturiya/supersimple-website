@@ -234,6 +234,30 @@ body.toggled .project {
 }
 
 .project:hover .project-label {
+  opacity: 0; /* hide number when hovering; tooltip shows instead */
+}
+
+/* tooltip shown when hovering over a project. content comes from titledescription.txt */
+.project-tooltip {
+  position: absolute;
+  /* base color is white so that mix-blend-mode produces
+     white-on-dark and black-on-light automatically */
+  color: #fff;
+  mix-blend-mode: difference; /* invert relative to whatever's behind */
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.5rem;
+  line-height: 1.2;
+  /* allow wrapping and multiple lines */
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  max-width: calc(var(--project-size) * 1.5);
+  text-align: center;
+}
+
+.project:hover .project-tooltip {
   opacity: 1;
 }
 
