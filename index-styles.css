@@ -3,6 +3,26 @@
   --project-gap: 30px;
 }
 
+/* background branding text */
+.background-text {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Menlo", monospace;
+  text-align: center;
+  /* outlined text: transparent fill with light stroke */
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(114, 114, 114);
+  text-stroke: 1px rgba(255, 255, 255, 0.35);
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1.2;
+  white-space: pre-line;
+}
+
 /* main */
 body {
   margin: 0;

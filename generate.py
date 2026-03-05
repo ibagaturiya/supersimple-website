@@ -196,6 +196,16 @@ def generate_index_html(projects):
         if (hLine) hLine.style.top = e.clientY + 'px';
       }});
     </script>
+
+    <!-- centered background branding text -->
+    <div class="background-text">
+      I.A.B <br />
+      Ivan Bagaturiya<br />
+      Computational Architect<br /><br />
+      Architecture · Code<br />
+      ETH Zürich
+    </div>
+
     {copyright}
   </body>
 </html>
