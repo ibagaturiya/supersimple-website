@@ -1,7 +1,16 @@
 body {
   margin: 0;
-  background: #ff9100;
-  color: #111;
+  background: linear-gradient(
+    45deg,
+    #ff9100,
+    #ff5722,
+    #bbbbbb,
+    #656565,
+    #000000
+  );
+  background-size: 800% 800%;
+  animation: gradientShift 25s ease infinite;
+  color: #ffffff;
   font-family: Menlo, monospace !important;
   font-size: 9px;
 }
@@ -344,4 +353,16 @@ hr {
 }
 #slideshow-next {
   right: 10px;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
