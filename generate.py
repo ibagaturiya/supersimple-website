@@ -106,7 +106,7 @@ def media_html_tag(src):
         full_path = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR, src)
         content = read_file(full_path)
         if content.startswith('http'):
-            return f'<iframe src="{content}" width="400" height="300" frameborder="0" allowfullscreen></iframe>'
+            return f'<a href="{content}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View Website</a>'
         else:
             return f'<pre>{content}</pre>'  # display as text
     else:
@@ -236,7 +236,7 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     if os.path.exists(trailer_txt_path):
       trailer_html = read_file(trailer_txt_path)
       if trailer_html.startswith('http'):
-        trailer_html = f'<iframe src="{trailer_html}" width="400" height="300" frameborder="0" allowfullscreen></iframe>'
+        trailer_html = f'<a href="{trailer_html}" target="_blank" style="color:#fff;text-decoration:underline;">View Website</a>'
     else:
       for ext in [".mp4", ".gif"]:
         trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
