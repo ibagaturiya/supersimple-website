@@ -9,7 +9,7 @@
   inset: 0;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   font-family: "Menlo", monospace;
   text-align: left;
   /* outlined text: transparent fill with light stroke */
