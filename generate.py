@@ -25,7 +25,7 @@ copyright = '''
     pointer-events: none;
   "
 >
-  Ivan Bagaturiya &mdash;
+  created by Ivan Bagaturiya &mdash;
   <script>
     document.write(document.lastModified);
   </script>
@@ -201,9 +201,11 @@ def generate_index_html(projects):
 
     <!-- centered background branding text -->
     <div class="background-text">
-      I.A.B <br />
-      Ivan Bagaturiya<br />
-      Computational Architect
+      I.A.B</br />
+      Ivan</br />
+      Bagaturiya<br />
+      Computational</br />
+      Architect
     </div>
 
     {copyright}

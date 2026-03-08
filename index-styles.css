@@ -8,18 +8,19 @@
   position: fixed;
   inset: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: "Futura", monospace;
-  text-align: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  font-family: "Menlo", monospace;
+  text-align: left;
   /* outlined text: transparent fill with light stroke */
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
-  font-size: 2rem;
+  font-size: 3.2rem;
   pointer-events: none;
   z-index: 0;
-  line-height: 1.2;
-  white-space: pre-line;
+  line-height: 0.7;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* main */
@@ -55,7 +56,7 @@ body.toggled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
+  background: transparent;
   border-radius: 19%;
   overflow: hidden;
   text-decoration: none;
@@ -237,21 +238,17 @@ body.toggled .project {
   word-wrap: break-word;
 }
 
-.project:hover .project-label {
-  opacity: 0; /* hide number when hovering; tooltip shows instead */
-}
-
 /* tooltip shown when hovering over a project. content comes from titledescription.txt */
 .project-tooltip {
   position: absolute;
   /* base color is white so that mix-blend-mode produces
      white-on-dark and black-on-light automatically */
-  color: #fff;
+  color: #ffffff;
   mix-blend-mode: difference; /* invert relative to whatever's behind */
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.5rem;
-  line-height: 1.2;
+  padding: 4px 4px;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  line-height: 1;
   /* allow wrapping and multiple lines */
   white-space: normal;
   opacity: 0;
@@ -259,6 +256,7 @@ body.toggled .project {
   z-index: 4;
   max-width: calc(var(--project-size) * 1.5);
   text-align: center;
+  word-break: break-all;
 }
 
 .project:hover .project-tooltip {

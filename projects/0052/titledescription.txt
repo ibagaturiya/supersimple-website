@@ -1,4 +1,2 @@
-0052
-_Zwischendecken
-ETH Zürich
-2025
+_zwischendecke
+2024

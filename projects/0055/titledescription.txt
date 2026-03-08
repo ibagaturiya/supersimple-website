@@ -1,4 +1,2 @@
-0055
-_Leuchtturm
-ETH Zürich
+_leuchtturm
 2025
