@@ -15,7 +15,7 @@
   /* outlined text: transparent fill with light stroke */
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
-  font-size: 3.2rem;
+  font-size: 3.3rem;
   pointer-events: none;
   z-index: 0;
   line-height: 0.7;
