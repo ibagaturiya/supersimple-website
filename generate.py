@@ -330,6 +330,8 @@ def main():
 
     # Second pass: generate HTML files with complete projects list
     for idx, folder in enumerate(project_folders):
+        if folder == "2409":
+            continue  # Skip regenerating 2409 to preserve custom edits
         folder_path = safe_join(PROJECTS_DIR, folder)
         title = read_file(safe_join(folder_path, "title.txt"))
         desc = read_file(safe_join(folder_path, "description.txt"))

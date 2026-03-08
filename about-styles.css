@@ -107,7 +107,22 @@ body {
   width: 100%;
   max-width: 100%;
   border-radius: 12px;
-  background: #eee;
+  background: transparent;
+}
+.social-icons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.social-icons a {
+  display: inline-block;
+  transition: opacity 0.2s;
+}
+.social-icons a:hover {
+  opacity: 0.7;
+}
+.social-icons svg {
+  fill: #ffffff;
 }
 hr {
   border: none;
