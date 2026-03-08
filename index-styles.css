@@ -10,12 +10,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "Menlo", monospace;
+  font-family: "Futura", monospace;
   text-align: center;
   /* outlined text: transparent fill with light stroke */
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
-  text-stroke: 1px rgba(255, 255, 255, 0.35);
   font-size: 2rem;
   pointer-events: none;
   z-index: 0;

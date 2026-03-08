@@ -132,13 +132,13 @@ def generate_index_html(projects):
     '''
     import html as _html
     grid_html = "\n".join(
-        f'''
+        (lambda proj: f'''
         <a class="project" data-project="{proj['num']}" data-hashtags="{' '.join(proj['hashtags'])}" href="{PROJECT_HTML_DIR}/project{proj['num']}.html">
           <img src="projects/{proj['num']}/icon.svg" alt="icon" class="project-logo" />
           <span class="project-label">{proj['num']}</span>
-          <span class="project-tooltip">{_html.escape(proj.get('titledesc','')).replace('\n','<br />')}</span>
+          <span class="project-tooltip">{_html.escape(proj.get('titledesc','')).replace(chr(10),'<br />')}</span>
         </a>
-        ''' for proj in projects
+        ''')(proj) for proj in projects
     )
     dynamic_icon_js = '''
     <script>
@@ -203,9 +203,7 @@ def generate_index_html(projects):
     <div class="background-text">
       I.A.B <br />
       Ivan Bagaturiya<br />
-      Computational Architect<br /><br />
-      Architecture · Code<br />
-      ETH Zürich
+      Computational Architect
     </div>
 
     {copyright}
@@ -241,9 +239,9 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
         elif trailer_ext == ".gif":
           trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
-    # Images (exclude trailer)
-    image_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
-    images_html = "\n".join(f'<img src="{src}" alt="" />' for src in image_media)
+    # Media (exclude trailer) - use media_html_tag to handle all types
+    non_trailer_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
+    images_html = "\n".join(media_html_tag(src) for src in non_trailer_media)
 
     # Navigation SVGs (same for all, just direction changes)
     svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
