@@ -270,6 +270,7 @@ body.toggled .project {
   object-fit: contain;
   display: block;
   margin: auto;
+  background: transparent;
 }
 
 /* mouse lines */

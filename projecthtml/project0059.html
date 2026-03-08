@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0059 – _drums</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../project-styles.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="project-number-fixed">0059</a>
+    <div class="project-hero">
+      
+      <div class="project-header-overlay">
+        <span class="project-title">_drums</span>
+      </div>
+    </div>
+    <hr />
+    <div class="project-main">
+      <div class="project-left">
+        <div class="project-desc">iab disassembles<br />and builds again<br />the drums.<br /><br />unique pictographique design <br />by iab<br />produced for music competition<br />JUMU 2026 in Geneva</div>
+      </div>
+      <div class="project-right"><img src="../projects/0059/image1.png" alt="" style="background: transparent;" />
+<img src="../projects/0059/image2.png" alt="" style="background: transparent;" />
+<img src="../projects/0059/image3.png" alt="" style="background: transparent;" />
+<img src="../projects/0059/image4.png" alt="" style="background: transparent;" />
+<img src="../projects/0059/image5.png" alt="" style="background: transparent;" /></div>
+    </div>
+    <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project2409.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0055.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project0050.html">
+          <img src="../projects/0050/icon.jpg" alt="icon" class="also-like-img" />
+          <span class="also-like-label">0050</span>
+        </a>
+      </div>
+    </div>
+    
+
+    <!-- slideshow overlay used when clicking project images -->
+    <div id="slideshow-overlay">
+      <span id="slideshow-close">&times;</span>
+      <img id="slideshow-img" src="" alt="" />
+      <div id="slideshow-prev" class="slideshow-nav">&#10094;</div>
+      <div id="slideshow-next" class="slideshow-nav">&#10095;</div>
+    </div>
+
+    <script>
+      const trailer = document.querySelector(".project-trailer");
+      if (trailer && trailer.tagName === "VIDEO") {
+        trailer.muted = true;
+        trailer.autoplay = true;
+        trailer.playsInline = true;
+        trailer.play().catch(function () {
+          // Try to play again on user interaction if autoplay was blocked
+          const tryPlay = function () {
+            trailer.play();
+            window.removeEventListener("click", tryPlay);
+          };
+          window.addEventListener("click", tryPlay);
+        });
+      }
+      if (trailer) {
+        trailer.addEventListener("click", function () {
+          if (trailer.requestFullscreen) trailer.requestFullscreen();
+          else if (trailer.webkitRequestFullscreen)
+            trailer.webkitRequestFullscreen();
+          else if (trailer.msRequestFullscreen) trailer.msRequestFullscreen();
+        });
+      }
+
+      // slideshow logic for clickable images
+      (function () {
+        const images = Array.from(document.querySelectorAll('.project-right img'));
+        if (!images.length) return;
+        images.forEach((img, idx) => {
+          img.style.cursor = 'pointer';
+          img.dataset.index = idx;
+        });
+        const overlay = document.getElementById('slideshow-overlay');
+        const slideshowImg = document.getElementById('slideshow-img');
+        const closeBtn = document.getElementById('slideshow-close');
+        const prevBtn = document.getElementById('slideshow-prev');
+        const nextBtn = document.getElementById('slideshow-next');
+        let currentIndex = 0;
+        const showSlide = (i) => {
+          currentIndex = (i + images.length) % images.length;
+          slideshowImg.src = images[currentIndex].src;
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        };
+        const hideSlide = () => {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        };
+        images.forEach(img => img.addEventListener('click', () => showSlide(parseInt(img.dataset.index))));
+        closeBtn.addEventListener('click', hideSlide);
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex - 1); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex + 1); });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) hideSlide(); });
+        document.addEventListener('keydown', (e) => {
+          if (!overlay.classList.contains('active')) return;
+          if (e.key === 'ArrowRight') showSlide(currentIndex + 1);
+          else if (e.key === 'ArrowLeft') showSlide(currentIndex - 1);
+          else if (e.key === 'Escape') hideSlide();
+        });
+        let touchStartX = 0;
+        overlay.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; });
+        overlay.addEventListener('touchend', e => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) showSlide(currentIndex + 1);
+            else showSlide(currentIndex - 1);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

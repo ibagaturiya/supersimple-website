@@ -93,7 +93,8 @@ def get_hashtags(folder):
 
 def media_html_tag(src):
     if src.lower().endswith(('.jpg', '.jpeg', '.gif', '.png', '.svg')):
-        return f'<img src="{src}" alt="" />'
+        style = ' style="background: transparent;"' if src.lower().endswith('.png') else ''
+        return f'<img src="{src}" alt=""{style} />'
     elif src.lower().endswith('.mp4'):
         return f'<video src="{src}" controls loop muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:120px;max-height:340px;"></video>'
     elif src.lower().endswith('.mp3'):
