@@ -286,6 +286,8 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
 
     # Replace placeholders in template
     html = template
+    if project_num == "2409":
+        html = html.replace("../project-styles.css", "../about-styles.css")
     html = html.replace("{{PROJECT_NUM}}", project_num)
     html = html.replace("{{TITLE}}", title)
     html = html.replace("{{DESC}}", desc.replace('\n', '<br />'))

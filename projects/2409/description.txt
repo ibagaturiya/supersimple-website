@@ -1,1 +1,16 @@
-iab is
+Ivan Bagaturiya 
+i.a.b.
+is an architecture graduate from ETH Zurich
+specializing in computational design 
+and digital workflows. 
+His work bridges architecture and software 
+through parametric modeling, 
+scripting, 
+and process automation. 
+
+He is interested in developing 
+tools and systems 
+that make complex design processes 
+more efficient, 
+scalable, 
+and intelligent.
