@@ -59,7 +59,7 @@ def get_icon(folder):
 
 def get_media(folder):
     media = []
-    exts = {".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf"}
+    exts = {".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf", ".txt"}
 
     try:
         files = os.listdir(folder)
@@ -101,6 +101,14 @@ def media_html_tag(src):
         return f'<audio src="{src}" controls style="width:100%;margin-top:8px;"></audio>'
     elif src.lower().endswith('.pdf'):
         return f'<a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a>'
+    elif src.lower().endswith('.txt'):
+        # compute full path: src is relative to projecthtml, like ../projects/0056/image1.txt
+        full_path = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR, src)
+        content = read_file(full_path)
+        if content.startswith('http'):
+            return f'<iframe src="{content}" width="400" height="300" frameborder="0" allowfullscreen></iframe>'
+        else:
+            return f'<pre>{content}</pre>'  # display as text
     else:
         return ''
 
@@ -227,6 +235,8 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
     if os.path.exists(trailer_txt_path):
       trailer_html = read_file(trailer_txt_path)
+      if trailer_html.startswith('http'):
+        trailer_html = f'<iframe src="{trailer_html}" width="400" height="300" frameborder="0" allowfullscreen></iframe>'
     else:
       for ext in [".mp4", ".gif"]:
         trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
