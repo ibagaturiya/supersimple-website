@@ -57,6 +57,26 @@ def get_icon(folder):
             return os.path.relpath(icon_path, project_base).replace("\\", "/")
     return ""
 
+def parse_media_number(name):
+    base, _ = os.path.splitext(name)
+    m = re.match(r'^(\d+)', base)
+    if m:
+        return int(m.group(1))
+    m = re.search(r'image\s*(\d+)', base, re.I)
+    return int(m.group(1)) if m else float('inf')
+
+
+def media_sort_key(name):
+    base, _ = os.path.splitext(name)
+    m = re.match(r'^(\d+)', base)
+    if m:
+        return (0, int(m.group(1)), name.lower())
+    m = re.search(r'image\s*(\d+)', base, re.I)
+    if m:
+        return (0, int(m.group(1)), name.lower())
+    return (1, float('inf'), name.lower())
+
+
 def get_media(folder):
     media = []
     exts = {".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf", ".txt"}
@@ -66,22 +86,20 @@ def get_media(folder):
     except FileNotFoundError:
         return media
 
-    # sort by the numeric portion after "image"; leading zeros are ignored
-    def sort_key(name):
-        m = re.search(r'image\s*(\d+)', name, re.I)
-        return int(m.group(1)) if m else float('inf')
-
-    for fname in sorted(files, key=sort_key):
+    for fname in sorted(files, key=media_sort_key):
         base, ext = os.path.splitext(fname)
 
-        # accept any "image" name followed by one or more digits (e.g. image1,
-        # image01, image00001).  This keeps old single-digit names working while
-        # allowing longer numbers with leading zeros.
-        if ext.lower() in exts and re.search(r'^image\s*\d+$', base, re.I):
+        # accept numbered files such as 0001_name.jpg, 0002_name.png, or older
+        # image1/image00001 style names.
+        if ext.lower() in exts and (re.match(r'^\d+', base) or re.search(r'^image\s*\d+$', base, re.I)):
             media_path = safe_join(folder, fname)
             project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
             rel_path = os.path.relpath(media_path, project_base).replace("\\", "/")
-            media.append(rel_path)
+            media.append({
+                "src": rel_path,
+                "number": parse_media_number(fname),
+                "name": fname,
+            })
 
     return media
 
@@ -94,21 +112,21 @@ def get_hashtags(folder):
 def media_html_tag(src):
     if src.lower().endswith(('.jpg', '.jpeg', '.gif', '.png', '.svg')):
         style = ' style="background: transparent;"' if src.lower().endswith('.png') else ''
-        return f'<img src="{src}" alt=""{style} />'
+        return f'<div class="project-media-item"><img class="project-media" src="{src}" alt=""{style} /></div>'
     elif src.lower().endswith('.mp4'):
-        return f'<video src="{src}" controls loop muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:120px;max-height:340px;"></video>'
+        return f'<div class="project-media-item"><video class="project-media" src="{src}" controls loop muted playsinline></video></div>'
     elif src.lower().endswith('.mp3'):
-        return f'<audio src="{src}" controls style="width:100%;margin-top:8px;"></audio>'
+        return f'<div class="project-media-item"><audio class="project-media" src="{src}" controls></audio></div>'
     elif src.lower().endswith('.pdf'):
-        return f'<a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a>'
+        return f'<div class="project-media-item"><a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a></div>'
     elif src.lower().endswith('.txt'):
         # compute full path: src is relative to projecthtml, like ../projects/0056/image1.txt
         full_path = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR, src)
         content = read_file(full_path)
         if content.startswith('http'):
-            return f'<a href="{content}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View Website</a>'
+            return f'<div class="project-media-item"><a href="{content}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View Website</a></div>'
         else:
-            return f'<pre>{content}</pre>'  # display as text
+            return f'<div class="project-media-item"><pre>{content}</pre></div>'  # display as text
     else:
         return ''
 
@@ -240,9 +258,22 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
         elif trailer_ext == ".gif":
           trailer_html = f'<img class="project-trailer" src="{trailer}" alt="Trailer" />'
 
-    # Media (exclude trailer) - use media_html_tag to handle all types
-    non_trailer_media = [src for src in media if not src.endswith("trailer.mp4") and not src.endswith("trailer.gif")]
-    images_html = "\n".join(media_html_tag(src) for src in non_trailer_media)
+    # Media (exclude trailer) - group by numbered prefix so items with the same
+    # number share a row and later numbers appear below in order.
+    non_trailer_media = [item for item in media if not item["src"].endswith("trailer.mp4") and not item["src"].endswith("trailer.gif")]
+    grouped_media = []
+    for item in non_trailer_media:
+        if not grouped_media or grouped_media[-1][-1]["number"] != item["number"]:
+            grouped_media.append([item])
+        else:
+            grouped_media[-1].append(item)
+
+    rows_html = []
+    for group in grouped_media:
+        items_html = "".join(media_html_tag(item["src"]) for item in group)
+        row_class = "project-media-row" if len(group) == 1 else "project-media-row project-media-row--multi"
+        rows_html.append(f'<div class="{row_class}">{items_html}</div>')
+    images_html = "\n".join(rows_html)
 
     # Navigation SVGs (same for all, just direction changes)
     svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
