@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
       el.style.position = "absolute";
       el.style.transition = "none";
       el.style.zIndex = 10;
+      el.style.pointerEvents = "none";
       const rect = originalRects[i];
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
