@@ -115,6 +115,11 @@ document.addEventListener("DOMContentLoaded", function () {
         background: "transparent",
       },
     });
+    if (render.canvas) {
+      render.canvas.style.pointerEvents = "none";
+      render.canvas.style.zIndex = "-1";
+      render.canvas.style.position = "fixed";
+    }
     const wallThickness = 100;
     const wallOptions = {
       isStatic: true,
@@ -177,11 +182,13 @@ document.addEventListener("DOMContentLoaded", function () {
       Matter.World.add(engine.world, body);
       return body;
     });
-    mouseConstraint = Matter.MouseConstraint.create(engine, {
-      element: document.body,
-      constraint: { stiffness: 0.2, render: { visible: false } },
-    });
-    Matter.World.add(engine.world, mouseConstraint);
+    if (window.innerWidth > 768) {
+      mouseConstraint = Matter.MouseConstraint.create(engine, {
+        element: document.body,
+        constraint: { stiffness: 0.2, render: { visible: false } },
+      });
+      Matter.World.add(engine.world, mouseConstraint);
+    }
     Matter.Events.on(engine, "afterUpdate", () => {
       bodies.forEach((body) => {
         const w = body.bounds.max.x - body.bounds.min.x;
@@ -190,6 +197,10 @@ document.addEventListener("DOMContentLoaded", function () {
         body.el.style.top = body.position.y - h / 2 + "px";
         body.el.style.transform = `rotate(${body.angle}rad)`;
       });
+    });
+    console.log("Bubble mode started", {
+      width: window.innerWidth,
+      height: window.innerHeight,
     });
     window.addEventListener("deviceorientation", handleOrientation);
     window.addEventListener("mousemove", handleMouseMove);
