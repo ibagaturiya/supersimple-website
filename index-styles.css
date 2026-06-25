@@ -232,6 +232,35 @@ body.toggled .project {
   color: #111;
 }
 
+.filter-btn[data-action="toggle"] {
+  color: #d4d4d4;
+  transition:
+    color 15s ease,
+    background 0.3s ease,
+    text-shadow 0.3s ease;
+  animation: funPulse 15s ease-in-out infinite;
+}
+
+.filter-btn[data-action="toggle"]:hover,
+.filter-btn[data-action="toggle"]:focus,
+.filter-btn[data-action="toggle"].active {
+  color: #ff8c42;
+  background: rgba(194, 96, 35, 0.645);
+  text-shadow: 0 0 10px rgba(255, 140, 66, 0.35);
+}
+
+@keyframes funPulse {
+  0%,
+  100% {
+    color: #ff8c42;
+    text-shadow: 0 0 10px rgba(255, 140, 66, 0.35);
+  }
+  50% {
+    color: #b0b0b0;
+    text-shadow: 0 0 14px rgba(255, 77, 77, 0.45);
+  }
+}
+
 /* project label */
 .project-label {
   position: absolute;
