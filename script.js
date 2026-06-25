@@ -164,7 +164,10 @@ document.addEventListener("DOMContentLoaded", function () {
       el.style.position = "absolute";
       el.style.transition = "none";
       el.style.zIndex = 10;
-      el.style.pointerEvents = "none";
+      el.style.pointerEvents = "auto";
+      el.querySelectorAll("*").forEach((child) => {
+        child.style.pointerEvents = "none";
+      });
       const rect = originalRects[i];
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
@@ -266,6 +269,9 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.zIndex = "";
         el.style.pointerEvents = "";
         el.style.transform = "";
+        el.querySelectorAll("*").forEach((child) => {
+          child.style.pointerEvents = "";
+        });
       });
       grid.classList.remove("bubble-mode");
       grid.style.position = "";
