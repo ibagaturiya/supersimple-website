@@ -224,18 +224,20 @@ hr {
 }
 @media (max-width: 900px) {
   .project-main {
-    flex-direction: row;
-    gap: 18px;
+    flex-direction: column;
+    gap: 24px;
     padding: 32px 4vw 16px 4vw;
   }
   .project-left {
-    max-width: 35%;
-    flex: 1 1 35%;
-    padding: 0 12px 0 0;
+    max-width: 100%;
+    flex: 1 1 100%;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
   }
   .project-right {
-    max-width: 65%;
-    flex: 1 1 65%;
+    max-width: 100%;
+    flex: 1 1 100%;
     padding: 0;
   }
   .nav-btn {
@@ -248,17 +250,19 @@ hr {
     padding-top: 16px;
   }
   .project-main {
-    flex-direction: row;
+    flex-direction: column;
     padding: 16px 2vw 8px 2vw;
   }
   .project-left {
-    max-width: 35%;
-    flex: 1 1 35%;
-    padding: 0 8px 0 0;
+    max-width: 100%;
+    flex: 1 1 100%;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
   }
   .project-right {
-    max-width: 65%;
-    flex: 1 1 65%;
+    max-width: 100%;
+    flex: 1 1 100%;
     padding: 0;
   }
   .nav-btn {
