@@ -20,13 +20,44 @@
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
   font-size: 3.3rem;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   z-index: 0;
   line-height: 0.7;
   white-space: pre-wrap;
   word-break: break-word;
   padding-right: clamp(18px, 3vw, 48px);
   box-sizing: border-box;
+}
+
+.direction-arrow {
+  position: fixed;
+  width: 180px;
+  height: 24px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  transform-origin: left center;
+  transition: opacity 0.2s ease;
+  color: rgb(251, 173, 5);
+}
+
+.direction-arrow line,
+.direction-arrow path {
+  stroke: currentColor;
+  stroke-width: 1.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 2;
+}
+
+.direction-arrow.visible {
+  opacity: 1;
+}
+
+body.toggled .direction-arrow {
+  color: rgba(0, 0, 0, 0.8);
 }
 
 /* main */
@@ -223,12 +254,12 @@ body.toggled .project {
 }
 
 .filter-btn:hover {
-  background: #fff;
+  background: #ffffffc9;
   color: #111;
 }
 
 .filter-btn:focus {
-  background: #ffb347;
+  background: #ff9500cc;
   color: #111;
 }
 
@@ -244,20 +275,17 @@ body.toggled .project {
 .filter-btn[data-action="toggle"]:hover,
 .filter-btn[data-action="toggle"]:focus,
 .filter-btn[data-action="toggle"].active {
-  color: #ff8c42;
-  background: rgba(194, 96, 35, 0.645);
-  text-shadow: 0 0 10px rgba(255, 140, 66, 0.35);
+  color: #ffba42;
+  background: rgba(243, 118, 40, 0.746);
 }
 
 @keyframes funPulse {
   0%,
   100% {
-    color: #ff8c42;
-    text-shadow: 0 0 10px rgba(255, 140, 66, 0.35);
+    color: #b0b0b0;
   }
   50% {
-    color: #b0b0b0;
-    text-shadow: 0 0 14px rgba(255, 77, 77, 0.45);
+    color: #ff8c42;
   }
 }
 

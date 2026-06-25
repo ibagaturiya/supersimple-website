@@ -6,8 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const toggleButton = document.querySelector(
     '.filter-btn[data-action="toggle"]',
   );
+  const backgroundText = document.getElementById("backgroundText");
+  const directionArrow = document.getElementById("directionArrow");
   let activeFilter = null;
   let bubbleModeActive = false;
+  let arrowOrigin = { x: 0, y: 0 };
+  let arrowVisible = false;
+  let arrowFollowTimer = null;
+  let arrowHideTimer = null;
+  let arrowTrackingUntil = 0;
+  let arrowAnimationFrame = null;
 
   if (!grid) {
     console.error("Missing #projectGrid in the HTML.");
@@ -26,6 +34,99 @@ document.addEventListener("DOMContentLoaded", function () {
     projects = allProjects;
     storeOriginalPositions();
     originalRects = projects.map((el) => el.getBoundingClientRect());
+  }
+
+  function updateDirectionArrow() {
+    if (!directionArrow) return;
+
+    const aboutProject = document.querySelector(
+      '.project[data-project="2409"]',
+    );
+    if (!aboutProject) return;
+
+    const rect = aboutProject.getBoundingClientRect();
+    const target = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+
+    const startX = arrowOrigin.x;
+    const startY = arrowOrigin.y;
+    const angle = Math.atan2(target.y - startY, target.x - startX);
+    const distance = Math.hypot(target.x - startX, target.y - startY);
+
+    directionArrow.style.left = `${startX}px`;
+    directionArrow.style.top = `${startY}px`;
+    directionArrow.style.width = `${Math.max(distance, 40)}px`;
+    directionArrow.style.transform = `translateY(-50%) rotate(${angle}rad)`;
+    directionArrow.setAttribute("viewBox", `0 0 ${Math.max(distance, 40)} 20`);
+    directionArrow.innerHTML = `<line x1="0" y1="10" x2="${Math.max(distance, 40)}" y2="10" stroke-dasharray="2 2"></line>`;
+    directionArrow.classList.toggle("visible", arrowVisible);
+  }
+
+  function stopArrowAnimation() {
+    if (arrowAnimationFrame) {
+      cancelAnimationFrame(arrowAnimationFrame);
+      arrowAnimationFrame = null;
+    }
+  }
+
+  function startArrowAnimation() {
+    if (arrowAnimationFrame) return;
+    const tick = () => {
+      if (arrowVisible) {
+        updateDirectionArrow();
+      }
+      arrowAnimationFrame = requestAnimationFrame(tick);
+    };
+    arrowAnimationFrame = requestAnimationFrame(tick);
+  }
+
+  function showDirectionArrow(targetX, targetY) {
+    arrowOrigin = { x: targetX, y: targetY };
+    arrowTrackingUntil = Date.now() + 1000;
+    arrowVisible = true;
+    updateDirectionArrow();
+    startArrowAnimation();
+
+    if (arrowHideTimer) clearTimeout(arrowHideTimer);
+    arrowHideTimer = setTimeout(() => {
+      arrowVisible = false;
+      directionArrow.classList.remove("visible");
+      stopArrowAnimation();
+    }, 1200);
+  }
+
+  if (backgroundText) {
+    const revealArrow = (event) => {
+      const clickX = event.clientX;
+      const clickY = event.clientY;
+      showDirectionArrow(clickX, clickY);
+    };
+
+    backgroundText.addEventListener("click", revealArrow);
+    backgroundText.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        revealArrow({
+          clientX: window.innerWidth / 2,
+          clientY: window.innerHeight / 2,
+        });
+      }
+    });
+  }
+
+  window.addEventListener("mousemove", (event) => {
+    if (Date.now() < arrowTrackingUntil) {
+      arrowOrigin = { x: event.clientX, y: event.clientY };
+      updateDirectionArrow();
+    }
+  });
+
+  window.addEventListener("resize", updateDirectionArrow);
+  window.addEventListener("scroll", updateDirectionArrow);
+  if (document.fonts) {
+    document.fonts.addEventListener?.("loadingdone", updateDirectionArrow);
   }
 
   if (filterBar) {
