@@ -2,12 +2,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const grid = document.getElementById("projectGrid");
   const allProjects = Array.from(document.querySelectorAll(".project"));
   let projects = allProjects.slice();
-  const toggle = document.getElementById("bubbleToggle");
   const filterBar = document.getElementById("filterBar");
+  const toggleButton = document.querySelector(
+    '.filter-btn[data-action="toggle"]',
+  );
   let activeFilter = null;
+  let bubbleModeActive = false;
 
-  if (!grid || !toggle) {
-    console.error("Missing #projectGrid or #bubbleToggle in the HTML.");
+  if (!grid) {
+    console.error("Missing #projectGrid in the HTML.");
     return;
   }
 
@@ -29,8 +32,30 @@ document.addEventListener("DOMContentLoaded", function () {
     filterBar.addEventListener("click", function (e) {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-      btn.classList.toggle("active");
-      if (btn.classList.contains("active")) {
+
+      if (btn.dataset.action === "toggle") {
+        const shouldActivate = !btn.classList.contains("active");
+        filterBar.querySelectorAll(".filter-btn").forEach((filterBtn) => {
+          if (filterBtn !== btn) filterBtn.classList.remove("active");
+        });
+
+        if (shouldActivate) {
+          btn.classList.add("active");
+          setBubbleMode(true);
+        } else {
+          btn.classList.remove("active");
+          setBubbleMode(false);
+        }
+        return;
+      }
+
+      const isActive = btn.classList.contains("active");
+      filterBar.querySelectorAll(".filter-btn").forEach((filterBtn) => {
+        if (filterBtn !== btn) filterBtn.classList.remove("active");
+      });
+
+      if (!isActive) {
+        btn.classList.add("active");
         applyFilter(btn.dataset.filter.toLowerCase());
       } else {
         applyFilter(null);
@@ -242,7 +267,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function stopBubblePhysics() {
     inBubbleMode = false;
-    document.querySelector(".center-toggle").style.pointerEvents = "auto";
     if (window.innerWidth > 768) {
       unlockBodyScroll();
     }
@@ -314,8 +338,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   window.addEventListener("load", storeOriginalPositions);
 
-  toggle.addEventListener("change", function () {
-    if (toggle.checked) {
+  function setBubbleMode(active) {
+    if (bubbleModeActive === active) return;
+    bubbleModeActive = active;
+
+    if (active) {
       document.body.classList.add("toggled");
       storeOriginalPositions();
       startBubblePhysics();
@@ -326,5 +353,16 @@ document.addEventListener("DOMContentLoaded", function () {
         location.reload();
       }, 1000);
     }
-  });
+  }
+
+  if (toggleButton) {
+    toggleButton.addEventListener("click", function () {
+      const shouldActivate = !toggleButton.classList.contains("active");
+      if (shouldActivate) {
+        setBubbleMode(true);
+      } else {
+        setBubbleMode(false);
+      }
+    });
+  }
 });
