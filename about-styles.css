@@ -13,7 +13,7 @@ body {
   animation: gradientShift 25s ease infinite;
   color: #ffffff;
   font-family: Menlo, monospace !important;
-  font-size: 9px;
+  font-size: 12px;
 }
 .project-hero {
   position: relative;

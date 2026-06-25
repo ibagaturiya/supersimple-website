@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (shouldActivate) {
           btn.classList.add("active");
+          applyFilter(null);
           setBubbleMode(true);
         } else {
           btn.classList.remove("active");
