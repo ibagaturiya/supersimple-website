@@ -208,6 +208,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     window.addEventListener("deviceorientation", handleOrientation);
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", (e) => {
+      if (!engine) return;
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+
+      const x = (t.clientX / window.innerWidth - 0.5) * 2;
+      const y = (t.clientY / window.innerHeight - 0.5) * 2;
+
+      engine.world.gravity.x = x;
+      engine.world.gravity.y = y;
+    });
     Matter.Render.run(render);
     runner = Matter.Runner.create();
     Matter.Runner.run(runner, engine);
