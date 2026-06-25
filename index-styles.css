@@ -1,17 +1,21 @@
 :root {
   --project-size: 120px;
   --project-gap: 30px;
+  --left-panel-width: 50vw;
 }
 
 /* background branding text */
 .background-text {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: var(--left-panel-width);
+  height: 100vh;
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   font-family: "Menlo", monospace;
-  text-align: left;
+  text-align: right;
   /* outlined text: transparent fill with light stroke */
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
@@ -20,7 +24,9 @@
   z-index: 0;
   line-height: 0.7;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
+  padding-right: clamp(18px, 3vw, 48px);
+  box-sizing: border-box;
 }
 
 /* main */
@@ -29,6 +35,7 @@ body {
   font-family: "Menlo", monospace !important;
   background: #000000;
   transition: background 0.5s;
+  overflow-x: hidden;
 }
 
 body.toggled {
@@ -38,17 +45,25 @@ body.toggled {
 .main {
   max-width: none;
   margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--project-size), max-content)
+  );
   gap: var(--project-gap);
-  width: 100%;
-  margin: 0 auto;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 30px;
+  width: auto;
+  max-width: calc(100vw - var(--left-panel-width));
+  margin: 0 0 0 auto;
+  justify-content: start;
+  align-items: start;
+  padding: 30px 30px 30px 0;
   box-sizing: border-box;
 }
 
@@ -89,8 +104,8 @@ body.toggled .project {
 /* switch toggle */
 .center-toggle {
   position: fixed;
-  bottom: 18px;
-  left: 10px;
+  bottom: 250px;
+  left: 70px;
   z-index: 100000;
   pointer-events: auto;
   touch-action: manipulation;
@@ -316,6 +331,36 @@ body.toggled .mouse-line-horizontal {
 }
 
 @media (max-width: 900px) {
+  :root {
+    --left-panel-width: 50vw;
+  }
+
+  .background-text {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--left-panel-width);
+    height: 80vh;
+    justify-content: flex-end;
+    text-align: right;
+    padding-right: clamp(5px, 1vw, 1px);
+  }
+
+  .main {
+    min-height: 100vh;
+  }
+
+  .grid {
+    max-width: calc(100vw - var(--left-panel-width));
+    width: auto;
+    padding: 22px 18px 22px 0;
+    margin: 0 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, var(--project-size));
+    justify-content: start;
+    align-items: start;
+  }
+
   .project-trailer {
     width: 98vw;
     min-height: 180px;
@@ -326,15 +371,21 @@ body.toggled .mouse-line-horizontal {
 
 @media (max-width: 600px) {
   :root {
-    --project-size: 80px;
-    --project-gap: 10px;
+    --project-size: 72px;
+    --project-gap: 12px;
+    --left-panel-width: 50vw;
+  }
+
+  .background-text {
+    font-size: 1.1rem;
+    line-height: 0.5;
+    padding-right: 8px;
   }
 
   .grid {
-    display: grid;
-    grid-template-columns: repeat(4, var(--project-size));
-    gap: var(--project-gap);
-    justify-content: center;
+    padding: 18px 12px 18px 0;
+    gap: 12px;
+    grid-template-columns: repeat(2, var(--project-size));
   }
 
   .project-label {
