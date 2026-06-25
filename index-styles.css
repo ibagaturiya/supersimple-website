@@ -303,8 +303,10 @@ body.toggled .mouse-line-horizontal {
   object-fit: contain;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 400px) {
   :root {
+    --project-size: 72px;
+    --project-gap: 12px;
     --left-panel-width: 50vw;
   }
 
@@ -317,6 +319,8 @@ body.toggled .mouse-line-horizontal {
     justify-content: flex-end;
     text-align: right;
     padding-right: clamp(5px, 1vw, 1px);
+    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+    line-height: 0.5;
   }
 
   .main {
@@ -326,12 +330,17 @@ body.toggled .mouse-line-horizontal {
   .grid {
     max-width: calc(100vw - var(--left-panel-width));
     width: auto;
-    padding: 22px 18px 22px 0;
+    padding: 18px 12px 18px 0;
     margin: 0 0 0 auto;
     display: grid;
     grid-template-columns: repeat(2, var(--project-size));
     justify-content: start;
     align-items: start;
+    gap: 12px;
+  }
+
+  .project-label {
+    font-size: 1.1rem;
   }
 
   .project-trailer {
@@ -339,29 +348,5 @@ body.toggled .mouse-line-horizontal {
     min-height: 180px;
     height: 32vh;
     max-height: 40vh;
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    --project-size: 72px;
-    --project-gap: 12px;
-    --left-panel-width: 50vw;
-  }
-
-  .background-text {
-    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
-    line-height: 0.5;
-    padding-right: 8px;
-  }
-
-  .grid {
-    padding: 18px 12px 18px 0;
-    gap: 12px;
-    grid-template-columns: repeat(2, var(--project-size));
-  }
-
-  .project-label {
-    font-size: 1.1rem;
   }
 }
