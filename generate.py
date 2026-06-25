@@ -113,23 +113,6 @@ def media_html_tag(src):
         return ''
 
 def generate_index_html(projects):
-    toggle_html = '''
-    <div class="center-toggle">
-      <div class="switch">
-        <label for="bubbleToggle">
-          <input id="bubbleToggle" type="checkbox" />
-          <div class="sun-moon">
-            <div class="dots"></div>
-          </div>
-          <div class="background">
-            <div class="stars1"></div>
-            <div class="stars2"></div>
-          </div>
-          <div class="fill"></div>
-        </label>
-      </div>
-    </div>
-    '''
     filter_html = '''
     <div class="filter-bar" id="filterBar">
       <button class="filter-btn" data-filter="#selected">#SELECTED</button>
@@ -137,6 +120,7 @@ def generate_index_html(projects):
       <button class="filter-btn" data-filter="#tech">#TECH</button>
       <button class="filter-btn" data-filter="#art">#ART</button>
       <button class="filter-btn" data-filter="#music">#MUSIC</button>
+      <button class="filter-btn" data-action="toggle">#FUN</button>
     </div>
     '''
     import html as _html
@@ -181,7 +165,6 @@ def generate_index_html(projects):
     <link rel="stylesheet" href="index-styles.css" />
   </head>
   <body>
-    {toggle_html}
     {filter_html}
     <main class="main">
       <div class="grid" id="projectGrid">
@@ -208,13 +191,18 @@ def generate_index_html(projects):
       }});
     </script>
 
-    <!-- centered background branding text -->
-    <div class="background-text">
-      I.A.B</br />
-      Ivan</br />
-      Bagaturiya<br />
-      Computational</br />
-      Architect
+    <div class="background-layer">
+      <!-- centered background branding text -->
+      <div class="background-text" id="backgroundText" role="button" tabindex="0" aria-label="Show about project">
+        I.A.B</br />
+        Ivan</br />
+        Bagaturiya<br />
+        Computational</br />
+        Architect
+      </div>
+      <svg class="direction-arrow" id="directionArrow" viewBox="0 0 140 20" aria-hidden="true">
+        <line x1="0" y1="10" x2="140" y2="10"></line>
+      </svg>
     </div>
 
     {copyright}

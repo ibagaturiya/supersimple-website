@@ -1,6 +1,6 @@
 :root {
-  --project-size: 120px;
-  --project-gap: 30px;
+  --project-size: clamp(72px, 10.5vw, 140px);
+  --project-gap: clamp(12px, 2.2vw, 30px);
   --left-panel-width: 50vw;
 }
 
@@ -19,7 +19,7 @@
   /* outlined text: transparent fill with light stroke */
   color: transparent;
   -webkit-text-stroke: 1px rgb(114, 114, 114);
-  font-size: 3.3rem;
+  font-size: clamp(1.1rem, 2vw, 3.3rem);
   pointer-events: auto;
   cursor: pointer;
   z-index: 0;
@@ -236,7 +236,7 @@ body.toggled .project {
 }
 
 .filter-btn {
-  background: #171717;
+  background: #3a3a3a7e;
   color: #b3b3b3;
   border: none;
   border-radius: 8px;
@@ -434,7 +434,7 @@ body.toggled .mouse-line-horizontal {
   }
 
   .background-text {
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
     line-height: 0.5;
     padding-right: 8px;
   }
