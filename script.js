@@ -3,9 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const allProjects = Array.from(document.querySelectorAll(".project"));
   let projects = allProjects.slice();
   const filterBar = document.getElementById("filterBar");
-  const toggleButton = document.querySelector(
-    '.filter-btn[data-action="toggle"]',
-  );
   const backgroundText = document.getElementById("backgroundText");
   const directionArrow = document.getElementById("directionArrow");
   let activeFilter = null;
@@ -192,23 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.scrollTo(0, scrollPosition);
   }
 
-  function preventTouchMove(e) {
-    if (!e.target.closest(".center-toggle")) {
-      e.preventDefault();
-    }
-  }
-
-  function enableTouchLock() {
-    document.body.addEventListener("touchmove", preventTouchMove, {
-      passive: false,
-    });
-  }
-  function disableTouchLock() {
-    document.body.removeEventListener("touchmove", preventTouchMove, {
-      passive: false,
-    });
-  }
-
   function storeOriginalPositions() {
     if (!inBubbleMode) {
       projects = allProjects.filter((el) => el.style.display !== "none");
@@ -372,7 +352,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.innerWidth > 768) {
       unlockBodyScroll();
     }
-    disableTouchLock();
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("mousemove", handleMouseMove);
     Matter.Render.stop(render);
@@ -455,16 +434,5 @@ document.addEventListener("DOMContentLoaded", function () {
         location.reload();
       }, 1000);
     }
-  }
-
-  if (toggleButton) {
-    toggleButton.addEventListener("click", function () {
-      const shouldActivate = !toggleButton.classList.contains("active");
-      if (shouldActivate) {
-        setBubbleMode(true);
-      } else {
-        setBubbleMode(false);
-      }
-    });
   }
 });
