@@ -91,14 +91,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function startBubblePhysics() {
     inBubbleMode = true;
-    lockBodyScroll();
+    if (window.innerWidth > 768) {
+      lockBodyScroll();
+      grid.style.position = "fixed";
+      grid.style.left = "0";
+      grid.style.top = "0";
+      grid.style.width = "100vw";
+      grid.style.height = "100vh";
+      grid.style.zIndex = "100";
+    }
     grid.classList.add("bubble-mode");
-    grid.style.position = "fixed";
-    grid.style.left = "0";
-    grid.style.top = "0";
-    grid.style.width = "100vw";
-    grid.style.height = "100vh";
-    grid.style.zIndex = "100";
     engine = Matter.Engine.create();
     if (render && render.canvas && render.canvas.parentNode) {
       render.canvas.parentNode.removeChild(render.canvas);
@@ -128,28 +130,28 @@ document.addEventListener("DOMContentLoaded", function () {
         -wallThickness / 30,
         window.innerWidth,
         wallThickness,
-        wallOptions
+        wallOptions,
       ),
       Matter.Bodies.rectangle(
         window.innerWidth / 2,
         window.innerHeight + wallThickness / 2,
         window.innerWidth,
         wallThickness,
-        wallOptions
+        wallOptions,
       ),
       Matter.Bodies.rectangle(
         -wallThickness / 2,
         window.innerHeight / 2,
         wallThickness,
         window.innerHeight,
-        wallOptions
+        wallOptions,
       ),
       Matter.Bodies.rectangle(
         window.innerWidth + wallThickness / 2,
         window.innerHeight / 2,
         wallThickness,
         window.innerHeight,
-        wallOptions
+        wallOptions,
       ),
     ];
     Matter.World.add(engine.world, walls);
@@ -215,7 +217,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function stopBubblePhysics() {
     inBubbleMode = false;
     document.querySelector(".center-toggle").style.pointerEvents = "auto";
-    unlockBodyScroll();
+    if (window.innerWidth > 768) {
+      unlockBodyScroll();
+    }
     disableTouchLock();
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("mousemove", handleMouseMove);
