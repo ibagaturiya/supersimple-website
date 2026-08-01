@@ -240,10 +240,11 @@ Source vs generated — quick reference
 projects: Source for the site. Each project folder (e.g., 0055/) contains title.txt, description.txt, hashtags.txt, icon.*, optional imageN.* and trailer.*. Edit here.
 projectTEMPLATE.html: Template used by the generator. Change this to modify all project pages.
 Generated output (do NOT edit):
-projectNNNN.html files at the repo root — produced from projects + projectTEMPLATE.html.
+projecthtml/projectNNNN.html files — produced from projects + projectTEMPLATE.html.
+projecthtml/project2409.html is the custom about page and is intentionally not regenerated.
 index.html — the main grid; its project grid is updated by the generator.
 _archive/ : Archived/unused styles and files (not referenced).
-projecthtml: Currently empty / unused.
+portfolio-export/: Separate local tool for generating tailored portfolio and CV PDFs. It reads projects/ but does not change the website. See portfolio-export/README.md.
 .vscode: Local VS Code settings (not required for the site). Safe to remove if you don't rely on editor settings.
 ================================================================================
 END OF GUIDE

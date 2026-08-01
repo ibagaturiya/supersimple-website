@@ -1,0 +1,14 @@
+{
+  "office": "Example Computational Architecture Studio",
+  "position": "Junior Architect / Computational Designer",
+  "job_description": "We are looking for an architectural designer with strong computational design and digital workflow skills. Experience with Rhino, Grasshopper, Vectorworks, parametric design, visual programming, architectural design, and tool development is valued.",
+  "software": ["Vectorworks", "Rhino", "Grasshopper"],
+  "skills": ["architectural design", "computational design", "parametric design", "visual programming", "tool development"],
+  "focus": ["architecture", "computational design"],
+  "project_limit": 4,
+  "include_hobbies": true,
+  "hobby_categories": [],
+  "hobby_item_limit": 5,
+  "include_projects": [],
+  "exclude_projects": []
+}

@@ -1,0 +1,387 @@
+{
+  "name": "Ivan Bagaturiya",
+  "initials": "I.A.B",
+  "headline": "Computational Architect",
+  "headline_de": "Computational Architect | BIM | Parametrisches Design | Automatisierung",
+  "contact": {
+    "location": "Zürich, Schweiz",
+    "phone": "+41 78 662 69 09",
+    "email": "i@bagaturiya.com",
+    "website": "bagaturiya.com",
+    "linkedin": "linkedin.com/in/bagaturiya/",
+    "instagram": "instagram.com/ibagaturiya"
+  },
+  "profile": "Architekt ETH Zürich. Fokus auf parametrisches Design, Automatisierung und digitale Arbeitsprozesse. Entwicklung eigener Werkzeuge mit Grasshopper und Python zur Optimierung von Prozessen in Entwurf, Planung und Fertigung. Erfahrung in der Beratung zu BIM, Modellqualität, interdisziplinärer Koordination und Lehre an der ETH Zürich. Systemorientierte Arbeitsweise an der Schnittstelle von Architektur und Technologie.",
+  "profile_de": "Architekt ETH Zürich. Fokus auf parametrisches Design, Automatisierung und digitale Arbeitsprozesse. Entwicklung eigener Werkzeuge mit Grasshopper und Python zur Optimierung von Prozessen in Entwurf, Planung und Fertigung. Erfahrung in der Beratung zu BIM, Modellqualität, interdisziplinärer Koordination und Lehre an der ETH Zürich. Systemorientierte Arbeitsweise an der Schnittstelle von Architektur und Technologie.",
+  "profile_en": "Architect ETH Zurich. Specializing in computational design and digital workflows. His work bridges architecture and software through parametric modeling, scripting, and process automation. He develops tools and systems that make complex design processes more efficient, scalable, and intelligent.",
+  "skill_groups": [
+    {
+      "name": "Software",
+      "items": [
+        "Rhino",
+        "Grasshopper",
+        "Python",
+        "RhinoCommon",
+        "Visual Studio",
+        "Dynamo",
+        "AI for BIM",
+        "Vectorworks",
+        "Archicad",
+        "Revit",
+        "Navisworks",
+        "Solibri",
+        "BIM 360",
+        "Twinmotion",
+        "D5",
+        "Blender",
+        "Radii",
+        "Adobe Creative Suite",
+        "Affinity Suite"
+      ]
+    },
+    {
+      "name": "Architecture and BIM",
+      "items": [
+        "Architectural design",
+        "Computational design",
+        "Parametric design",
+        "BIM",
+        "Digital workflows",
+        "Model quality assurance",
+        "Interdisciplinary coordination",
+        "Design and fabrication"
+      ]
+    },
+    {
+      "name": "Programming and automation",
+      "items": [
+        "Python programming",
+        "Visual programming",
+        "Tool development",
+        "Plugin development",
+        "Process automation",
+        "Data management",
+        "Workflow analysis",
+        "Debugging"
+      ]
+    },
+    {
+      "name": "Visualization, XR and capture",
+      "items": [
+        "Visualization",
+        "Virtual Reality",
+        "VR",
+        "XR",
+        "360 degree photography",
+        "Drone photography",
+        "LiDAR",
+        "Gaussian Splatting"
+      ]
+    },
+    {
+      "name": "Teaching and operations",
+      "items": [
+        "Teaching",
+        "Tutorial development",
+        "Lecture delivery",
+        "Studio coordination",
+        "Infrastructure management",
+        "Material management",
+        "Technical support",
+        "Mentoring"
+      ]
+    }
+  ],
+  "expertise_groups_de": [
+    {
+      "name": "Parametrisches Design und Programmierung",
+      "items": [
+        "Rhino",
+        "Grasshopper",
+        "Python",
+        "RhinoCommon",
+        "Visual Studio",
+        "Dynamo",
+        "AI for BIM"
+      ]
+    },
+    {
+      "name": "CAD und BIM",
+      "items": [
+        "Rhino",
+        "Vectorworks",
+        "Archicad",
+        "Revit",
+        "Navisworks",
+        "Solibri",
+        "BIM 360"
+      ]
+    },
+    {
+      "name": "Visualisierung und XR",
+      "items": [
+        "Twinmotion",
+        "D5",
+        "Blender",
+        "Radii",
+        "VR",
+        "XR",
+        "Adobe Creative Suite",
+        "Affinity Suite"
+      ]
+    },
+    {
+      "name": "Räumliche Datenerfassung",
+      "items": [
+        "360 Grad Fotografie",
+        "Drohnenfotografie",
+        "LiDAR",
+        "Gaussian Splatting"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "role": "Kurator und Dozent Digitales Entwerfen",
+      "company": "ETH Studio Foundations und Gramazio Kohler Research",
+      "dates": "2025 bis heute",
+      "start": "2025",
+      "end": "heute",
+      "highlights": [
+        "Koordination der interdisziplinären Zusammenarbeit im ersten Jahr des Bachelorstudiums Architektur mit acht Professuren und mehr als 350 Studierenden.",
+        "Entwicklung von Tutorialserien und Plugins für Rhino.",
+        "Durchführung von Übungen und Vorlesungen zu Rhino, Grasshopper und weiteren digitalen Werkzeugen.",
+        "Verantwortung für Infrastruktur, Materialverwaltung und Prozessautomatisierung des Studios."
+      ]
+    },
+    {
+      "role": "Consulting Digitale Planung, Spezialisierung Vectorworks",
+      "company": "HMQ AG",
+      "location": "Chur",
+      "dates": "2025 bis heute",
+      "start": "2025",
+      "end": "heute",
+      "highlights": [
+        "Beratung und Unterstützung bei der Optimierung von Arbeitsprozessen mit BIM sowie beim Datenaustausch zwischen unterschiedlichen BIM Anwendungen.",
+        "Datenmanagement und Analyse bestehender Abläufe sowie Entwicklung und Einführung geeigneter digitaler Werkzeuge.",
+        "Qualitätssicherung von Projektmodellen und Dokumentation vor der Abgabe an Kundinnen und Kunden."
+      ]
+    },
+    {
+      "role": "Design und Fabrikationsassistent",
+      "company": "ETH Startup impact.build",
+      "dates": "2024 bis 2025",
+      "start": "2024",
+      "end": "2025",
+      "highlights": [
+        "Entwicklung und Optimierung von Prototypen für Konstruktionen aus Lehm und Holz mit Robotern von ABB für innovative und nachhaltige Bauweisen.",
+        "Erstellung parametrischer Modelle für Entwurf und Fertigung.",
+        "Verantwortung für die Ausführung digitaler und handwerklicher Bauprozesse."
+      ]
+    },
+    {
+      "role": "Computational Design Hilfsassistent",
+      "company": "ETH Digital Building Technologies, Professur Dillenburger",
+      "dates": "2023 bis 2024",
+      "start": "2023",
+      "end": "2024",
+      "highlights": [
+        "Betreuung von rund 15 Studierenden bei Arbeitsprozessen mit Grasshopper und Rhino.",
+        "Unterstützung beim parametrischen Modellieren, bei strukturierten Definitionen und beim Debugging.",
+        "Auswertung und Besprechung von Resultaten."
+      ]
+    },
+    {
+      "role": "Architekt, Visualisierung und IT Support",
+      "company": "Studio Hajnos GmbH",
+      "dates": "2021 bis 2024",
+      "start": "2021",
+      "end": "2024",
+      "highlights": [
+        "Einstieg als Praktikant, anschliessend Tätigkeit als Junior Architekt parallel zum Studium.",
+        "Erstellung von Projektplänen in unterschiedlichen Massstäben und hochwertigen Visualisierungen mit Vectorworks und Twinmotion.",
+        "Entwicklung und Umsetzung von Anwendungen für Virtual Reality.",
+        "Interner Ansprechpartner für Arbeitsprozesse in 3D und VR sowie technische Unterstützung von Mitarbeitenden und Praktikanten.",
+        "Betreuung und Einführung neuer Praktikanten.",
+        "Optimierung bestehender Entwurfsprozesse in 3D und Einführung von BIM zur Steigerung von Effizienz und Kundenzufriedenheit."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "qualification": "Master of Science ETH Architektur",
+      "institution": "ETH Zürich",
+      "dates": "2023 bis 2025",
+      "start": "2023",
+      "end": "2025",
+      "professors": [
+        "Prof. Dr. Pauli",
+        "Prof. Charbonnet",
+        "Prof. Heiz",
+        "Prof. Gramazio",
+        "Prof. Kohler",
+        "Prof. Emerson"
+      ],
+      "professor_groups": [
+        {
+          "context": "Diplom",
+          "professors": [
+            "Prof. Dr. Pauli",
+            "Prof. Charbonnet",
+            "Prof. Heiz"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Gramazio",
+            "Prof. Kohler"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Emerson"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Charbonnet",
+            "Prof. Heiz"
+          ]
+        }
+      ]
+    },
+    {
+      "qualification": "Bachelor of Science ETH Architektur",
+      "institution": "ETH Zürich",
+      "dates": "2019 bis 2023",
+      "start": "2019",
+      "end": "2023",
+      "professors": [
+        "Prof. Kerez",
+        "Prof. Rossi",
+        "Prof. Gagliardi",
+        "Prof. Hovestadt",
+        "Prof. Christ",
+        "Prof. Gantenbein",
+        "Prof. Spiro",
+        "Prof. Deplazes"
+      ],
+      "professor_groups": [
+        {
+          "professors": [
+            "Prof. Kerez",
+            "Prof. Rossi",
+            "Prof. Gagliardi"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Hovestadt"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Christ",
+            "Prof. Gantenbein"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Spiro"
+          ]
+        },
+        {
+          "professors": [
+            "Prof. Deplazes"
+          ]
+        }
+      ]
+    }
+  ],
+  "languages": [
+    "Deutsch",
+    "Schweizerdeutsch",
+    "Englisch",
+    "Russisch",
+    "Französisch"
+  ],
+  "hobbies": {
+    "optional": true,
+    "enabled_by_default": true,
+    "categories": [
+      {
+        "name": "Fotografie",
+        "items": [
+          "360 Grad Fotografie",
+          "VR, AR und XR",
+          "Drohnenfotografie und -filmografie",
+          "Eventfotograf der Tribute-Band von 'Ramones', 2019 bis 2022",
+          "Analoge und digitale Fotografie, professionelle Porträts, Objektfotografie und Makrofotografie",
+          "Preisträger des 'National Geographic' Fotowettbewerbs 2015"
+        ]
+      },
+      {
+        "name": "Zeichnung und Grafik",
+        "items": [
+          "Ausstellung in der Smolenskaya Galerie, Moskau 2017: Öl, Aquarell, Bleistift und Modellbau",
+          "Ausstellung in der Kunsthalle Zürich: Mycelium As Building System, Between Design Iterations And Living Mockups"
+        ]
+      },
+      {
+        "name": "Musik",
+        "items": [
+          "Jurymitglied bei Jugend musiziert, 2018 bis 2021",
+          "Mehrfacher Sieger bei Jugend musiziert auf Bundesebene: E-Bass Solo, E-Gitarre, Akustikgitarre und Schlagzeug",
+          "Tontechnikassistent bei musikalischen Events in Prag, Stockholm, Helsinki, Paris und Moskau, 2014 bis 2021"
+        ]
+      },
+      {
+        "name": "Sport",
+        "items": [
+          "Schwimmen",
+          "Eishockey, Captain 2016 bis 2019",
+          "Vietnamesische Kampfkunst Tam Qui",
+          "Volleyball, Europaspiele 2016 in Brüssel"
+        ]
+      },
+      {
+        "name": "Kommunikation",
+        "items": [
+          "Silberpreis beim China International College Students' 'Internet+' Innovation and Entrepreneurship Wettbewerb 2021",
+          "Rhetorik- und Redekurse 2015"
+        ]
+      }
+    ]
+  },
+  "verification_notes": [
+    "The canonical email address was confirmed by the user as i@bagaturiya.com.",
+    "The source CV lists languages without proficiency levels.",
+    "The source CV lists software and technologies without proficiency levels."
+  ],
+  "source_documents": [
+    {
+      "title": "Lebenslauf Ivan Bagaturiya",
+      "subject": "ATS optimierter Lebenslauf",
+      "language": "de",
+      "path": "/Users/iab/Library/Mobile Documents/com~apple~CloudDocs/0000 Projekte/0 Portfolio/5 CV/Ivan_Bagaturiya_CV_ATS.pdf",
+      "keywords": [
+        "Architektur",
+        "BIM",
+        "Computational",
+        "Design",
+        "Automatisierung"
+      ]
+    },
+    {
+      "title": "260119_CV_v22",
+      "language": "de",
+      "pages": 2,
+      "path": "/Users/iab/Library/Mobile Documents/com~apple~CloudDocs/0000 Projekte/0 Portfolio/5 CV/260403/260403_CV_v23.pdf",
+      "used_for": [
+        "hobbies",
+        "master professors",
+        "bachelor professors"
+      ]
+    }
+  ]
+}
