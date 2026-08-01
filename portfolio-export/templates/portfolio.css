@@ -17,13 +17,13 @@
 }
 
 html {
-  background: #d1d100;
+  background: #cfcfcb;
 }
 
 body {
   margin: 0;
   color: var(--ink);
-  background: #d3d310;
+  background: #c0c0bb;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
