@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{{PROJECT_NUM}} – {{TITLE}}</title>
+    <link rel="stylesheet" href="../assets/css/drone-gallery.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="gallery-back" aria-label="Back to all projects">{{PROJECT_NUM}}</a>
+
+    <header class="gallery-header">
+      <div>
+        <p class="gallery-kicker">aerial archive · <span>{{IMAGE_COUNT}}</span> images</p>
+        <h1>{{TITLE}}</h1>
+        <p class="gallery-description">{{DESC}}</p>
+      </div>
+      <button id="gallery-sort" class="gallery-sort" type="button" aria-label="Change image order">
+        newest first <span aria-hidden="true">↓</span>
+      </button>
+    </header>
+
+    <main id="drone-gallery" class="drone-gallery" aria-label="Drone image gallery">
+      {{GALLERY}}
+    </main>
+
+    {{ALSO_LIKE}}
+    {{NAV}}
+
+    <div id="gallery-viewer" class="gallery-viewer" role="dialog" aria-modal="true" aria-label="Full image preview" aria-hidden="true">
+      <button id="viewer-close" class="viewer-close" type="button" aria-label="Close full image preview">×</button>
+      <button id="viewer-prev" class="viewer-nav viewer-prev" type="button" aria-label="Previous image">‹</button>
+      <figure>
+        <img id="viewer-image" src="" alt="" />
+        <figcaption>
+          <time id="viewer-date"></time>
+          <span id="viewer-counter" aria-live="polite"></span>
+        </figcaption>
+      </figure>
+      <button id="viewer-next" class="viewer-nav viewer-next" type="button" aria-label="Next image">›</button>
+    </div>
+
+    <script src="../assets/js/drone-gallery.js"></script>
+  </body>
+</html>

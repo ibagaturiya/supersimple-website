@@ -1,1 +1,1 @@
-help! i have a sinus wall, but i dont have the brick size yet! i need a tool that adjusts.. 
+This project shows how a parametric tool can keep a sinusoidal brick wall buildable before the brick size is known.

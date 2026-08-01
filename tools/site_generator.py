@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from datetime import datetime
 from html import escape
 from pathlib import Path
 
@@ -9,6 +10,7 @@ PROJECTS_DIR = str(ROOT_DIR / "projects")
 OUTPUT_DIR = str(ROOT_DIR)
 PROJECT_HTML_DIR = "projecthtml"
 PROJECT_TEMPLATE = ROOT_DIR / "templates" / "project.html"
+DRONE_GALLERY_TEMPLATE = ROOT_DIR / "templates" / "drone-gallery.html"
 ABOUT_TEMPLATE = ROOT_DIR / "templates" / "about.html"
 CV_DATA_PATH = ROOT_DIR / "portfolio-export" / "data" / "cv.json"
 PROJECT_FOLDER_PATTERN = re.compile(
@@ -117,6 +119,14 @@ def media_sort_key(name):
 def get_media(folder):
     media = []
     exts = {".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".png", ".pdf", ".txt"}
+    stored_dates = {}
+
+    dates_path = Path(folder) / "media-dates.json"
+    if dates_path.exists():
+        try:
+            stored_dates = json.loads(dates_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            stored_dates = {}
 
     try:
         files = os.listdir(folder)
@@ -136,9 +146,86 @@ def get_media(folder):
                 "src": rel_path,
                 "number": parse_media_number(fname),
                 "name": fname,
+                "created": stored_dates.get(fname, media_created_at(media_path)),
             })
 
     return media
+
+
+def media_created_at(path):
+    """Return the file creation time, falling back to modification time."""
+    stat = os.stat(path)
+    return getattr(stat, "st_birthtime", stat.st_mtime)
+
+
+def generate_drone_gallery_html(project_num, project_folder, title, desc, media, next_project, prev_project, all_projects):
+    """Generate the chronological, image-first layout used only by project 0010."""
+    with DRONE_GALLERY_TEMPLATE.open("r", encoding="utf-8") as handle:
+        template = handle.read()
+
+    images = [
+        item for item in media
+        if item["src"].lower().endswith((".jpg", ".jpeg", ".png", ".gif"))
+    ]
+    images.sort(key=lambda item: (item["created"], item["name"].lower()), reverse=True)
+
+    cards = []
+    for index, item in enumerate(images):
+        created = datetime.fromtimestamp(item["created"])
+        machine_date = created.strftime("%Y-%m-%dT%H:%M:%S")
+        display_date = created.strftime("%d.%m.%Y")
+        src = escape(item["src"], quote=True)
+        alt = escape(f"{title} — aerial image {index + 1}", quote=True)
+        cards.append(
+            f'<button class="drone-card" type="button" data-created="{machine_date}" '
+            f'data-index="{index}" aria-label="Open aerial image from {display_date}">'
+            f'<img src="{src}" alt="{alt}" loading="lazy" decoding="async" />'
+            f'<time datetime="{machine_date}">{display_date}</time>'
+            '</button>'
+        )
+
+    svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_up = '<svg viewBox="0 0 60 60" width="80" height="80" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    svg_right = '<svg viewBox="0 0 60 60" width="80" height="80" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    prev_link = (f'<a class="nav-btn" href="project{prev_project}.html" aria-label="Previous project">{svg_left}</a>'
+                 if prev_project else f'<span class="nav-btn disabled" aria-hidden="true">{svg_left}</span>')
+    next_link = (f'<a class="nav-btn" href="project{next_project}.html" aria-label="Next project">{svg_right}</a>'
+                 if next_project else f'<span class="nav-btn disabled" aria-hidden="true">{svg_right}</span>')
+    nav_html = (f'<nav class="project-nav" aria-label="Project navigation">{prev_link}'
+                f'<a class="nav-btn" href="../index.html" aria-label="Back to all projects">{svg_up}</a>'
+                f'{next_link}</nav>')
+
+    also_like_html = ""
+    current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_folder)))
+    related_projects = [
+        project for project in all_projects
+        if project["num"] != project_num and set(project["hashtags"]) & current_hashtags
+    ]
+    if related_projects:
+        related = sorted(related_projects, key=lambda project: project["num"], reverse=True)[0]
+        icon_src = related["icon"] or f'../projects/{related["folder"]}/icon.svg'
+        also_like_html = f'''<section class="also-like-section">
+      <p class="also-like-title">u might also like</p>
+      <div class="also-like-container">
+        <a class="also-like-project" href="project{related['num']}.html">
+          <img src="{icon_src}" alt="" class="also-like-img" />
+          <span class="also-like-label">{related['num']}</span>
+        </a>
+      </div>
+    </section>'''
+
+    replacements = {
+        "{{PROJECT_NUM}}": escape(project_num),
+        "{{TITLE}}": escape(title),
+        "{{DESC}}": escape(desc),
+        "{{IMAGE_COUNT}}": str(len(images)),
+        "{{GALLERY}}": "\n".join(cards),
+        "{{NAV}}": nav_html,
+        "{{ALSO_LIKE}}": also_like_html,
+    }
+    for placeholder, value in replacements.items():
+        template = template.replace(placeholder, value)
+    return template
 
 def get_hashtags(folder):
     hashtags_path = safe_join(folder, "hashtags.txt")
@@ -523,6 +610,13 @@ def main():
         titledesc = read_file(safe_join(folder_path, "titledescription.txt"))
         icon = get_icon(folder_path)
         media = get_media(folder_path)
+        if project_id == "0010" and not icon:
+            first_image = next(
+                (item for item in media if item["src"].lower().endswith((".jpg", ".jpeg", ".png", ".gif"))),
+                None,
+            )
+            if first_image:
+                icon = first_image["src"]
         hashtags = get_hashtags(folder_path)
         next_project = project_ids[idx + 1] if idx + 1 < len(project_ids) else ""
         prev_project = project_ids[idx - 1] if idx - 1 >= 0 else ""
@@ -554,7 +648,13 @@ def main():
         media = get_media(folder_path)
         next_project = project_ids[idx + 1] if idx + 1 < len(project_ids) else ""
         prev_project = project_ids[idx - 1] if idx - 1 >= 0 else ""
-        html = generate_project_html(project_id, folder, title, desc, icon, media, next_project, prev_project, projects)
+        if project_id == "0010":
+            html = generate_drone_gallery_html(
+                project_id, folder, title, desc, media,
+                next_project, prev_project, projects
+            )
+        else:
+            html = generate_project_html(project_id, folder, title, desc, icon, media, next_project, prev_project, projects)
         # ensure output directory exists
         out_dir = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
         os.makedirs(out_dir, exist_ok=True)

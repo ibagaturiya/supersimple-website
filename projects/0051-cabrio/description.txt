@@ -1,0 +1,1 @@
+This project shows how parametric architecture can turn a noisy parking lot into an adaptable urban stage.
