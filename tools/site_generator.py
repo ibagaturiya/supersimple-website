@@ -1,5 +1,7 @@
+import json
 import os
 import re
+from html import escape
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -7,6 +9,8 @@ PROJECTS_DIR = str(ROOT_DIR / "projects")
 OUTPUT_DIR = str(ROOT_DIR)
 PROJECT_HTML_DIR = "projecthtml"
 PROJECT_TEMPLATE = ROOT_DIR / "templates" / "project.html"
+ABOUT_TEMPLATE = ROOT_DIR / "templates" / "about.html"
+CV_DATA_PATH = ROOT_DIR / "portfolio-export" / "data" / "cv.json"
 PROJECT_FOLDER_PATTERN = re.compile(
     r"^(?P<project_id>\d{4,})(?:-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*))?$"
 )
@@ -170,7 +174,6 @@ def generate_index_html(projects):
       <button class="filter-btn" data-filter="#architecture">#ARCHITECTURE</button>
       <button class="filter-btn" data-filter="#tech">#TECH</button>
       <button class="filter-btn" data-filter="#art">#ART</button>
-      <button class="filter-btn" data-filter="#music">#MUSIC</button>
       <button class="filter-btn" data-action="toggle">#FUN</button>
     </div>
     '''
@@ -241,6 +244,123 @@ def generate_index_html(projects):
   </body>
 </html>
 '''
+
+
+def html_items(values, class_name="cv-list"):
+    items = "".join(f"<li>{escape(str(value))}</li>" for value in values if value)
+    return f'<ul class="{class_name}">{items}</ul>' if items else ""
+
+
+def contact_href(key, value):
+    if key == "email":
+        return f"mailto:{value}"
+    if key == "phone":
+        return f"tel:{re.sub(r'[^+0-9]', '', value)}"
+    if key in {"website", "linkedin", "instagram"}:
+        return value if value.startswith(("http://", "https://")) else f"https://{value}"
+    return ""
+
+
+def generate_about_html(project_folder):
+    with CV_DATA_PATH.open("r", encoding="utf-8") as handle:
+        cv = json.load(handle)
+    with ABOUT_TEMPLATE.open("r", encoding="utf-8") as handle:
+        template = handle.read()
+
+    contact_rows = []
+    for key in ("location", "phone", "email", "website", "linkedin", "instagram"):
+        value = cv.get("contact", {}).get(key)
+        if not value:
+            continue
+        href = contact_href(key, value)
+        content = escape(str(value))
+        if href:
+            external = ' target="_blank" rel="noopener noreferrer"' if key in {"website", "linkedin", "instagram"} else ""
+            content = f'<a href="{escape(href, quote=True)}"{external}>{content}</a>'
+        contact_rows.append(
+            f'<div class="contact-row"><dt>{escape(key)}</dt><dd>{content}</dd></div>'
+        )
+
+    profile_blocks = []
+    if cv.get("profile_en"):
+        profile_blocks.append(
+            f'<div class="profile-language"><span>EN</span><p>{escape(cv["profile_en"])}</p></div>'
+        )
+    german_profile = cv.get("profile_de") or cv.get("profile")
+    if german_profile:
+        profile_blocks.append(
+            f'<div class="profile-language"><span>DE</span><p>{escape(german_profile)}</p></div>'
+        )
+
+    skill_groups = []
+    for group in cv.get("skill_groups", []):
+        skill_groups.append(
+            '<article class="skill-group">'
+            f'<h3>{escape(group.get("name", "Skills"))}</h3>'
+            f'{html_items(group.get("items", []), "chip-list")}'
+            '</article>'
+        )
+
+    experience_entries = []
+    for entry in cv.get("experience", []):
+        location = f' · {escape(entry["location"])}' if entry.get("location") else ""
+        experience_entries.append(
+            '<article class="timeline-entry">'
+            '<header>'
+            f'<h3>{escape(entry.get("role", ""))}</h3>'
+            f'<time>{escape(entry.get("dates", ""))}</time>'
+            '</header>'
+            f'<p class="institution">{escape(entry.get("company", ""))}{location}</p>'
+            f'{html_items(entry.get("highlights", []))}'
+            '</article>'
+        )
+
+    education_entries = []
+    for entry in cv.get("education", []):
+        professors = entry.get("professors", [])
+        professor_html = ""
+        if professors:
+            professor_html = (
+                '<div class="professors"><span>Professors</span>'
+                f'{html_items(professors, "inline-list")}</div>'
+            )
+        education_entries.append(
+            '<article class="timeline-entry education-entry">'
+            '<header>'
+            f'<h3>{escape(entry.get("qualification", ""))}</h3>'
+            f'<time>{escape(entry.get("dates", ""))}</time>'
+            '</header>'
+            f'<p class="institution">{escape(entry.get("institution", ""))}</p>'
+            f'{professor_html}'
+            '</article>'
+        )
+
+    hobby_groups = []
+    for category in cv.get("hobbies", {}).get("categories", []):
+        hobby_groups.append(
+            '<article class="hobby-group">'
+            f'<h3>{escape(category.get("name", "Interests"))}</h3>'
+            f'{html_items(category.get("items", []))}'
+            '</article>'
+        )
+
+    replacements = {
+        "{{CV_NAME}}": escape(cv.get("name", "")),
+        "{{CV_INITIALS}}": escape(cv.get("initials", "")),
+        "{{CV_HEADLINE}}": escape(cv.get("headline", "")),
+        "{{CV_HEADLINE_DE}}": escape(cv.get("headline_de", cv.get("headline", ""))),
+        "{{CV_PORTRAIT}}": f"../projects/{escape(project_folder, quote=True)}/image1.png",
+        "{{CV_CONTACT}}": "".join(contact_rows),
+        "{{CV_PROFILES}}": "".join(profile_blocks),
+        "{{CV_SKILLS}}": "".join(skill_groups),
+        "{{CV_EXPERIENCE}}": "".join(experience_entries),
+        "{{CV_EDUCATION}}": "".join(education_entries),
+        "{{CV_LANGUAGES}}": html_items(cv.get("languages", []), "chip-list"),
+        "{{CV_HOBBIES}}": "".join(hobby_groups),
+    }
+    for placeholder, value in replacements.items():
+        template = template.replace(placeholder, value)
+    return template
 
 def generate_project_html(project_num, project_folder, title, desc, icon, media, next_project, prev_project, all_projects=None):
     # Read the template
@@ -375,7 +495,11 @@ def main():
     # Second pass: generate HTML files with complete projects list
     for idx, project_id in enumerate(project_ids):
         if project_id == "2409":
-            continue  # Skip regenerating 2409 to preserve custom edits
+            out_dir = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
+            os.makedirs(out_dir, exist_ok=True)
+            with open(os.path.join(out_dir, "project2409.html"), "w", encoding="utf-8") as f:
+                f.write(generate_about_html(folder_by_id[project_id]))
+            continue
         folder = folder_by_id[project_id]
         folder_path = safe_join(PROJECTS_DIR, folder)
         title = read_file(safe_join(folder_path, "title.txt"))

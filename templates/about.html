@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Curriculum vitae of {{CV_NAME}}, {{CV_HEADLINE}}" />
+    <title>{{CV_NAME}} · About &amp; CV</title>
+    <link rel="stylesheet" href="../assets/css/about.css" />
+  </head>
+  <body>
+    <a href="../index.html" class="back-link" aria-label="Back to projects">2409 <span>↖</span></a>
+
+    <header class="about-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">{{CV_INITIALS}} · ABOUT / CV</p>
+        <h1>{{CV_NAME}}</h1>
+        <p class="headline">{{CV_HEADLINE_DE}}</p>
+        <a class="hero-contact" href="mailto:i@bagaturiya.com">i@bagaturiya.com</a>
+      </div>
+      <figure class="portrait">
+        <img src="{{CV_PORTRAIT}}" alt="Portrait of {{CV_NAME}}" />
+      </figure>
+    </header>
+
+    <main class="cv-layout">
+      <aside class="cv-sidebar">
+        <section class="cv-section contact-section">
+          <p class="section-number">01</p>
+          <h2>Contact</h2>
+          <dl>{{CV_CONTACT}}</dl>
+        </section>
+
+        <section class="cv-section">
+          <p class="section-number">02</p>
+          <h2>Languages</h2>
+          {{CV_LANGUAGES}}
+        </section>
+
+        <section class="cv-section skills-section">
+          <p class="section-number">03</p>
+          <h2>Skills &amp; software</h2>
+          <div class="skill-groups">{{CV_SKILLS}}</div>
+        </section>
+      </aside>
+
+      <div class="cv-main">
+        <section class="cv-section profile-section">
+          <p class="section-number">04</p>
+          <h2>Profile</h2>
+          <div class="profiles">{{CV_PROFILES}}</div>
+        </section>
+
+        <section class="cv-section">
+          <p class="section-number">05</p>
+          <h2>Experience</h2>
+          <div class="timeline">{{CV_EXPERIENCE}}</div>
+        </section>
+
+        <section class="cv-section">
+          <p class="section-number">06</p>
+          <h2>Education</h2>
+          <div class="timeline">{{CV_EDUCATION}}</div>
+        </section>
+
+        <section class="cv-section hobbies-section">
+          <p class="section-number">07</p>
+          <h2>Interests &amp; achievements</h2>
+          <div class="hobby-groups">{{CV_HOBBIES}}</div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="cv-footer">
+      <div>
+        <p class="eyebrow">FULL CV · PDF</p>
+        <h2>Take a copy.</h2>
+      </div>
+      <a class="download-button" href="../assets/downloads/Ivan_Bagaturiya_CV.pdf" download>
+        Download CV <span>↓</span>
+      </a>
+      <a class="index-button" href="../index.html">Back to projects <span>↑</span></a>
+    </footer>
+  </body>
+</html>

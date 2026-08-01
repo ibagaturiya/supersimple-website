@@ -8,6 +8,18 @@ JavaScript.
 See `SOURCES.md` for the complete map of every editable CV, cover, portrait,
 project-text, image, software, and skill source.
 
+The public comprehensive CV used by the About page is generated with the normal
+site command:
+
+```bash
+python3 generate.py
+```
+
+It writes `assets/downloads/Ivan_Bagaturiya_CV.pdf`. This public CV contains the
+full verified profile, experience highlights, education and professors,
+languages, skills, software, and hobbies. Internal verification notes and local
+source-document paths are excluded.
+
 ## One-time setup
 
 From the repository root:

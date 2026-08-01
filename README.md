@@ -15,7 +15,8 @@ Bagaturiya. GitHub Pages serves the repository root through the domain in
 │   ├── css/                    Website styles
 │   └── js/                     Browser-side interactions and filters
 ├── templates/
-│   └── project.html            Template for generated project pages
+│   ├── project.html            Template for generated project pages
+│   └── about.html              About/CV page template
 ├── tools/
 │   └── site_generator.py       Site-generation implementation
 ├── projects/
@@ -75,9 +76,9 @@ python3 generate.py
 5. Open `index.html` through a local web server and verify the index, filters,
    project page, media, and previous/next navigation.
 
-Do not edit generated pages in `projecthtml/` directly. The exception is
-`projecthtml/project2409.html`, the custom about page, which the generator
-intentionally preserves.
+Do not edit generated pages in `projecthtml/` directly. The About/CV page at
+`projecthtml/project2409.html` is generated from `templates/about.html` and
+`portfolio-export/data/cv.json`.
 
 ## Draft and archive workflow
 
@@ -89,15 +90,31 @@ intentionally preserves.
 
 ## Website source and output
 
-The generator reads project source folders and `templates/project.html`, then
-writes:
+The generator reads project source folders, the page templates, and the main CV
+source, then writes:
 
 - `index.html`
 - `projecthtml/projectNNNN.html`
+- `projecthtml/project2409.html` as the About/CV page
+- `assets/downloads/Ivan_Bagaturiya_CV.pdf` as the public comprehensive CV
 
 The index embeds each project's hashtags in `data-hashtags`. The filter and
 bubble interactions live in `assets/js/site.js`. Matter.js is loaded from a CDN
 for the optional physics mode.
+
+The visible filters are Selected, Architecture, Tech, Art, and Fun. Projects
+may still use `#music` as metadata even though Music is not a visible filter.
+
+## About/CV page
+
+`portfolio-export/data/cv.json` is the single content source for the public
+About/CV page and its downloadable comprehensive PDF. It includes profile text,
+contact details, skills, software, experience, education, professors, languages,
+and hobbies. Internal verification notes and local source-document paths are not
+rendered publicly.
+
+After changing `cv.json`, run `python3 generate.py` to update both the web page
+and public CV PDF.
 
 ## Tailored PDF exports
 
