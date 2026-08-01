@@ -261,6 +261,40 @@ def contact_href(key, value):
     return ""
 
 
+def contact_icon_src(key):
+    if key == "email":
+        return "../assets/icons/email.svg"
+    if key == "phone":
+        return "../assets/icons/phone.svg"
+    if key == "linkedin":
+        return "../assets/icons/linkedin.svg"
+    if key == "instagram":
+        return "../assets/icons/instagram.svg"
+    return ""
+
+
+def contact_icon_svg(key):
+    if key == "email":
+        return (
+            '<svg viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M4 5h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2zm0 2v.01L12 12.01 20 7.01V7H4zm0 12h16V9.24l-8 5.33-8-5.33V19z"/>'
+            '</svg>'
+        )
+    if key == "linkedin":
+        return (
+            '<svg viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M4 4h16v16H4V4zm3.5 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zM7 18h3.5V10H7v8zm5 0h3.5v-4.5c0-1.07-.86-1.5-1.25-1.5-.39 0-1.25.43-1.25 1.5V18zm0-10.75h3.5V8H12v-.75z"/>'
+            '</svg>'
+        )
+    if key == "instagram":
+        return (
+            '<svg viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm11 2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h11zm-5 3.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm4.75-.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/>'
+            '</svg>'
+        )
+    return ""
+
+
 def generate_about_html(project_folder):
     with CV_DATA_PATH.open("r", encoding="utf-8") as handle:
         cv = json.load(handle)
@@ -268,15 +302,26 @@ def generate_about_html(project_folder):
         template = handle.read()
 
     contact_rows = []
+    icon_links = []
     for key in ("location", "phone", "email", "website", "linkedin", "instagram"):
         value = cv.get("contact", {}).get(key)
         if not value:
             continue
+        if key == "website":
+            continue
         href = contact_href(key, value)
+        if key in {"email", "phone", "linkedin", "instagram"}:
+            external = ' target="_blank" rel="noopener noreferrer"' if key in {"linkedin", "instagram"} else ""
+            icon_src = contact_icon_src(key)
+            icon_links.append(
+                f'<a class="contact-icon" href="{escape(href, quote=True)}"{external} aria-label="{escape(key)}">'
+                f'<img src="{escape(icon_src, quote=True)}" alt="{escape(key)} icon" />'
+                '</a>'
+            )
+            continue
         content = escape(str(value))
         if href:
-            external = ' target="_blank" rel="noopener noreferrer"' if key in {"website", "linkedin", "instagram"} else ""
-            content = f'<a href="{escape(href, quote=True)}"{external}>{content}</a>'
+            content = f'<a href="{escape(href, quote=True)}">{content}</a>'
         contact_rows.append(
             f'<div class="contact-row"><dt>{escape(key)}</dt><dd>{content}</dd></div>'
         )
@@ -346,6 +391,7 @@ def generate_about_html(project_folder):
         "{{CV_HEADLINE_DE}}": escape(cv.get("headline_de", cv.get("headline", ""))),
         "{{CV_PORTRAIT}}": f"../projects/{escape(project_folder, quote=True)}/image1.png",
         "{{CV_CONTACT}}": "".join(contact_rows),
+        "{{CV_CONTACT_ICONS}}": "".join(icon_links),
         "{{CV_PROFILES}}": "".join(profile_blocks),
         "{{CV_SKILLS}}": "".join(skill_groups),
         "{{CV_EXPERIENCE}}": "".join(experience_entries),
