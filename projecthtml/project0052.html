@@ -7,24 +7,24 @@
     <link rel="stylesheet" href="../assets/css/project.css" />
   </head>
   <body>
-    <a href="../index.html" class="project-number-fixed">0052</a>
-    <div class="project-hero">
+    <a href="../index.html" class="project-number-fixed" aria-label="Back to all projects">0052</a>
+    <header class="project-hero">
       <img class="project-trailer" src="../projects/0052-zwischendecken/trailer.gif" alt="Trailer" />
       <div class="project-header-overlay">
-        <span class="project-title">_Zwischendecken</span>
+        <h1 class="project-title">_Zwischendecken</h1>
       </div>
-    </div>
+    </header>
     <hr />
-    <div class="project-main">
-      <div class="project-left">
+    <main class="project-main">
+      <section class="project-left" aria-label="Project description">
         <div class="project-desc">IAB, together with Lancelot Burwell,<br />develops “Zwischendecke – The Space in Between.” <br />With this project, both are invited <br />to present their model <br />in the 2025 exhibition at the Kunsthalle Zürich.<br /><br /><br /><br /><br /><br /><br />The project experiments with<br />mycelium <br />a new bio-based technology <br />that grows within layers of textile <br />and gradually hardens the soft fabric <br />into a rigid structural element.<br /><br /><br /><br /><br /><br /><br />The complex vaulted geometry <br />is visually programmed in Grasshopper, <br />where the hanging membranes and their mirrored forms<br />are generated through parametric design.</div>
-      </div>
-      <div class="project-right"><div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image2.jpeg" alt="" /></div></div>
-<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image3.gif" alt="" /></div></div>
-<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image4.jpg" alt="" /></div></div>
-<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image5.png" alt="" style="background: transparent;" /></div></div></div>
-    </div>
-    <div class="project-nav" style="gap:0;"><a class="nav-btn" href="project0054.html" title="Previous" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0051.html" title="Next" style="background:none;box-shadow:none;"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div> <div class="also-like-section">
+      </section>
+      <section class="project-right" aria-label="Project gallery"><div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image2.jpeg" alt="_Zwischendecken — image 1" loading="lazy" decoding="async" /></div></div>
+<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image3.gif" alt="_Zwischendecken — image 2" loading="lazy" decoding="async" /></div></div>
+<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image4.jpg" alt="_Zwischendecken — image 3" loading="lazy" decoding="async" /></div></div>
+<div class="project-media-row"><div class="project-media-item"><img class="project-media" src="../projects/0052-zwischendecken/image5.png" alt="_Zwischendecken — image 4" loading="lazy" decoding="async" /></div></div></section>
+    </main>
+    <nav class="project-nav" aria-label="Project navigation"><a class="nav-btn" href="project0054.html" aria-label="Previous project"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="../index.html" aria-label="Back to all projects"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="nav-btn" href="project0051.html" aria-label="Next project"><svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></nav> <div class="also-like-section">
       <p class="also-like-title">u might also like</p>
       <div class="also-like-container">
         <a class="also-like-project" href="project2409.html">
@@ -36,11 +36,12 @@
     
 
     <!-- slideshow overlay used when clicking project images -->
-    <div id="slideshow-overlay">
-      <span id="slideshow-close">&times;</span>
+    <div id="slideshow-overlay" role="dialog" aria-modal="true" aria-label="Project image viewer" aria-hidden="true">
+      <button id="slideshow-close" type="button" aria-label="Close image viewer">&times;</button>
       <img id="slideshow-img" src="" alt="" />
-      <div id="slideshow-prev" class="slideshow-nav">&#10094;</div>
-      <div id="slideshow-next" class="slideshow-nav">&#10095;</div>
+      <button id="slideshow-prev" class="slideshow-nav" type="button" aria-label="Previous image">&#10094;</button>
+      <button id="slideshow-next" class="slideshow-nav" type="button" aria-label="Next image">&#10095;</button>
+      <div id="slideshow-counter" aria-live="polite"></div>
     </div>
 
     <script>
@@ -71,27 +72,51 @@
       (function () {
         const images = Array.from(document.querySelectorAll('.project-right img'));
         if (!images.length) return;
+        const projectTitle = document.querySelector('.project-title')?.textContent.trim() || 'Project';
         images.forEach((img, idx) => {
-          img.style.cursor = 'pointer';
           img.dataset.index = idx;
+          if (!img.alt) img.alt = `${projectTitle} — image ${idx + 1}`;
+          img.tabIndex = 0;
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-label', `Open image ${idx + 1} of ${images.length}`);
         });
         const overlay = document.getElementById('slideshow-overlay');
         const slideshowImg = document.getElementById('slideshow-img');
         const closeBtn = document.getElementById('slideshow-close');
         const prevBtn = document.getElementById('slideshow-prev');
         const nextBtn = document.getElementById('slideshow-next');
+        const counter = document.getElementById('slideshow-counter');
         let currentIndex = 0;
+        let previouslyFocused = null;
         const showSlide = (i) => {
           currentIndex = (i + images.length) % images.length;
           slideshowImg.src = images[currentIndex].src;
+          slideshowImg.alt = images[currentIndex].alt;
+          counter.textContent = `${currentIndex + 1} / ${images.length}`;
           overlay.classList.add('active');
+          overlay.setAttribute('aria-hidden', 'false');
           document.body.style.overflow = 'hidden';
+          closeBtn.focus();
         };
         const hideSlide = () => {
           overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
           document.body.style.overflow = '';
+          if (previouslyFocused) previouslyFocused.focus();
         };
-        images.forEach(img => img.addEventListener('click', () => showSlide(parseInt(img.dataset.index))));
+        images.forEach(img => {
+          const openImage = () => {
+            previouslyFocused = img;
+            showSlide(parseInt(img.dataset.index));
+          };
+          img.addEventListener('click', openImage);
+          img.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openImage();
+            }
+          });
+        });
         closeBtn.addEventListener('click', hideSlide);
         prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex - 1); });
         nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showSlide(currentIndex + 1); });

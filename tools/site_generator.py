@@ -146,22 +146,22 @@ def get_hashtags(folder):
     tags = re.findall(r'#\w+', hashtags)
     return [tag.lower() for tag in tags]
 
-def media_html_tag(src):
+def media_html_tag(src, alt_text="Project media"):
+    safe_alt = escape(alt_text, quote=True)
     if src.lower().endswith(('.jpg', '.jpeg', '.gif', '.png', '.svg')):
-        style = ' style="background: transparent;"' if src.lower().endswith('.png') else ''
-        return f'<div class="project-media-item"><img class="project-media" src="{src}" alt=""{style} /></div>'
+        return f'<div class="project-media-item"><img class="project-media" src="{src}" alt="{safe_alt}" loading="lazy" decoding="async" /></div>'
     elif src.lower().endswith('.mp4'):
-        return f'<div class="project-media-item"><video class="project-media" src="{src}" controls loop muted playsinline></video></div>'
+        return f'<div class="project-media-item"><video class="project-media" src="{src}" controls loop muted playsinline aria-label="{safe_alt}"></video></div>'
     elif src.lower().endswith('.mp3'):
         return f'<div class="project-media-item"><audio class="project-media" src="{src}" controls></audio></div>'
     elif src.lower().endswith('.pdf'):
-        return f'<div class="project-media-item"><a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a></div>'
+        return f'<div class="project-media-item"><a href="{src}" target="_blank" rel="noopener noreferrer">View PDF</a></div>'
     elif src.lower().endswith('.txt'):
         # src is relative to projecthtml, for example ../projects/0056-sinuswall/image1.txt
         full_path = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR, src)
         content = read_file(full_path)
         if content.startswith('http'):
-            return f'<div class="project-media-item"><a href="{content}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View Website</a></div>'
+            return f'<div class="project-media-item"><a href="{content}" target="_blank" rel="noopener noreferrer">View Website</a></div>'
         else:
             return f'<div class="project-media-item"><pre>{content}</pre></div>'  # display as text
     else:
@@ -417,7 +417,7 @@ def generate_project_html(project_num, project_folder, title, desc, icon, media,
     if os.path.exists(trailer_txt_path):
       trailer_html = read_file(trailer_txt_path)
       if trailer_html.startswith('http'):
-        trailer_html = f'<a href="{trailer_html}" target="_blank" style="color:#fff;text-decoration:underline;">View Website</a>'
+        trailer_html = f'<a href="{trailer_html}" target="_blank" rel="noopener noreferrer">View Website</a>'
     else:
       for ext in [".mp4", ".gif"]:
         trailer_path = safe_join(PROJECTS_DIR, project_folder, f"trailer{ext}")
@@ -444,8 +444,13 @@ def generate_project_html(project_num, project_folder, title, desc, icon, media,
             grouped_media[-1].append(item)
 
     rows_html = []
+    media_index = 0
     for group in grouped_media:
-        items_html = "".join(media_html_tag(item["src"]) for item in group)
+        group_items = []
+        for item in group:
+            media_index += 1
+            group_items.append(media_html_tag(item["src"], f"{title} — image {media_index}"))
+        items_html = "".join(group_items)
         row_class = "project-media-row" if len(group) == 1 else "project-media-row project-media-row--multi"
         rows_html.append(f'<div class="{row_class}">{items_html}</div>')
     images_html = "\n".join(rows_html)
@@ -454,18 +459,18 @@ def generate_project_html(project_num, project_folder, title, desc, icon, media,
     svg_left = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="40,10 20,30 40,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     svg_up = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="10,40 30,20 50,40" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     svg_right = '<svg viewBox="0 0 60 60" width="80" height="80" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg"><polyline points="20,10 40,30 20,50" fill="none" stroke="#bbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    nav_html = '<div class="project-nav" style="gap:0;">'
+    nav_html = '<nav class="project-nav" aria-label="Project navigation">'
     if prev_project:
-        nav_html += f'<a class="nav-btn" href="project{prev_project}.html" title="Previous" style="background:none;box-shadow:none;">{svg_left}</a>'
+        nav_html += f'<a class="nav-btn" href="project{prev_project}.html" aria-label="Previous project">{svg_left}</a>'
     else:
-      nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_left}</span>'
+      nav_html += f'<span class="nav-btn disabled" aria-hidden="true">{svg_left}</span>'
     # when project pages live in a subfolder, link back to root index
-    nav_html += f'<a class="nav-btn" href="../index.html" title="Back to index" style="background:none;box-shadow:none;">{svg_up}</a>'
+    nav_html += f'<a class="nav-btn" href="../index.html" aria-label="Back to all projects">{svg_up}</a>'
     if next_project:
-        nav_html += f'<a class="nav-btn" href="project{next_project}.html" title="Next" style="background:none;box-shadow:none;">{svg_right}</a>'
+        nav_html += f'<a class="nav-btn" href="project{next_project}.html" aria-label="Next project">{svg_right}</a>'
     else:
-        nav_html += f'<span class="nav-btn disabled" style="background:none;box-shadow:none;">{svg_right}</span>'
-    nav_html += '</div>'
+        nav_html += f'<span class="nav-btn disabled" aria-hidden="true">{svg_right}</span>'
+    nav_html += '</nav>'
 
     # Generate "You might also like" section
     also_like_html = ""
