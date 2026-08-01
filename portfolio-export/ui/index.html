@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Application Generator · I.A.B</title>
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="brand">I.A.B</div>
+      <div>
+        <p class="eyebrow">PRIVATE LOCAL TOOL</p>
+        <h1>Application<br />Generator</h1>
+      </div>
+      <p class="intro">Turn one vacancy into a focused CV and portfolio package.</p>
+    </header>
+
+    <main>
+      <form id="applicationForm" novalidate>
+        <section class="panel form-panel">
+          <div class="section-heading">
+            <span>01</span>
+            <div>
+              <p class="eyebrow">TARGET</p>
+              <h2>Define the role</h2>
+            </div>
+          </div>
+
+          <div class="two-column">
+            <label>
+              <span>Office</span>
+              <input id="office" name="office" placeholder="e.g. Herzog & de Meuron" required maxlength="160" />
+            </label>
+            <label>
+              <span>Position</span>
+              <input id="position" name="position" placeholder="e.g. BIM Architect" required maxlength="160" />
+            </label>
+          </div>
+
+          <label>
+            <span>Job description</span>
+            <textarea id="jobDescription" name="job_description" rows="12" placeholder="Paste the complete vacancy here…"></textarea>
+          </label>
+
+          <div class="three-column">
+            <label>
+              <span>Software <small>comma separated</small></span>
+              <input id="software" name="software" placeholder="Vectorworks, Rhino" />
+            </label>
+            <label>
+              <span>Skills <small>comma separated</small></span>
+              <input id="skills" name="skills" placeholder="BIM, coordination" />
+            </label>
+            <label>
+              <span>Focus <small>comma separated</small></span>
+              <input id="focus" name="focus" placeholder="architecture, computation" />
+            </label>
+          </div>
+
+          <div class="settings-row">
+            <label class="compact-field">
+              <span>Projects</span>
+              <input id="projectLimit" type="number" min="1" max="12" value="4" />
+            </label>
+            <label class="toggle">
+              <input id="includeHobbies" type="checkbox" checked />
+              <span class="toggle-track" aria-hidden="true"></span>
+              <span>Show hobbies in CV</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="section-heading">
+            <span>02</span>
+            <div>
+              <p class="eyebrow">SELECTION</p>
+              <h2>Review the match</h2>
+            </div>
+          </div>
+
+          <div id="emptyState" class="empty-state">
+            <p>Paste a vacancy, then preview the match.</p>
+            <span>The strongest projects and detected skills will appear here.</span>
+          </div>
+
+          <div id="inferred" class="inferred" hidden></div>
+          <div id="projectList" class="project-list" aria-live="polite"></div>
+        </section>
+
+        <div class="action-bar">
+          <div id="status" class="status" role="status" aria-live="polite">Ready.</div>
+          <div class="actions">
+            <button type="button" id="previewButton" class="button secondary">Preview match</button>
+            <button type="submit" id="generateButton" class="button primary">Generate CV + Portfolio</button>
+          </div>
+        </div>
+      </form>
+
+      <section id="successPanel" class="panel success-panel" hidden>
+        <div>
+          <p class="eyebrow">COMPLETE</p>
+          <h2>Your application package is ready.</h2>
+          <p id="outputPath" class="output-path"></p>
+        </div>
+        <div class="download-grid">
+          <a id="portfolioDownload" class="download-card" href="#">Portfolio PDF <span>↘</span></a>
+          <a id="cvDownload" class="download-card" href="#">CV PDF <span>↘</span></a>
+          <a id="selectionDownload" class="download-card quiet" href="#">Selection report <span>↘</span></a>
+          <a id="applicationDownload" class="download-card quiet" href="#">Application profile <span>↘</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Runs only on this Mac</span>
+      <span>Generated files stay in <code>output/pdf</code></span>
+    </footer>
+    <script src="/app.js"></script>
+  </body>
+</html>

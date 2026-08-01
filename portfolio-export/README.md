@@ -1,9 +1,12 @@
 # Tailored portfolio and CV export
 
-This add-on reads the existing `projects/NNNN/` library and generates a ranked,
+This add-on reads the existing `projects/NNNN-readable-slug/` library and generates a ranked,
 role-specific portfolio PDF and CV PDF. It is deliberately separate from the
 website generator, so it does not rewrite `index.html`, project pages, styles, or
 JavaScript.
+
+See `SOURCES.md` for the complete map of every editable CV, cover, portrait,
+project-text, image, software, and skill source.
 
 ## One-time setup
 
@@ -14,6 +17,25 @@ python3 -m pip install -r portfolio-export/requirements.txt
 ```
 
 ## Generate from an application profile
+
+### Private dashboard
+
+From the repository root, start the local interface:
+
+```bash
+python3 start-application-generator.py
+```
+
+It opens `http://127.0.0.1:8765/`. Enter the office and role, paste the vacancy,
+and select **Preview match**. The dashboard shows automatically detected terms,
+project scores, and the reasons for each match. Check or uncheck projects before
+selecting **Generate CV + Portfolio**.
+
+The dashboard is deliberately local-only and is not deployed with GitHub Pages.
+Each export saves `application.json` and `selection.json` beside the two PDFs so
+the exact input and selection remain reviewable.
+
+### Command line
 
 Duplicate the example application JSON, paste the vacancy into
 `job_description`, and adjust the structured software/skill/focus lists:
@@ -59,7 +81,7 @@ with `"include_hobbies": false` or the `--no-hobbies` command-line option.
 
 ## Truth and tailoring layers
 
-- `projects/NNNN/`: existing website source; titles, descriptions, hashtags,
+- `projects/NNNN-readable-slug/`: existing website source; titles, descriptions, hashtags,
   and images are reused directly.
 - `portfolio-export/data/projects.json`: optional export-only metadata such as
   software, skills, priority, year, and preferred portfolio images.
@@ -72,13 +94,15 @@ The generator records every score and match reason in `selection.json`. It never
 creates experience, dates, software proficiency, or other CV facts that are not
 in `cv.json`.
 
-## Important current-library behavior
+## Project-folder behavior
 
-The website accepts only project folder names containing 4 or more digits.
-The export tool intentionally applies the same rule. Therefore
-`projects/0058 lamp v1/` and `projects/0059 beamboxmap/` are not loaded by either
-system. Rename them to `0058` and `0059` only after checking that they are ready
-to publish.
+Both generators accept published direct children named
+`NNNN-readable-lowercase-slug`. The numeric prefix remains the project ID and
+the slug is only for human readability. Drafts and archives remain outside the
+published library under `projects/_drafts/` and `projects/_archive/`.
+
+Malformed direct folders and duplicate numeric IDs stop generation instead of
+being silently skipped.
 
 Before sending a real application, complete and verify the empty experience,
 language, dates, location, and proficiency fields in `data/cv.json`.

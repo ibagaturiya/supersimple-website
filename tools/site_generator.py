@@ -7,6 +7,9 @@ PROJECTS_DIR = str(ROOT_DIR / "projects")
 OUTPUT_DIR = str(ROOT_DIR)
 PROJECT_HTML_DIR = "projecthtml"
 PROJECT_TEMPLATE = ROOT_DIR / "templates" / "project.html"
+PROJECT_FOLDER_PATTERN = re.compile(
+    r"^(?P<project_id>\d{4,})(?:-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*))?$"
+)
 
 
 #generates the index.html and project pages based on the contents of the projects folder
@@ -34,14 +37,42 @@ copyright = '''
 </span>
 '''
 
-def is_safe_folder(name):
-    return re.fullmatch(r'\d{4,}', name) is not None
+def parse_project_folder(name):
+    match = PROJECT_FOLDER_PATTERN.fullmatch(name)
+    return match.group("project_id") if match else None
 
 def safe_join(base, *paths):
-    final_path = os.path.abspath(os.path.join(base, *paths))
-    if not final_path.startswith(os.path.abspath(base)):
-        raise ValueError("Unsafe path detected!")
-    return final_path
+    base_path = Path(base).resolve()
+    final_path = base_path.joinpath(*paths).resolve()
+    try:
+        final_path.relative_to(base_path)
+    except ValueError as exc:
+        raise ValueError("Unsafe path detected!") from exc
+    return str(final_path)
+
+def discover_project_folders():
+    projects = {}
+    invalid = []
+    for name in os.listdir(PROJECTS_DIR):
+        path = Path(safe_join(PROJECTS_DIR, name))
+        if not path.is_dir() or name.startswith("_"):
+            continue
+        project_id = parse_project_folder(name)
+        if project_id is None:
+            if name[:1].isdigit():
+                invalid.append(name)
+            continue
+        if project_id in projects:
+            raise ValueError(
+                f"Duplicate project ID {project_id}: {projects[project_id]} and {name}"
+            )
+        projects[project_id] = name
+    if invalid:
+        raise ValueError(
+            "Invalid project folder name(s): " + ", ".join(sorted(invalid))
+            + ". Use NNNN-lowercase-hyphenated-title."
+        )
+    return projects
 
 def read_file(path):
     try:
@@ -122,7 +153,7 @@ def media_html_tag(src):
     elif src.lower().endswith('.pdf'):
         return f'<div class="project-media-item"><a href="{src}" target="_blank" style="display:block;margin:10px 0;color:#111;font-weight:bold;">View PDF</a></div>'
     elif src.lower().endswith('.txt'):
-        # compute full path: src is relative to projecthtml, like ../projects/0056/image1.txt
+        # src is relative to projecthtml, for example ../projects/0056-sinuswall/image1.txt
         full_path = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR, src)
         content = read_file(full_path)
         if content.startswith('http'):
@@ -212,7 +243,7 @@ def generate_index_html(projects):
 </html>
 '''
 
-def generate_project_html(project_num, title, desc, icon, media, next_project, prev_project, all_projects=None):
+def generate_project_html(project_num, project_folder, title, desc, icon, media, next_project, prev_project, all_projects=None):
     # Read the template
     with PROJECT_TEMPLATE.open("r", encoding="utf-8") as f:
         template = f.read()
@@ -222,14 +253,14 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     trailer_ext = ""
     trailer_html = ""
     # Check for trailer.txt (embed code)
-    trailer_txt_path = os.path.join(PROJECTS_DIR, project_num, "trailer.txt")
+    trailer_txt_path = safe_join(PROJECTS_DIR, project_folder, "trailer.txt")
     if os.path.exists(trailer_txt_path):
       trailer_html = read_file(trailer_txt_path)
       if trailer_html.startswith('http'):
         trailer_html = f'<a href="{trailer_html}" target="_blank" style="color:#fff;text-decoration:underline;">View Website</a>'
     else:
       for ext in [".mp4", ".gif"]:
-        trailer_path = os.path.join(PROJECTS_DIR, project_num, f"trailer{ext}")
+        trailer_path = safe_join(PROJECTS_DIR, project_folder, f"trailer{ext}")
         if os.path.exists(trailer_path):
           # compute path relative to where project html files will live
           project_base = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
@@ -280,14 +311,14 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     also_like_html = ""
     if all_projects:
         # Get current project hashtags
-        current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_num)))
+        current_hashtags = set(get_hashtags(safe_join(PROJECTS_DIR, project_folder)))
         # Find projects with shared hashtags
         related_projects = [p for p in all_projects if p['num'] != project_num and set(p['hashtags']) & current_hashtags]
         if related_projects:
             random_project = sorted(
                 related_projects, key=lambda project: project["num"], reverse=True
             )[0]
-            icon_src = random_project['icon'] if random_project['icon'] else f"projects/{random_project['num']}/icon.svg"
+            icon_src = random_project['icon'] if random_project['icon'] else f"../projects/{random_project['folder']}/icon.svg"
             also_like_html = f'''<div class="also-like-section">
       <p class="also-like-title">u might also like</p>
       <div class="also-like-container">
@@ -313,15 +344,13 @@ def generate_project_html(project_num, title, desc, icon, media, next_project, p
     return html
 
 def main():
-    all_folders = [
-        f for f in os.listdir(PROJECTS_DIR)
-        if os.path.isdir(safe_join(PROJECTS_DIR, f)) and is_safe_folder(f)
-    ]
-    project_folders = sorted(all_folders)[::-1]
+    folder_by_id = discover_project_folders()
+    project_ids = sorted(folder_by_id, key=int, reverse=True)
 
     # First pass: collect all project metadata
     projects = []
-    for idx, folder in enumerate(project_folders):
+    for idx, project_id in enumerate(project_ids):
+        folder = folder_by_id[project_id]
         folder_path = safe_join(PROJECTS_DIR, folder)
         title = read_file(safe_join(folder_path, "title.txt"))
         desc = read_file(safe_join(folder_path, "description.txt"))
@@ -330,10 +359,11 @@ def main():
         icon = get_icon(folder_path)
         media = get_media(folder_path)
         hashtags = get_hashtags(folder_path)
-        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
-        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
+        next_project = project_ids[idx + 1] if idx + 1 < len(project_ids) else ""
+        prev_project = project_ids[idx - 1] if idx - 1 >= 0 else ""
         projects.append({
-            "num": folder,
+            "num": project_id,
+            "folder": folder,
             "title": title,
             "desc": desc,
             "titledesc": titledesc,
@@ -344,21 +374,22 @@ def main():
         })
 
     # Second pass: generate HTML files with complete projects list
-    for idx, folder in enumerate(project_folders):
-        if folder == "2409":
+    for idx, project_id in enumerate(project_ids):
+        if project_id == "2409":
             continue  # Skip regenerating 2409 to preserve custom edits
+        folder = folder_by_id[project_id]
         folder_path = safe_join(PROJECTS_DIR, folder)
         title = read_file(safe_join(folder_path, "title.txt"))
         desc = read_file(safe_join(folder_path, "description.txt"))
         icon = get_icon(folder_path)
         media = get_media(folder_path)
-        next_project = project_folders[idx + 1] if idx + 1 < len(project_folders) else ""
-        prev_project = project_folders[idx - 1] if idx - 1 >= 0 else ""
-        html = generate_project_html(folder, title, desc, icon, media, next_project, prev_project, projects)
+        next_project = project_ids[idx + 1] if idx + 1 < len(project_ids) else ""
+        prev_project = project_ids[idx - 1] if idx - 1 >= 0 else ""
+        html = generate_project_html(project_id, folder, title, desc, icon, media, next_project, prev_project, projects)
         # ensure output directory exists
         out_dir = os.path.join(OUTPUT_DIR, PROJECT_HTML_DIR)
         os.makedirs(out_dir, exist_ok=True)
-        with open(os.path.join(out_dir, f"project{folder}.html"), "w", encoding="utf-8") as f:
+        with open(os.path.join(out_dir, f"project{project_id}.html"), "w", encoding="utf-8") as f:
           f.write(html)
 
     index_html = generate_index_html(projects)

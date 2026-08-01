@@ -45,6 +45,9 @@ STOPWORDS = {
     "experience", "skills", "role", "position", "work", "working", "office",
 }
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"}
+PROJECT_FOLDER_PATTERN = re.compile(
+    r"^(?P<project_id>\d{4,})(?:-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*))?$"
+)
 
 
 @dataclass
@@ -115,6 +118,21 @@ def dedupe(values: Iterable[str]) -> list[str]:
     return result
 
 
+def dedupe_vocabulary(values: Iterable[str]) -> list[str]:
+    """Dedupe known terms while treating simple singular/plural forms alike."""
+    result: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        cleaned = clean_text(value)
+        key = normalize(cleaned)
+        if key.endswith("s"):
+            key = key[:-1]
+        if cleaned and key not in seen:
+            seen.add(key)
+            result.append(cleaned)
+    return result
+
+
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", normalize(value)).strip("-")
     return slug or "application"
@@ -123,6 +141,32 @@ def slugify(value: str) -> str:
 def website_hashtags(folder: Path) -> list[str]:
     raw = read_text(folder / "hashtags.txt")
     return [match.lower().lstrip("#") for match in re.findall(r"#\w+", raw)]
+
+
+def published_project_folders() -> dict[str, Path]:
+    projects: dict[str, Path] = {}
+    invalid: list[str] = []
+    for folder in PROJECTS_DIR.iterdir():
+        if not folder.is_dir() or folder.name.startswith("_"):
+            continue
+        match = PROJECT_FOLDER_PATTERN.fullmatch(folder.name)
+        if match is None:
+            if folder.name[:1].isdigit():
+                invalid.append(folder.name)
+            continue
+        project_id = match.group("project_id")
+        if project_id in projects:
+            raise ValueError(
+                f"Duplicate project ID {project_id}: "
+                f"{projects[project_id].name} and {folder.name}"
+            )
+        projects[project_id] = folder
+    if invalid:
+        raise ValueError(
+            "Invalid project folder name(s): " + ", ".join(sorted(invalid))
+            + ". Use NNNN-lowercase-hyphenated-title."
+        )
+    return projects
 
 
 def discover_images(folder: Path) -> list[str]:
@@ -142,14 +186,14 @@ def discover_images(folder: Path) -> list[str]:
 def load_projects() -> list[Project]:
     overrides = load_json(DATA_DIR / "projects.json")
     projects: list[Project] = []
-    for folder in sorted(PROJECTS_DIR.iterdir(), key=lambda path: path.name, reverse=True):
-        if not folder.is_dir() or not re.fullmatch(r"\d{4,}", folder.name):
-            continue
-        extra = overrides.get(folder.name, {})
+    folders = published_project_folders()
+    for project_id in sorted(folders, key=int, reverse=True):
+        folder = folders[project_id]
+        extra = overrides.get(project_id, {})
         site_tags = website_hashtags(folder)
         projects.append(
             Project(
-                project_id=folder.name,
+                project_id=project_id,
                 folder=folder,
                 title=clean_text(read_text(folder / "title.txt") or folder.name),
                 description=clean_text(read_text(folder / "description.txt")),
@@ -227,15 +271,15 @@ def enrich_application(
         for item in group.get("items", [])
     ]
     known = {
-        "software": dedupe([
+        "software": dedupe_vocabulary([
             *(item for project in projects for item in project.software),
             *cv_software,
         ]),
-        "skills": dedupe([
+        "skills": dedupe_vocabulary([
             *(item for project in projects for item in project.skills),
             *cv_skills,
         ]),
-        "focus": dedupe(item for project in projects for item in project.tags),
+        "focus": dedupe_vocabulary(item for project in projects for item in project.tags),
     }
     inferred: dict[str, list[str]] = {}
     for key, vocabulary in known.items():
@@ -449,7 +493,8 @@ def render_portfolio(
     # Cover
     pdf.setFillColor(INK)
     pdf.rect(0, 0, page_width, page_height, fill=1, stroke=0)
-    portrait = PROJECTS_DIR / "2409" / "image1.png"
+    portrait_folder = published_project_folders().get("2409")
+    portrait = (portrait_folder or PROJECTS_DIR / "2409") / "image1.png"
     image_x = page_width * 0.61
     if draw_image_cover(pdf, portrait, image_x, 0, page_width - image_x, page_height):
         pdf.setFillColor(Color(0, 0, 0, alpha=0.28))
@@ -529,12 +574,6 @@ def render_portfolio(
             draw_label(pdf, "Software", left_x, y)
             y -= 16
             y = draw_chips(pdf, project.software, left_x, y, left_width, fill=INK, text_color=white, max_rows=2)
-        matched = [reason.split(" +", 1)[0] for reason in item.reasons if not reason.startswith("library")]
-        if matched and y > 70:
-            y -= 3
-            draw_label(pdf, "Why selected", left_x, y)
-            y -= 15
-            draw_text_block(pdf, " / ".join(matched[:3]), left_x, y, left_width, size=7.5, leading=10, color=MID, max_lines=4)
         draw_footer(pdf, cv["name"], index + 1, page_width)
         pdf.showPage()
 
@@ -753,14 +792,14 @@ def render_cv(
 
 
 def manifest_data(
-    application_path: Path,
+    application_source: str | Path,
     application: dict[str, Any],
     selected: list[RankedProject],
     portfolio_path: Path,
     cv_path: Path,
 ) -> dict[str, Any]:
     return {
-        "application_source": str(application_path.resolve()),
+        "application_source": str(application_source),
         "application": application,
         "outputs": {"portfolio": str(portfolio_path), "cv": str(cv_path)},
         "selection": [
@@ -773,6 +812,74 @@ def manifest_data(
             for item in selected
         ],
     }
+
+
+def prepare_application(application: dict[str, Any]) -> dict[str, Any]:
+    """Return a complete, isolated application profile for UI and CLI callers."""
+    prepared = json.loads(json.dumps(application, ensure_ascii=False))
+    prepared.setdefault("office", "Untitled office")
+    prepared.setdefault("position", "Architecture position")
+    prepared.setdefault("job_description", "")
+    prepared.setdefault("software", [])
+    prepared.setdefault("skills", [])
+    prepared.setdefault("focus", [])
+    prepared.setdefault("project_limit", 4)
+    prepared.setdefault("include_projects", [])
+    prepared.setdefault("exclude_projects", [])
+    prepared.setdefault("include_hobbies", True)
+    prepared.setdefault("hobby_categories", [])
+    prepared.setdefault("hobby_item_limit", 5)
+    return prepared
+
+
+def preview_application(
+    application: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any], list[Project], list[RankedProject]]:
+    """Enrich an application and rank projects without writing any files."""
+    prepared = prepare_application(application)
+    cv_data = load_json(DATA_DIR / "cv.json")
+    projects = load_projects()
+    prepared = enrich_application(prepared, projects, cv_data)
+    ranked = rank_projects(projects, prepared)
+    return prepared, cv_data, projects, ranked
+
+
+def generate_application(
+    application: dict[str, Any],
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
+    application_source: str | Path = "local application generator",
+) -> dict[str, Any]:
+    """Generate one tailored package and return its manifest."""
+    prepared, cv_data, _projects, ranked = preview_application(application)
+    if not ranked:
+        raise ValueError("No publishable projects are available for this application.")
+
+    project_limit = max(1, min(int(prepared.get("project_limit", 4)), len(ranked)))
+    selected = ranked[:project_limit]
+    target_slug = slugify(f"{prepared['office']} {prepared['position']}")
+    target_dir = output_dir.resolve() / target_slug
+    target_dir.mkdir(parents=True, exist_ok=True)
+    portfolio_path = target_dir / "Ivan_Bagaturiya_Portfolio.pdf"
+    cv_path = target_dir / "Ivan_Bagaturiya_CV.pdf"
+    manifest_path = target_dir / "selection.json"
+    application_path = target_dir / "application.json"
+
+    application_path.write_text(
+        json.dumps(prepared, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    render_portfolio(portfolio_path, cv_data, prepared, selected)
+    render_cv(cv_path, cv_data, prepared, selected)
+    manifest = manifest_data(
+        application_source, prepared, selected, portfolio_path, cv_path
+    )
+    manifest["outputs"]["application"] = str(application_path)
+    manifest["outputs"]["selection"] = str(manifest_path)
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return manifest
 
 
 def parse_args() -> argparse.Namespace:
@@ -803,33 +910,18 @@ def main() -> int:
         return 2
 
     application = load_application(application_path, args)
-    cv_data = load_json(DATA_DIR / "cv.json")
-    projects = load_projects()
-    application = enrich_application(application, projects, cv_data)
-    ranked = rank_projects(projects, application)
-    project_limit = max(1, min(int(application.get("project_limit", 4)), len(ranked)))
-    selected = ranked[:project_limit]
-    target_slug = slugify(f"{application['office']} {application['position']}")
-    target_dir = args.output_dir.resolve() / target_slug
-    portfolio_path = target_dir / "Ivan_Bagaturiya_Portfolio.pdf"
-    cv_path = target_dir / "Ivan_Bagaturiya_CV.pdf"
-    manifest_path = target_dir / "selection.json"
-
-    render_portfolio(portfolio_path, cv_data, application, selected)
-    render_cv(cv_path, cv_data, application, selected)
-    manifest_path.write_text(
-        json.dumps(
-            manifest_data(application_path, application, selected, portfolio_path, cv_path),
-            indent=2,
-            ensure_ascii=False,
-        ) + "\n",
-        encoding="utf-8",
+    manifest = generate_application(
+        application,
+        output_dir=args.output_dir,
+        application_source=application_path.resolve(),
     )
-
-    print(f"Portfolio: {portfolio_path}")
-    print(f"CV: {cv_path}")
-    print(f"Selection: {manifest_path}")
-    print("Selected projects: " + ", ".join(item.project.project_id for item in selected))
+    print(f"Portfolio: {manifest['outputs']['portfolio']}")
+    print(f"CV: {manifest['outputs']['cv']}")
+    print(f"Selection: {manifest['outputs']['selection']}")
+    print(
+        "Selected projects: "
+        + ", ".join(item["project"] for item in manifest["selection"])
+    )
     return 0
 
 
