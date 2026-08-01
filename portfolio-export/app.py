@@ -246,6 +246,7 @@ class ApplicationHandler(BaseHTTPRequestHandler):
                 "message": "Application package generated.",
                 "downloads": {
                     "portfolio": relative_download(manifest["outputs"]["portfolio"]),
+                    "portfolio_html": relative_download(manifest["outputs"]["portfolio_html"]),
                     "cv": relative_download(manifest["outputs"]["cv"]),
                     "selection": relative_download(manifest["outputs"]["selection"]),
                     "application": relative_download(manifest["outputs"]["application"]),

@@ -141,6 +141,7 @@ form.addEventListener("submit", async (event) => {
   try {
     const result = await api("/api/generate", payload);
     document.querySelector("#portfolioDownload").href = result.downloads.portfolio;
+    document.querySelector("#portfolioHtmlDownload").href = result.downloads.portfolio_html;
     document.querySelector("#cvDownload").href = result.downloads.cv;
     document.querySelector("#selectionDownload").href = result.downloads.selection;
     document.querySelector("#applicationDownload").href = result.downloads.application;

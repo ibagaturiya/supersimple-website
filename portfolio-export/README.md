@@ -8,14 +8,28 @@ JavaScript.
 See `SOURCES.md` for the complete map of every editable CV, cover, portrait,
 project-text, image, software, and skill source.
 
-The public comprehensive CV used by the About page is generated with the normal
-site command:
+The public comprehensive CV used by the About page and the canonical full
+portfolio are generated with the normal site command:
 
 ```bash
 python3 generate.py
 ```
 
-It writes `assets/downloads/Ivan_Bagaturiya_CV.pdf`. This public CV contains the
+It writes:
+
+- `assets/downloads/Ivan_Bagaturiya_CV.pdf`
+- `portfolio.html`, containing every publishable project
+- `assets/downloads/Ivan_Bagaturiya_Portfolio.pdf`, printed from `portfolio.html`
+- `assets/downloads/Ivan_Bagaturiya_Full_CV_and_Portfolio.zip`, containing both
+  complete PDFs for the About-page download
+
+The full and tailored portfolios share
+`portfolio-export/templates/portfolio.html` and
+`portfolio-export/templates/portfolio.css`. Change these files to adjust the
+portfolio layout globally. Tailored exports change the project selection and
+cover text, but not the layout system.
+
+The public CV contains the
 full verified profile, experience highlights, education and professors,
 languages, skills, software, and hobbies. Internal verification notes and local
 source-document paths are excluded.
@@ -60,6 +74,7 @@ python3 portfolio-export/generate.py \
 The files are written to `output/pdf/<office-position>/`:
 
 - `Ivan_Bagaturiya_Portfolio.pdf`
+- `Ivan_Bagaturiya_Portfolio.html`
 - `Ivan_Bagaturiya_CV.pdf`
 - `selection.json` (scores and match reasons for review)
 

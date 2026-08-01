@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ivan Bagaturiya - Full Portfolio</title>
+    <style>@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+:root {
+  --accent: #ff5a1f;
+  --ink: #101010;
+  --mid: #5c5c5c;
+  --line: #d8d8d4;
+  --light: #efefed;
+  --paper: #fafaf7;
+}
+
+* { box-sizing: border-box; }
+
+html { background: #d9d9d6; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #d9d9d6;
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.portfolio-page {
+  position: relative;
+  display: grid;
+  width: 297mm;
+  height: 210mm;
+  margin: 8mm auto;
+  overflow: hidden;
+  break-after: page;
+  page-break-after: always;
+  background: var(--paper);
+  box-shadow: 0 8px 34px rgba(0, 0, 0, .16);
+}
+
+.portfolio-page:last-child { break-after: auto; page-break-after: auto; }
+
+.cover {
+  grid-template-columns: 61% 39%;
+  background: var(--ink);
+  color: #fff;
+}
+
+.cover-copy {
+  display: flex;
+  flex-direction: column;
+  padding: 18mm 14mm 13mm;
+}
+
+.cover-mark {
+  width: 17mm;
+  height: 1.5mm;
+  margin-bottom: 8mm;
+  background: var(--accent);
+}
+
+.cover-initials { margin: 0; font-size: 10pt; font-weight: 700; }
+.cover h1 { margin: 22mm 0 2mm; font-size: 31pt; line-height: 1; }
+.cover-headline { margin: 0; font-size: 16pt; }
+.cover-target { margin-top: auto; }
+.cover-label { margin: 0 0 3mm; color: #bdbdbd; font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; }
+.cover-position { margin: 0 0 1.5mm; font-size: 13pt; font-weight: 700; }
+.cover-office { margin: 0; font-size: 10pt; }
+
+.cover-image { position: relative; min-width: 0; }
+.cover-image::after { position: absolute; inset: 0; content: ""; background: rgba(0, 0, 0, .28); }
+.cover-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.project-page { grid-template-columns: 96mm 1fr; }
+
+.project-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 12mm 8mm 8mm 11mm;
+}
+
+.project-number { margin: 0 0 11mm; color: var(--accent); font-size: 9pt; font-weight: 700; }
+.project-page h2 { margin: 0 0 3mm; font-size: 23pt; line-height: 1.06; }
+.project-year { margin: 0 0 6mm; color: var(--mid); font-size: 9pt; }
+.chips { display: flex; flex-wrap: wrap; gap: 1.4mm; margin: 0 0 7mm; }
+.chip { padding: 1.2mm 2.4mm; border-radius: 4mm; background: var(--light); font-size: 7.5pt; }
+.chip--dark { color: #fff; background: var(--ink); }
+.section-label { margin: 0 0 4mm; color: var(--mid); font-size: 7pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.project-description { margin: 0 0 7mm; font-size: 8.8pt; line-height: 1.42; }
+.software { margin-top: auto; }
+
+.project-media { display: grid; min-width: 0; height: 100%; padding: 10mm 11mm 14mm 0; overflow: hidden; gap: 3mm; }
+.project-media[data-count="2"] { grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.project-media[data-count="1"] { grid-template-rows: minmax(0, 1fr); }
+.project-media img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; object-fit: cover; }
+.project-media-empty { display: grid; height: 100%; place-items: center; color: var(--mid); background: var(--light); font-size: 9pt; }
+
+.page-footer {
+  position: absolute;
+  right: 11mm;
+  bottom: 4mm;
+  left: 11mm;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 2mm;
+  border-top: .25mm solid var(--line);
+  color: var(--mid);
+  font-size: 7pt;
+}
+
+@media print {
+  html, body { background: transparent; }
+  .portfolio-page { margin: 0; box-shadow: none; }
+}
+
+@media screen and (max-width: 1120px) {
+  .portfolio-page { transform-origin: top left; }
+}
+</style>
+  </head>
+  <body>
+    <section class="portfolio-page cover">
+      <div class="cover-copy">
+        <div class="cover-mark"></div>
+        <p class="cover-initials">I.A.B</p>
+        <h1>Ivan Bagaturiya</h1>
+        <p class="cover-headline">Architect</p>
+        <div class="cover-target">
+          <p class="cover-label">FULL PORTFOLIO</p>
+          <p class="cover-position">Selected works</p>
+          <p class="cover-office">8 projects</p>
+        </div>
+      </div>
+      <div class="cover-image"><img src="projects/2409-about/image1.png" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>01</span></footer>
+    </section>
+    <section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0056 / 01</p>
+        <h2>_sinuswall</h2>
+        <p class="project-year">2025</p>
+        <div class="chips"><span class="chip">architecture</span><span class="chip">tech</span><span class="chip">technology</span><span class="chip">interactive model</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how a parametric tool can keep a sinusoidal brick wall buildable before the brick size is known.</p>
+        <div class="software">
+          <p class="section-label">Software</p>
+          <div class="chips"><span class="chip chip--dark">ShapeDiver</span></div>
+        </div>
+      </div>
+      <div class="project-media" data-count="1"><img src="projects/0056-sinuswall/image1.jpg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>02</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0055 / 02</p>
+        <h2>_der Leuchtturm</h2>
+        <p class="project-year">2025</p>
+        <div class="chips"><span class="chip">architecture</span><span class="chip">education</span><span class="chip">rapid prototyping</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how ten slats, a rope, and a sheet of textile can become a lighthouse in 45 minutes.</p>
+        
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0055-leuchtturm/image1.jpeg" alt="" /><img src="projects/0055-leuchtturm/image4.jpeg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>03</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0054 / 03</p>
+        <h2>_the NOTE</h2>
+        <p class="project-year">2025</p>
+        <div class="chips"><span class="chip">selected</span><span class="chip">architecture</span><span class="chip">eth</span><span class="chip">tech</span><span class="chip">computational design</span><span class="chip">adaptive reuse</span><span class="chip">concert hall</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how computational design can turn an underground parking garage into a concert hall.</p>
+        <div class="software">
+          <p class="section-label">Software</p>
+          <div class="chips"><span class="chip chip--dark">Grasshopper</span></div>
+        </div>
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0054-note/image00003.png" alt="" /><img src="projects/0054-note/image00005.jpg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>04</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0052 / 04</p>
+        <h2>_Zwischendecken</h2>
+        <p class="project-year">2024</p>
+        <div class="chips"><span class="chip">architecture</span><span class="chip">tech</span><span class="chip">computational design</span><span class="chip">material research</span><span class="chip">bio-based materials</span><span class="chip">exhibition</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how mycelium and parametric form-finding can turn soft textile into a structural vault.</p>
+        <div class="software">
+          <p class="section-label">Software</p>
+          <div class="chips"><span class="chip chip--dark">Grasshopper</span></div>
+        </div>
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0052-zwischendecken/image2.jpeg" alt="" /><img src="projects/0052-zwischendecken/image4.jpg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>05</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0051 / 05</p>
+        <h2>_the CABRIO</h2>
+        <p class="project-year">2024</p>
+        <div class="chips"><span class="chip">selected</span><span class="chip">architecture</span><span class="chip">tech</span><span class="chip">computational design</span><span class="chip">urban design</span><span class="chip">transformable structure</span><span class="chip">acoustics</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how parametric architecture can turn a noisy parking lot into an adaptable urban stage.</p>
+        <div class="software">
+          <p class="section-label">Software</p>
+          <div class="chips"><span class="chip chip--dark">Rhino</span><span class="chip chip--dark">Grasshopper</span></div>
+        </div>
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0051-cabrio/image2.jpeg" alt="" /><img src="projects/0051-cabrio/image4.jpeg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>06</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0050 / 06</p>
+        <h2>_panoramortraits</h2>
+        <p class="project-year">2024</p>
+        <div class="chips"><span class="chip">art</span><span class="chip">photography</span><span class="chip">spatial narrative</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">This project shows how 36 analog exposures can turn a changing room into a continuous archive of space, time, and memory.</p>
+        
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0050-panoramortraits/image2.jpeg" alt="" /><img src="projects/0050-panoramortraits/image3.jpeg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>07</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0013 / 07</p>
+        <h2>_Wissen Hütten</h2>
+        
+        <div class="chips"><span class="chip">architecture</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">Project description not yet available.</p>
+        
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0013-spirowissenhueten/image1.jpg" alt="" /><img src="projects/0013-spirowissenhueten/image2.jpg" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>08</span></footer>
+    </section>
+<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">0010 / 08</p>
+        <h2>_Areal Archive</h2>
+        
+        <div class="chips"><span class="chip">art</span></div>
+        <p class="section-label">Project</p>
+        <p class="project-description">An evolving aerial archive that reveals familiar landscapes from an unfamiliar point of view.</p>
+        
+      </div>
+      <div class="project-media" data-count="2"><img src="projects/0010-droneimages/image00001.JPG" alt="" /><img src="projects/0010-droneimages/image00002.JPG" alt="" /></div>
+      <footer class="page-footer"><span>Ivan Bagaturiya</span><span>09</span></footer>
+    </section>
+  </body>
+</html>

@@ -4,10 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import html
 import io
 import json
+import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -31,6 +37,8 @@ REPO_ROOT = SCRIPT_DIR.parent
 PROJECTS_DIR = REPO_ROOT / "projects"
 DATA_DIR = SCRIPT_DIR / "data"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "output" / "pdf"
+PORTFOLIO_TEMPLATE = SCRIPT_DIR / "templates" / "portfolio.html"
+PORTFOLIO_CSS = SCRIPT_DIR / "templates" / "portfolio.css"
 
 ACCENT = HexColor("#ff5a1f")
 INK = HexColor("#101010")
@@ -478,7 +486,7 @@ def draw_footer(pdf: canvas.Canvas, name: str, page_number: int, width: float, c
     pdf.drawRightString(width - 30, 12, f"{page_number:02d}")
 
 
-def render_portfolio(
+def render_portfolio_reportlab(
     destination: Path,
     cv: dict[str, Any],
     application: dict[str, Any],
@@ -578,6 +586,191 @@ def render_portfolio(
         pdf.showPage()
 
     pdf.save()
+
+
+def portfolio_asset_url(path: Path, html_destination: Path) -> str:
+    """Return a repo-relative URL so generated HTML remains portable."""
+    return os.path.relpath(path, html_destination.parent).replace(os.sep, "/")
+
+
+def portfolio_chips(values: Iterable[str], modifier: str = "") -> str:
+    class_name = f"chip {modifier}".strip()
+    return "".join(
+        f'<span class="{class_name}">{html.escape(clean_text(value))}</span>'
+        for value in dedupe(values)
+    )
+
+
+def build_portfolio_html(
+    html_destination: Path,
+    cv: dict[str, Any],
+    application: dict[str, Any],
+    selected: list[RankedProject],
+    full_portfolio: bool = False,
+) -> str:
+    template = PORTFOLIO_TEMPLATE.read_text(encoding="utf-8")
+    stylesheet = PORTFOLIO_CSS.read_text(encoding="utf-8")
+    portrait_folder = published_project_folders().get("2409")
+    portrait = (portrait_folder or PROJECTS_DIR / "2409") / "image1.png"
+    portfolio_label = "FULL PORTFOLIO" if full_portfolio else "TAILORED PORTFOLIO"
+    position = "Selected works" if full_portfolio else clean_text(application.get("position", ""))
+    office = f"{len(selected)} projects" if full_portfolio else clean_text(application.get("office", ""))
+    cover = f'''<section class="portfolio-page cover">
+      <div class="cover-copy">
+        <div class="cover-mark"></div>
+        <p class="cover-initials">{html.escape(clean_text(cv.get("initials", "")))}</p>
+        <h1>{html.escape(clean_text(cv["name"]))}</h1>
+        <p class="cover-headline">{html.escape(clean_text(cv.get("headline", "")))}</p>
+        <div class="cover-target">
+          <p class="cover-label">{portfolio_label}</p>
+          <p class="cover-position">{html.escape(position)}</p>
+          <p class="cover-office">{html.escape(office)}</p>
+        </div>
+      </div>
+      <div class="cover-image"><img src="{portfolio_asset_url(portrait, html_destination)}" alt="" /></div>
+      <footer class="page-footer"><span>{html.escape(clean_text(cv["name"]))}</span><span>01</span></footer>
+    </section>'''
+
+    project_pages: list[str] = []
+    for index, item in enumerate(selected, start=1):
+        project = item.project
+        image_paths = [project.folder / name for name in project.image_names]
+        image_paths = [path for path in image_paths if path.exists()][:2]
+        if image_paths:
+            media = "".join(
+                f'<img src="{portfolio_asset_url(path, html_destination)}" alt="" />'
+                for path in image_paths
+            )
+        else:
+            media = '<div class="project-media-empty">No portfolio image selected</div>'
+        year = f'<p class="project-year">{html.escape(project.year)}</p>' if project.year else ""
+        software = ""
+        if project.software:
+            software = f'''<div class="software">
+          <p class="section-label">Software</p>
+          <div class="chips">{portfolio_chips(project.software, "chip--dark")}</div>
+        </div>'''
+        project_pages.append(f'''<section class="portfolio-page project-page">
+      <div class="project-copy">
+        <p class="project-number">{project.project_id} / {index:02d}</p>
+        <h2>{html.escape(project.title)}</h2>
+        {year}
+        <div class="chips">{portfolio_chips(project.tags[:7])}</div>
+        <p class="section-label">Project</p>
+        <p class="project-description">{html.escape(project.description or "Project description not yet available.")}</p>
+        {software}
+      </div>
+      <div class="project-media" data-count="{len(image_paths)}">{media}</div>
+      <footer class="page-footer"><span>{html.escape(clean_text(cv["name"]))}</span><span>{index + 1:02d}</span></footer>
+    </section>''')
+
+    title = f"{clean_text(cv['name'])} - {'Full Portfolio' if full_portfolio else 'Portfolio'}"
+    return (template
+            .replace("{{DOCUMENT_TITLE}}", html.escape(title))
+            .replace("{{PORTFOLIO_CSS}}", stylesheet)
+            .replace("{{COVER}}", cover)
+            .replace("{{PROJECTS}}", "\n".join(project_pages)))
+
+
+def chrome_executable() -> str | None:
+    candidates = [
+        shutil.which("google-chrome"),
+        shutil.which("chromium"),
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+        "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    ]
+    return next((str(path) for path in candidates if path and Path(path).exists()), None)
+
+
+def print_html_to_pdf(source: Path, destination: Path) -> bool:
+    browser = chrome_executable()
+    if not browser:
+        return False
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.unlink(missing_ok=True)
+    with tempfile.TemporaryDirectory(prefix="portfolio-chrome-") as profile:
+        process = subprocess.Popen(
+            [
+                browser,
+                "--headless=new",
+                "--disable-gpu",
+                "--disable-breakpad",
+                "--disable-extensions",
+                "--no-first-run",
+                "--no-pdf-header-footer",
+                f"--user-data-dir={profile}",
+                f"--print-to-pdf={destination}",
+                source.resolve().as_uri(),
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        deadline = time.monotonic() + 90
+        previous_size = -1
+        stable_checks = 0
+        success = False
+        while time.monotonic() < deadline:
+            if destination.exists() and destination.stat().st_size > 1000:
+                size = destination.stat().st_size
+                stable_checks = stable_checks + 1 if size == previous_size else 0
+                previous_size = size
+                if stable_checks >= 4:
+                    success = True
+                    break
+            if process.poll() is not None:
+                success = destination.exists() and destination.stat().st_size > 1000
+                break
+            time.sleep(.25)
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+    if not success:
+        print("Warning: browser PDF export did not complete.", file=sys.stderr)
+    return success
+
+
+def render_portfolio(
+    destination: Path,
+    cv: dict[str, Any],
+    application: dict[str, Any],
+    selected: list[RankedProject],
+    html_destination: Path | None = None,
+    full_portfolio: bool = False,
+) -> Path:
+    """Render portfolio HTML from the shared template, then print that HTML to PDF."""
+    html_destination = html_destination or destination.with_suffix(".html")
+    html_destination.parent.mkdir(parents=True, exist_ok=True)
+    html_destination.write_text(
+        build_portfolio_html(html_destination, cv, application, selected, full_portfolio),
+        encoding="utf-8",
+    )
+    if not print_html_to_pdf(html_destination, destination):
+        print("Warning: falling back to the legacy ReportLab portfolio renderer.", file=sys.stderr)
+        render_portfolio_reportlab(destination, cv, application, selected)
+    return html_destination
+
+
+def generate_full_portfolio() -> tuple[Path, Path]:
+    """Generate the canonical public portfolio containing every publishable project."""
+    cv_data = load_json(DATA_DIR / "cv.json")
+    projects = [project for project in load_projects() if not project.exclude]
+    selected = [RankedProject(project=project, score=0, reasons=[]) for project in projects]
+    html_path = REPO_ROOT / "portfolio.html"
+    pdf_path = REPO_ROOT / "assets" / "downloads" / "Ivan_Bagaturiya_Portfolio.pdf"
+    render_portfolio(
+        pdf_path,
+        cv_data,
+        {"office": "", "position": ""},
+        selected,
+        html_destination=html_path,
+        full_portfolio=True,
+    )
+    return html_path, pdf_path
 
 
 def skill_relevance(group: dict[str, Any], application: dict[str, Any]) -> tuple[int, list[str]]:
@@ -860,6 +1053,7 @@ def generate_application(
     target_dir = output_dir.resolve() / target_slug
     target_dir.mkdir(parents=True, exist_ok=True)
     portfolio_path = target_dir / "Ivan_Bagaturiya_Portfolio.pdf"
+    portfolio_html_path = target_dir / "Ivan_Bagaturiya_Portfolio.html"
     cv_path = target_dir / "Ivan_Bagaturiya_CV.pdf"
     manifest_path = target_dir / "selection.json"
     application_path = target_dir / "application.json"
@@ -868,12 +1062,19 @@ def generate_application(
         json.dumps(prepared, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    render_portfolio(portfolio_path, cv_data, prepared, selected)
+    render_portfolio(
+        portfolio_path,
+        cv_data,
+        prepared,
+        selected,
+        html_destination=portfolio_html_path,
+    )
     render_cv(cv_path, cv_data, prepared, selected)
     manifest = manifest_data(
         application_source, prepared, selected, portfolio_path, cv_path
     )
     manifest["outputs"]["application"] = str(application_path)
+    manifest["outputs"]["portfolio_html"] = str(portfolio_html_path)
     manifest["outputs"]["selection"] = str(manifest_path)
     manifest_path.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
