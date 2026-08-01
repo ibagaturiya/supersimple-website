@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ivan Bagaturiya</title>
-    <link rel="stylesheet" href="index-styles.css" />
+    <link rel="stylesheet" href="assets/css/index.css" />
   </head>
   <body>
     
@@ -21,63 +21,56 @@
       <div class="grid" id="projectGrid">
         
         <a class="project" data-project="2409" data-hashtags="#selected #architecture #tech #art #music" href="projecthtml/project2409.html">
-          <img src="projects/2409/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/2409/icon.png" alt="icon" class="project-logo" />
           <span class="project-label">2409</span>
           <span class="project-tooltip">_about</span>
         </a>
         
 
-        <a class="project" data-project="0060" data-hashtags="#art #music" href="projecthtml/project0060.html">
-          <img src="projects/0060/icon.svg" alt="icon" class="project-logo" />
-          <span class="project-label">0060</span>
-          <span class="project-tooltip">_drums<br />2026</span>
-        </a>
-        
-
         <a class="project" data-project="0057" data-hashtags="#tech" href="projecthtml/project0057.html">
-          <img src="projects/0057/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0057/icon.png" alt="icon" class="project-logo" />
           <span class="project-label">0057</span>
           <span class="project-tooltip">_scatter2view<br />2026</span>
         </a>
         
 
         <a class="project" data-project="0056" data-hashtags="#architecture #tech" href="projecthtml/project0056.html">
-          <img src="projects/0056/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0056/icon.jpg" alt="icon" class="project-logo" />
           <span class="project-label">0056</span>
           <span class="project-tooltip">_sinuswall<br />2025</span>
         </a>
         
 
         <a class="project" data-project="0055" data-hashtags="#architecture" href="projecthtml/project0055.html">
-          <img src="projects/0055/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0055/icon.jpeg" alt="icon" class="project-logo" />
           <span class="project-label">0055</span>
           <span class="project-tooltip">_leuchtturm<br />2025</span>
         </a>
         
 
         <a class="project" data-project="0054" data-hashtags="#selected #architecture #eth #tech" href="projecthtml/project0054.html">
-          <img src="projects/0054/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0054/icon.jpeg" alt="icon" class="project-logo" />
           <span class="project-label">0054</span>
           <span class="project-tooltip">_note<br />2025</span>
         </a>
         
 
         <a class="project" data-project="0052" data-hashtags="#architecture #tech" href="projecthtml/project0052.html">
-          <img src="projects/0052/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0052/icon.gif" alt="icon" class="project-logo" />
           <span class="project-label">0052</span>
           <span class="project-tooltip">_zwischendecke<br />2024</span>
         </a>
         
 
         <a class="project" data-project="0051" data-hashtags="#selected #architecture #tech" href="projecthtml/project0051.html">
-          <img src="projects/0051/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0051/icon.png" alt="icon" class="project-logo" />
           <span class="project-label">0051</span>
           <span class="project-tooltip">_cabrio<br />2024</span>
         </a>
         
 
         <a class="project" data-project="0050" data-hashtags="#art" href="projecthtml/project0050.html">
-          <img src="projects/0050/icon.svg" alt="icon" class="project-logo" />
+          <img src="projects/0050/icon.jpg" alt="icon" class="project-logo" />
           <span class="project-label">0050</span>
           <span class="project-tooltip">_panoramortraits<br />2024</span>
         </a>
@@ -85,30 +78,7 @@
       </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="script.js"></script>
-    
-    <script>
-      // Dynamically set icon file extension for each project
-      (function () {
-        const exts = ["svg", "png", "jpg", "jpeg", "gif", "pdf"];
-        document.querySelectorAll(".project").forEach((project) => {
-          const projectNum = project.getAttribute("data-project");
-          const img = project.querySelector("img.project-logo");
-          if (!projectNum || !img) return;
-          (function tryNext(i) {
-            if (i >= exts.length) return;
-            const url = `projects/${projectNum}/icon.${exts[i]}`;
-            fetch(url, { method: "HEAD" })
-              .then((r) => {
-                if (r.ok) img.src = url;
-                else tryNext(i + 1);
-              })
-              .catch(() => tryNext(i + 1));
-          })(0);
-        });
-      })();
-    </script>
-    
+    <script src="assets/js/site.js"></script>
     <div class="mouse-line-vertical"></div>
     <div class="mouse-line-horizontal"></div>
     <script>
