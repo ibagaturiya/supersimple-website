@@ -1,0 +1,4 @@
+Goods are transported by vacuum through tubes. At the end of the tube there is
+a checkpoint. This consists on the one hand of a machine room with the technol-
+ogy to drive the infrastructure and on the other hand of a kiosk for receiving and
+delivering the goods.

@@ -13,8 +13,9 @@ html { min-width: 320px; background: var(--paper); }
 body {
   min-height: 100svh;
   margin: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding: clamp(24px, 5vw, 72px);
   color: var(--ink);
   background:
@@ -45,33 +46,21 @@ body {
   backdrop-filter: blur(16px);
 }
 
-.oops-icon {
-  position: relative;
-  width: 132px;
-  height: 132px;
+.oops-meme {
+  width: min(360px, 100%);
   margin: 0 auto 28px;
-  display: grid;
-  place-items: center;
+  overflow: hidden;
   border: 2px solid var(--ink);
-  border-radius: 50%;
-  background: #f1d4c8;
-  transform: rotate(-5deg);
+  border-radius: 14px;
+  background: var(--ink);
   box-shadow: 9px 10px 0 var(--ink);
+  transform: rotate(-1.5deg);
 }
 
-.oops-face { font: 70px/1 Arial, sans-serif; }
-.oops-lock {
-  position: absolute;
-  right: -12px;
-  bottom: -5px;
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 2px solid var(--ink);
-  border-radius: 50%;
-  background: var(--accent);
-  font-size: 23px;
+.oops-meme img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .eyebrow {
@@ -94,6 +83,61 @@ h1 {
   margin: 28px auto 0;
   font-size: clamp(13px, 1.8vw, 16px);
   line-height: 1.65;
+}
+
+.ivan-instructions {
+  max-width: 590px;
+  margin: 28px auto 0;
+  padding: 18px;
+  border: 1px dashed rgba(17, 17, 15, .42);
+  border-radius: 12px;
+  background: rgba(255,255,255,.2);
+  text-align: left;
+}
+
+.instruction-label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.command-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--ink);
+}
+
+.command-box code {
+  min-width: 0;
+  padding: 13px 14px;
+  overflow-x: auto;
+  color: #fff;
+  font: 12px/1.4 Menlo, Monaco, "Courier New", monospace;
+  white-space: nowrap;
+}
+
+.copy-button {
+  min-width: 76px;
+  border: 0;
+  border-left: 1px solid rgba(255,255,255,.25);
+  background: var(--accent);
+  color: var(--ink);
+  cursor: pointer;
+  font: 700 11px/1 Menlo, Monaco, "Courier New", monospace;
+}
+
+.copy-button:hover { background: #ff784f; }
+.copy-button:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+
+.copy-status {
+  min-height: 14px;
+  margin: 10px 0 0;
+  color: #6d493d;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .access-actions {
@@ -130,10 +174,17 @@ h1 {
 @media (max-width: 560px) {
   body { padding: 72px 16px 24px; }
   .access-card { padding: 28px 20px; border-radius: 20px; }
-  .oops-icon { width: 104px; height: 104px; }
-  .oops-face { font-size: 55px; }
+  .oops-meme { width: min(290px, 100%); box-shadow: 6px 7px 0 var(--ink); }
   .access-actions { flex-direction: column; }
   .access-button { width: 100%; }
+  .ivan-instructions { padding: 14px; }
+  .command-box { grid-template-columns: 1fr; }
+  .command-box code { font-size: 10px; text-align: center; }
+  .copy-button { min-height: 42px; border-top: 1px solid rgba(255,255,255,.25); border-left: 0; }
+}
+
+@media (min-height: 1050px) {
+  .access-card { margin-block: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

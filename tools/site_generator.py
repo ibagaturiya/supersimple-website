@@ -349,6 +349,8 @@ def contact_href(key, value):
 
 
 def contact_icon_src(key):
+    if key == "location":
+        return "../assets/icons/location.svg"
     if key == "email":
         return "../assets/icons/email.svg"
     if key == "phone":
@@ -390,16 +392,27 @@ def generate_about_html(project_folder):
 
     contact_rows = []
     icon_links = []
-    for key in ("location", "phone", "email", "website", "linkedin", "instagram"):
+    for key in ("phone", "email", "linkedin", "instagram", "location", "website"):
         value = cv.get("contact", {}).get(key)
         if not value:
             continue
         if key == "website":
             continue
         href = contact_href(key, value)
-        if key in {"email", "phone", "linkedin", "instagram"}:
+        if key in {"email", "phone", "linkedin", "instagram", "location"}:
             external = ' target="_blank" rel="noopener noreferrer"' if key in {"linkedin", "instagram"} else ""
             icon_src = contact_icon_src(key)
+            if key == "location":
+                icon_links.append(
+                    '<a class="contact-icon contact-icon--location" '
+                    'href="https://www.google.com/maps/place/zurich+switzerland/data=!4m2!3m1!1s0x47900b9749bea219:0xe66e8df1e71fdc03?sa=X&amp;ved=1t:155783&amp;ictx=111" '
+                    'target="_blank" rel="noopener noreferrer" '
+                    f'aria-label="{escape(str(value), quote=True)}" '
+                    f'data-label="{escape(str(value), quote=True)}">'
+                    f'<img src="{escape(icon_src, quote=True)}" alt="" />'
+                    '</a>'
+                )
+                continue
             icon_links.append(
                 f'<a class="contact-icon" href="{escape(href, quote=True)}"{external} aria-label="{escape(key)}">'
                 f'<img src="{escape(icon_src, quote=True)}" alt="{escape(key)} icon" />'

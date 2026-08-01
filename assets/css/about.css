@@ -247,6 +247,7 @@ h1 {
 }
 
 .contact-icon {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -261,6 +262,32 @@ h1 {
     transform 0.18s ease,
     background 0.18s ease,
     border-color 0.18s ease;
+}
+
+.contact-icon--location::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 9px);
+  z-index: 5;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgba(17, 17, 15, 0.9);
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.contact-icon--location:hover::after,
+.contact-icon--location:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .contact-icon:hover {

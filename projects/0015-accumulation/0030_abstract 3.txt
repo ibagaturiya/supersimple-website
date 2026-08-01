@@ -1,0 +1,8 @@
+From the checkpoints there is a fine distribution, where the orders are brought to
+the individual addresses by bicycle. Thus, there are only a certain number of
+couriers who take care of the deliveries of all the shops in the vicinity of a check-
+point. The infrastructure covers the busy roads, so the goods are transported
+through the tubes avoiding congestions, instead of adding couriers to the traffic.
+The system works in both directions, so the infrastructure runs in a cycle. It
+relieves the strain on traffic and enables goods to be transported quickly from
+the city center to the outskirts and vice versa.

@@ -665,9 +665,13 @@ def build_portfolio_html(
     </section>''')
 
     title = f"{clean_text(cv['name'])} - {'Full Portfolio' if full_portfolio else 'Portfolio'}"
+    if full_portfolio:
+        styles = '<link rel="stylesheet" href="portfolio-export/templates/portfolio.css" />'
+    else:
+        styles = f"<style>{stylesheet}</style>"
     return (template
             .replace("{{DOCUMENT_TITLE}}", html.escape(title))
-            .replace("{{PORTFOLIO_CSS}}", stylesheet)
+            .replace("{{PORTFOLIO_STYLES}}", styles)
             .replace("{{COVER}}", cover)
             .replace("{{PROJECTS}}", "\n".join(project_pages)))
 

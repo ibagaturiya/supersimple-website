@@ -11,16 +11,28 @@
     <a class="site-mark" href="index.html" aria-label="Back to all projects">I.A.B</a>
 
     <main class="access-card">
-      <div class="oops-icon" aria-hidden="true">
-        <span class="oops-face">😬</span>
-        <span class="oops-lock">🔒</span>
-      </div>
+      <figure class="oops-meme">
+        <img
+          src="assets/images/ivan-only-sorry.gif"
+          alt="Joey from Friends saying I’m sorry"
+        />
+      </figure>
       <p class="eyebrow">PRIVATE GENERATOR · VERY DRAMATIC SECURITY</p>
       <h1>Oops.<br />Wrong human.</h1>
       <p class="message">
         This tiny door only opens for Ivan. The portfolio robots checked the
         guest list twice and, awkwardly, your name is not on it.
       </p>
+      <section class="ivan-instructions" aria-labelledby="ivan-instructions-title">
+        <p class="instruction-label" id="ivan-instructions-title">Ivan, wake up the generator first:</p>
+        <div class="command-box">
+          <code id="generator-command">python3 start-application-generator.py</code>
+          <button class="copy-button" id="copy-command" type="button">Copy</button>
+        </div>
+        <p class="copy-status" id="copy-status" aria-live="polite">
+          Paste this into Terminal, press Return, and keep Terminal open.
+        </p>
+      </section>
       <div class="access-actions">
         <a class="access-button access-button--primary" href="index.html">
           Return to the civilized website
@@ -38,5 +50,31 @@
         Nice try, though. Ten points for curiosity.
       </p>
     </main>
+    <script>
+      const copyButton = document.getElementById("copy-command");
+      const command = document.getElementById("generator-command").textContent;
+      const copyStatus = document.getElementById("copy-status");
+
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(command);
+        } catch (error) {
+          const input = document.createElement("textarea");
+          input.value = command;
+          input.setAttribute("readonly", "");
+          input.style.position = "fixed";
+          input.style.opacity = "0";
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          input.remove();
+        }
+        copyButton.textContent = "Copied!";
+        copyStatus.textContent = "Copied. Paste it into Terminal and press Return.";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy";
+        }, 2200);
+      });
+    </script>
   </body>
 </html>
