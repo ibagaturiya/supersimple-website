@@ -18,9 +18,22 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    linear-gradient(90deg, rgba(17, 17, 15, 0.04) 1px, transparent 1px) 0 0 / 25% 100%,
-    var(--paper);
+  background: linear-gradient(
+    45deg,
+    #ff9100,
+    #ff5722,
+    #bbbbbb,
+    #656565,
+    #000000
+  );
+  background-size: 800% 800%;
+  animation: gradientShift 25s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 a { color: inherit; }
@@ -371,5 +384,9 @@ h1 {
   .cv-footer { display: none; }
   .about-hero { min-height: 0; }
   .cv-sidebar { position: static; }
-  body { background: white; }
+  body { background: white; animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
 }
