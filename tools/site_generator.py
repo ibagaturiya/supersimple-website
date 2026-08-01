@@ -284,12 +284,7 @@ def generate_about_html(project_folder):
     profile_blocks = []
     if cv.get("profile_en"):
         profile_blocks.append(
-            f'<div class="profile-language"><span>EN</span><p>{escape(cv["profile_en"])}</p></div>'
-        )
-    german_profile = cv.get("profile_de") or cv.get("profile")
-    if german_profile:
-        profile_blocks.append(
-            f'<div class="profile-language"><span>DE</span><p>{escape(german_profile)}</p></div>'
+            f'<div class="profile-language"><p>{escape(cv["profile_en"])}</p></div>'
         )
 
     skill_groups = []
