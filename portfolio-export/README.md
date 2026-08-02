@@ -29,6 +29,12 @@ The full and tailored portfolios share
 portfolio layout globally. Tailored exports change the project selection and
 cover text, but not the layout system.
 
+Every published project has a `skill.txt`. Write hash-prefixed labels there,
+such as `#rhino #grasshopper`; those values become the outlined skill chips on
+the project's opener and are also used by the tailored-project matcher. The
+Areal Archive keeps the same opener, then uses its complete image set as one
+edge-to-edge contact sheet.
+
 The public CV contains the
 full verified profile, experience highlights, education and professors,
 languages, skills, software, and hobbies. Internal verification notes and local

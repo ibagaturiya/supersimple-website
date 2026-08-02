@@ -1,4 +1,22 @@
 {
+  "0010": {
+    "year": "ongoing",
+    "tags": ["art", "photography", "aerial archive"],
+    "software": [],
+    "priority": 1
+  },
+  "0013": {
+    "year": "2020",
+    "tags": ["architecture", "timber construction", "model making"],
+    "software": [],
+    "priority": 1
+  },
+  "0015": {
+    "year": "2022",
+    "tags": ["architecture", "infrastructure", "adaptive reuse"],
+    "software": [],
+    "priority": 1.5
+  },
   "0050": {
     "year": "2024",
     "tags": ["art", "photography", "spatial narrative"],
@@ -68,4 +86,3 @@
     "tags": ["about"]
   }
 }
-

@@ -52,6 +52,7 @@ projects/0062-housing-tool/
 ├── titledescription.txt
 ├── description.txt
 ├── hashtags.txt
+├── skill.txt
 ├── icon.svg|png|jpg|jpeg|gif
 ├── trailer.mp4|gif|txt
 └── image1.jpg, image2.png, ...
@@ -67,13 +68,15 @@ media include JPG, JPEG, PNG, GIF, MP4, MP3, PDF, and text links.
 2. Replace its text and media.
 3. Add hashtags such as `#selected`, `#architecture`, `#tech`, `#art`, or
    `#music`.
-4. Generate the site:
+4. List the portfolio skill chips in `skill.txt`, for example
+   `#rhino #grasshopper #parametric-design`.
+5. Generate the site:
 
 ```bash
 python3 generate.py
 ```
 
-5. Open `index.html` through a local web server and verify the index, filters,
+6. Open `index.html` through a local web server and verify the index, filters,
    project page, media, and previous/next navigation.
 
 Do not edit generated pages in `projecthtml/` directly. The About/CV page at
@@ -97,6 +100,7 @@ source, then writes:
 - `projecthtml/projectNNNN.html`
 - `projecthtml/project2409.html` as the About/CV page
 - `assets/downloads/Ivan_Bagaturiya_CV.pdf` as the public comprehensive CV
+- `assets/downloads/Ivan_Bagaturiya_Portfolio.pdf` as the public full portfolio
 
 The index embeds each project's hashtags in `data-hashtags`. The filter and
 bubble interactions live in `assets/js/site.js`. Matter.js is loaded from a CDN
@@ -119,8 +123,10 @@ and public CV PDF.
 ## Tailored PDF exports
 
 The independent `portfolio-export/` tool reads the same published project
-library and generates application-specific CV and portfolio PDFs. Its workflow
-is documented in `portfolio-export/README.md`.
+library and generates application-specific CV and portfolio PDFs. Full and
+tailored portfolios share one layout: cover, contents, project opener and
+content pages, followed by the website QR page. Its workflow is documented in
+`portfolio-export/README.md`.
 
 To use the private dashboard, install the PDF dependencies once and start it:
 

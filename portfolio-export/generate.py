@@ -20,6 +20,9 @@ from typing import Any, Iterable
 
 try:
     from PIL import Image, ImageOps
+    from reportlab.graphics import renderSVG
+    from reportlab.graphics.barcode import qr
+    from reportlab.graphics.shapes import Drawing
     from reportlab.lib.colors import Color, HexColor, black, white
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.lib.utils import ImageReader
@@ -39,6 +42,8 @@ DATA_DIR = SCRIPT_DIR / "data"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "output" / "pdf"
 PORTFOLIO_TEMPLATE = SCRIPT_DIR / "templates" / "portfolio.html"
 PORTFOLIO_CSS = SCRIPT_DIR / "templates" / "portfolio.css"
+QR_ASSET = REPO_ROOT / "assets" / "qr" / "bagaturiya.svg"
+PORTFOLIO_IMAGE_DIR = REPO_ROOT / "assets" / "portfolio-images"
 
 ACCENT = HexColor("#ff5a1f")
 INK = HexColor("#101010")
@@ -151,6 +156,26 @@ def website_hashtags(folder: Path) -> list[str]:
     return [match.lower().lstrip("#") for match in re.findall(r"#\w+", raw)]
 
 
+def project_skills(folder: Path, fallback: Iterable[str]) -> list[str]:
+    """Read display/ranking skills from the editable per-project skill.txt file."""
+    path = folder / "skill.txt"
+    if not path.exists():
+        return dedupe(fallback)
+    raw = read_text(path)
+    hashtag_values = re.findall(r"#[\w-]+", raw, flags=re.UNICODE)
+    if hashtag_values:
+        return dedupe(hashtag_values)
+    return dedupe(re.split(r"[,;\n]+", raw))
+
+
+def project_year(folder: Path, configured: Any) -> str:
+    year = clean_text(configured)
+    if year:
+        return year
+    match = re.search(r"\b(?:19|20)\d{2}\b", read_text(folder / "titledescription.txt"))
+    return match.group(0) if match else ""
+
+
 def published_project_folders() -> dict[str, Path]:
     projects: dict[str, Path] = {}
     invalid: list[str] = []
@@ -186,7 +211,7 @@ def discover_images(folder: Path) -> list[str]:
         path for path in folder.iterdir()
         if path.is_file()
         and path.suffix.lower() in IMAGE_EXTENSIONS
-        and path.stem.lower().startswith("image")
+        and path.stem.lower() != "icon"
     ]
     return [path.name for path in sorted(images, key=sort_key)]
 
@@ -206,10 +231,10 @@ def load_projects() -> list[Project]:
                 title=clean_text(read_text(folder / "title.txt") or folder.name),
                 description=clean_text(read_text(folder / "description.txt")),
                 website_tags=site_tags,
-                year=clean_text(extra.get("year", "")),
+                year=project_year(folder, extra.get("year", "")),
                 tags=dedupe([*site_tags, *extra.get("tags", [])]),
                 software=dedupe(extra.get("software", [])),
-                skills=dedupe(extra.get("skills", [])),
+                skills=project_skills(folder, extra.get("skills", [])),
                 priority=float(extra.get("priority", 0)),
                 image_names=extra.get("images", []) or discover_images(folder),
                 exclude=bool(extra.get("exclude", False)),
@@ -601,6 +626,51 @@ def portfolio_chips(values: Iterable[str], modifier: str = "") -> str:
     )
 
 
+def ensure_qr_asset() -> Path:
+    """Create a deterministic vector QR code without adding another dependency."""
+    if QR_ASSET.exists():
+        return QR_ASSET
+    QR_ASSET.parent.mkdir(parents=True, exist_ok=True)
+    widget = qr.QrCodeWidget("https://bagaturiya.com")
+    x1, y1, x2, y2 = widget.getBounds()
+    size = 96
+    drawing = Drawing(size, size, transform=[size / (x2 - x1), 0, 0, size / (y2 - y1), 0, 0])
+    drawing.add(widget)
+    renderSVG.drawToFile(drawing, str(QR_ASSET))
+    return QR_ASSET
+
+
+def portfolio_image_asset(
+    project: Project,
+    source: Path,
+    variant: str,
+    max_pixels: int,
+) -> Path:
+    """Create a compact, print-ready derivative while preserving source files."""
+    safe_stem = re.sub(r"[^a-zA-Z0-9._-]+", "-", source.stem).strip("-") or "image"
+    destination = PORTFOLIO_IMAGE_DIR / project.project_id / f"{safe_stem}-{variant}.jpg"
+    if destination.exists() and destination.stat().st_mtime >= source.stat().st_mtime:
+        return destination
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(source) as original:
+        original.seek(0)
+        image = ImageOps.exif_transpose(original).convert("RGBA")
+        background = Image.new("RGBA", image.size, "white")
+        background.alpha_composite(image)
+        flattened = background.convert("RGB")
+        flattened.thumbnail((max_pixels, max_pixels), Image.Resampling.LANCZOS)
+        flattened.save(destination, "JPEG", quality=83, optimize=True, progressive=True)
+    return destination
+
+
+def chunked(values: list[Path], size: int) -> list[list[Path]]:
+    return [values[index:index + size] for index in range(0, len(values), size)]
+
+
+def is_areal_archive(project: Project) -> bool:
+    return project.project_id == "0010" or normalize(project.title) == "areal archive"
+
+
 def build_portfolio_html(
     html_destination: Path,
     cv: dict[str, Any],
@@ -610,59 +680,154 @@ def build_portfolio_html(
 ) -> str:
     template = PORTFOLIO_TEMPLATE.read_text(encoding="utf-8")
     stylesheet = PORTFOLIO_CSS.read_text(encoding="utf-8")
+    qr_asset = ensure_qr_asset()
     portrait_folder = published_project_folders().get("2409")
     portrait = (portrait_folder or PROJECTS_DIR / "2409") / "image1.png"
-    portfolio_label = "FULL PORTFOLIO" if full_portfolio else "TAILORED PORTFOLIO"
-    position = "Selected works" if full_portfolio else clean_text(application.get("position", ""))
-    office = f"{len(selected)} projects" if full_portfolio else clean_text(application.get("office", ""))
+    name = clean_text(cv["name"])
+    portfolio_label = "Full portfolio" if full_portfolio else "Tailored portfolio"
+    office = clean_text(application.get("office", ""))
+    position = clean_text(application.get("position", ""))
+    if full_portfolio:
+        cover_sentence = f"This is the full portfolio of {name}."
+    else:
+        target = " - ".join(value for value in (office, position) if value)
+        cover_sentence = f"This tailored portfolio was prepared for {target or 'this application'}."
+
+    def page_chrome(page_number: int, inverse: bool = False) -> str:
+        modifier = " page-chrome--inverse" if inverse else ""
+        return f'''<div class="page-chrome{modifier}" aria-hidden="true">
+        <span class="page-corner page-corner--tl"></span>
+        <span class="page-corner page-corner--tr"></span>
+        <span class="page-corner page-corner--bl"></span>
+        <span class="page-corner page-corner--br"></span>
+        <span class="page-number">{page_number:02d}</span>
+      </div>'''
+
+    def project_images(project: Project) -> list[Path]:
+        return [
+            project.folder / name
+            for name in project.image_names
+            if (project.folder / name).exists()
+        ]
+
+    def content_page_count(project: Project) -> int:
+        images = project_images(project)
+        if is_areal_archive(project):
+            return 1
+        return max(1, (len(images) + 1) // 2)
+
+    project_start_pages: dict[str, int] = {}
+    next_page = 3
+    for item in selected:
+        project_start_pages[item.project.project_id] = next_page
+        next_page += 1 + content_page_count(item.project)
+
     cover = f'''<section class="portfolio-page cover">
       <div class="cover-copy">
-        <div class="cover-mark"></div>
         <p class="cover-initials">{html.escape(clean_text(cv.get("initials", "")))}</p>
         <h1>{html.escape(clean_text(cv["name"]))}</h1>
         <p class="cover-headline">{html.escape(clean_text(cv.get("headline", "")))}</p>
-        <div class="cover-target">
-          <p class="cover-label">{portfolio_label}</p>
-          <p class="cover-position">{html.escape(position)}</p>
-          <p class="cover-office">{html.escape(office)}</p>
-        </div>
+        <p class="cover-target"><span>{html.escape(portfolio_label)}</span>{html.escape(cover_sentence)}</p>
       </div>
-      <div class="cover-image"><img src="{portfolio_asset_url(portrait, html_destination)}" alt="" /></div>
-      <footer class="page-footer"><span>{html.escape(clean_text(cv["name"]))}</span><span>01</span></footer>
+      <figure class="cover-image"><img src="{portfolio_asset_url(portrait, html_destination)}" alt="Portrait of {html.escape(name)}" /></figure>
+      {page_chrome(1)}
+    </section>'''
+
+    contents_items = "".join(
+        f'''<li><span>{html.escape(item.project.title)}</span>
+        <span>{project_start_pages[item.project.project_id]:02d}</span></li>'''
+        for item in selected
+    )
+    contents = f'''<section class="portfolio-page contents-page">
+      <div class="contents-list">
+        <h2>Contents</h2>
+        <ol>{contents_items}</ol>
+      </div>
+      <div class="contents-frame"><span>portfolio</span></div>
+      {page_chrome(2)}
     </section>'''
 
     project_pages: list[str] = []
     for index, item in enumerate(selected, start=1):
         project = item.project
-        image_paths = [project.folder / name for name in project.image_names]
-        image_paths = [path for path in image_paths if path.exists()][:2]
-        if image_paths:
-            media = "".join(
-                f'<img src="{portfolio_asset_url(path, html_destination)}" alt="" />'
-                for path in image_paths
-            )
-        else:
-            media = '<div class="project-media-empty">No portfolio image selected</div>'
-        year = f'<p class="project-year">{html.escape(project.year)}</p>' if project.year else ""
-        software = ""
-        if project.software:
-            software = f'''<div class="software">
-          <p class="section-label">Software</p>
-          <div class="chips">{portfolio_chips(project.software, "chip--dark")}</div>
-        </div>'''
-        project_pages.append(f'''<section class="portfolio-page project-page">
-      <div class="project-copy">
-        <p class="project-number">{project.project_id} / {index:02d}</p>
-        <h2>{html.escape(project.title)}</h2>
-        {year}
-        <div class="chips">{portfolio_chips(project.tags[:7])}</div>
-        <p class="section-label">Project</p>
-        <p class="project-description">{html.escape(project.description or "Project description not yet available.")}</p>
-        {software}
+        page_number = project_start_pages[project.project_id]
+        image_paths = project_images(project)
+        lead_image = image_paths[0] if image_paths else None
+        lead_asset = (
+            portfolio_image_asset(project, lead_image, "title", 1800)
+            if lead_image else None
+        )
+        lead_media = (
+            f'<img src="{portfolio_asset_url(lead_asset, html_destination)}" alt="{html.escape(project.title)}" />'
+            if lead_asset else '<div class="project-media-empty">Image forthcoming</div>'
+        )
+        year = project.year or "Year forthcoming"
+        skills = project.skills or [f"#{tag}" for tag in project.tags[:5]]
+        project_pages.append(f'''<section class="portfolio-page project-title-page">
+      <figure class="project-title-image">{lead_media}</figure>
+      <div class="project-title-copy">
+        <div>
+          <p class="project-number">{project.project_id} / {index:02d}</p>
+          <h2>{html.escape(project.title)}</h2>
+          <p class="project-year">{html.escape(year)}</p>
+          <p class="project-description">{html.escape(project.description or "Project description forthcoming.")}</p>
+        </div>
+        <div class="project-skills">
+          <p class="section-label">Skills used</p>
+          <div class="chips">{portfolio_chips(skills, "chip--outline")}</div>
+        </div>
       </div>
-      <div class="project-media" data-count="{len(image_paths)}">{media}</div>
-      <footer class="page-footer"><span>{html.escape(clean_text(cv["name"]))}</span><span>{index + 1:02d}</span></footer>
+      {page_chrome(page_number)}
     </section>''')
+
+        if is_areal_archive(project):
+            if image_paths:
+                columns = max(1, round((len(image_paths) * 297 / 210) ** 0.5))
+                rows = max(1, (len(image_paths) + columns - 1) // columns)
+                grid_items = "".join(
+                    f'<img src="{portfolio_asset_url(portfolio_image_asset(project, path, "grid", 620), html_destination)}" alt="{html.escape(project.title)} - image {media_index}" />'
+                    for media_index, path in enumerate(image_paths, start=1)
+                )
+            else:
+                columns = rows = 1
+                grid_items = '<div class="project-media-empty">Images forthcoming</div>'
+            project_pages.append(f'''<section class="portfolio-page areal-grid-page">
+      <div class="areal-grid" style="--grid-columns:{columns};--grid-rows:{rows}">{grid_items}</div>
+      {page_chrome(page_number + 1, inverse=True)}
+    </section>''')
+            continue
+
+        groups = chunked(image_paths, 2) or [[]]
+        for group_index, group in enumerate(groups):
+            figures: list[str] = []
+            if group:
+                for image_index, path in enumerate(group, start=group_index * 2 + 1):
+                    text = project.description if image_index == 1 else ""
+                    content_asset = portfolio_image_asset(project, path, "content", 1600)
+                    figures.append(f'''<figure class="content-figure">
+          <div class="content-image"><img src="{portfolio_asset_url(content_asset, html_destination)}" alt="{html.escape(project.title)} - image {image_index}" /></div>
+          <figcaption><span>{html.escape(project.title)} / {image_index:02d}</span>{html.escape(text)}</figcaption>
+        </figure>''')
+            else:
+                figures.append('''<figure class="content-figure content-figure--empty">
+          <div class="content-image project-media-empty">Images forthcoming</div>
+          <figcaption>Project material can be added to this folder at any time.</figcaption>
+        </figure>''')
+            content_number = page_number + 1 + group_index
+            project_pages.append(f'''<section class="portfolio-page project-content-page">
+      <div class="project-content-grid" data-count="{len(group)}">{"".join(figures)}</div>
+      {page_chrome(content_number)}
+    </section>''')
+
+    closing_page_number = next_page
+    closing = f'''<section class="portfolio-page closing-page">
+      <a class="closing-link" href="https://bagaturiya.com">
+        <img src="{portfolio_asset_url(qr_asset, html_destination)}" alt="QR code linking to bagaturiya.com" />
+        <span>Want to see more?</span>
+        <strong>go to bagaturiya.com</strong>
+      </a>
+      {page_chrome(closing_page_number)}
+    </section>'''
 
     title = f"{clean_text(cv['name'])} - {'Full Portfolio' if full_portfolio else 'Portfolio'}"
     if full_portfolio:
@@ -672,8 +837,11 @@ def build_portfolio_html(
     return (template
             .replace("{{DOCUMENT_TITLE}}", html.escape(title))
             .replace("{{PORTFOLIO_STYLES}}", styles)
+            .replace("{{FAVICON_URL}}", portfolio_asset_url(REPO_ROOT / "assets" / "favicon" / "favicon.svg", html_destination))
             .replace("{{COVER}}", cover)
-            .replace("{{PROJECTS}}", "\n".join(project_pages)))
+            .replace("{{CONTENTS}}", contents)
+            .replace("{{PROJECTS}}", "\n".join(project_pages))
+            .replace("{{CLOSING}}", closing))
 
 
 def chrome_executable() -> str | None:
@@ -701,8 +869,13 @@ def print_html_to_pdf(source: Path, destination: Path) -> bool:
                 "--disable-gpu",
                 "--disable-breakpad",
                 "--disable-extensions",
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
                 "--no-first-run",
                 "--no-pdf-header-footer",
+                "--allow-file-access-from-files",
+                "--run-all-compositor-stages-before-draw",
+                "--virtual-time-budget=10000",
                 f"--user-data-dir={profile}",
                 f"--print-to-pdf={destination}",
                 source.resolve().as_uri(),

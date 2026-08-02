@@ -327,9 +327,6 @@ h1 {
   font-size: 10px;
   line-height: 1;
 }
-  font-size: 10px;
-  line-height: 1;
-}
 
 .skill-groups {
   display: grid;
@@ -456,7 +453,7 @@ h1 {
   margin: 20px auto 80px;
   padding: 38px;
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr repeat(3, auto);
   gap: 14px;
   align-items: center;
   color: #fff;
