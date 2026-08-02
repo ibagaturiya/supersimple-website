@@ -210,7 +210,7 @@ body {
   border: 0.18mm solid rgba(17, 17, 15, 0.08);
   border-radius: 6mm;
   background: #fff;
-  box-shadow: 0 1.2mm 3.2mm rgba(17, 17, 15, 0.13);
+  box-shadow: 0 12px 30px rgba(17, 17, 15, 0.06);
 }
 
 .cv-card {
@@ -539,18 +539,25 @@ body {
   position: relative;
   width: 102mm;
   height: 167mm;
-  justify-self: center;
-  border: 0.24mm solid var(--line);
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.contents-frame h2 {
+  margin: 0;
+  font-size: 29pt;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-align: right;
 }
 
 .contents-frame span {
-  position: absolute;
-  top: 7mm;
-  left: 50%;
-  transform: translateX(-50%);
-  color: transparent;
-  -webkit-text-stroke: 0.18mm var(--ink);
-  font-size: 14pt;
+  display: none;
 }
 
 .project-title-page {
@@ -742,7 +749,7 @@ body {
 }
 
 .text-media--title {
-  padding: 24mm 18mm;
+  display: none;
 }
 
 .text-media--title p {
