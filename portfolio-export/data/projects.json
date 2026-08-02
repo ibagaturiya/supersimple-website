@@ -22,48 +22,42 @@
     "tags": ["art", "photography", "spatial narrative"],
     "software": [],
     "skills": ["photography", "visual storytelling"],
-    "priority": 0.5,
-    "images": ["image2.jpeg", "image3.jpeg"]
+    "priority": 0.5
   },
   "0051": {
     "year": "2024",
     "tags": ["selected", "architecture", "computational design", "urban design", "transformable structure", "acoustics"],
     "software": ["Rhino", "Grasshopper"],
     "skills": ["architectural design", "parametric design", "visual programming", "urban design", "acoustic design", "collaborative design"],
-    "priority": 4,
-    "images": ["image2.jpeg", "image4.jpeg", "image5.jpeg"]
+    "priority": 4
   },
   "0052": {
     "year": "2024",
     "tags": ["architecture", "computational design", "material research", "bio-based materials", "exhibition"],
     "software": ["Grasshopper"],
     "skills": ["parametric design", "material research", "prototyping"],
-    "priority": 3,
-    "images": ["image2.jpeg", "image4.jpg", "image5.png"]
+    "priority": 3
   },
   "0054": {
     "year": "2025",
     "tags": ["selected", "architecture", "computational design", "adaptive reuse", "concert hall"],
     "software": ["Grasshopper"],
     "skills": ["architectural design", "parametric design", "visual programming", "spatial organization"],
-    "priority": 5,
-    "images": ["image00003.png", "image00005.jpg", "image00011.png"]
+    "priority": 5
   },
   "0055": {
     "year": "2025",
     "tags": ["architecture", "education", "rapid prototyping"],
     "software": [],
     "skills": ["architectural design", "teaching", "prototyping"],
-    "priority": 1,
-    "images": ["image1.jpeg", "image4.jpeg"]
+    "priority": 1
   },
   "0056": {
     "year": "2025",
     "tags": ["architecture", "technology", "interactive model"],
     "software": ["ShapeDiver"],
     "skills": ["computational design", "digital workflow"],
-    "priority": 1.5,
-    "images": ["image1.jpg"]
+    "priority": 1.5
   },
   "0057": {
     "year": "2026",

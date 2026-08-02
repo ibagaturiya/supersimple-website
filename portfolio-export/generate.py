@@ -44,6 +44,7 @@ PORTFOLIO_TEMPLATE = SCRIPT_DIR / "templates" / "portfolio.html"
 PORTFOLIO_CSS = SCRIPT_DIR / "templates" / "portfolio.css"
 QR_ASSET = REPO_ROOT / "assets" / "qr" / "bagaturiya.svg"
 PORTFOLIO_IMAGE_DIR = REPO_ROOT / "assets" / "portfolio-images"
+TITLE_PAGE_IMAGE = REPO_ROOT / "assets" / "titlepageimage" / "titlepagemage.png"
 
 ACCENT = HexColor("#ff5a1f")
 INK = HexColor("#101010")
@@ -75,7 +76,7 @@ class Project:
     software: list[str]
     skills: list[str]
     priority: float
-    image_names: list[str]
+    media_names: list[str]
     exclude: bool
 
 
@@ -202,18 +203,23 @@ def published_project_folders() -> dict[str, Path]:
     return projects
 
 
-def discover_images(folder: Path) -> list[str]:
+def discover_media(folder: Path) -> list[str]:
+    """Return ordered image and numbered text media, excluding project metadata."""
     def sort_key(path: Path) -> tuple[int, str]:
         match = re.search(r"(\d+)", path.stem)
         return (int(match.group(1)) if match else 999999, path.name.lower())
 
-    images = [
+    metadata_stems = {
+        "_readme", "description", "hashtags", "skill", "title",
+        "titledescription", "trailer",
+    }
+    media = [
         path for path in folder.iterdir()
         if path.is_file()
-        and path.suffix.lower() in IMAGE_EXTENSIONS
-        and path.stem.lower() != "icon"
+        and path.suffix.lower() in IMAGE_EXTENSIONS | {".txt"}
+        and path.stem.lower() not in metadata_stems | {"icon"}
     ]
-    return [path.name for path in sorted(images, key=sort_key)]
+    return [path.name for path in sorted(media, key=sort_key)]
 
 
 def load_projects() -> list[Project]:
@@ -236,7 +242,7 @@ def load_projects() -> list[Project]:
                 software=dedupe(extra.get("software", [])),
                 skills=project_skills(folder, extra.get("skills", [])),
                 priority=float(extra.get("priority", 0)),
-                image_names=extra.get("images", []) or discover_images(folder),
+                media_names=discover_media(folder),
                 exclude=bool(extra.get("exclude", False)),
             )
         )
@@ -561,7 +567,11 @@ def render_portfolio_reportlab(
         media_x = 286
         media_width = page_width - media_x - 30
         media_height = page_height - 60
-        image_paths = [project.folder / name for name in project.image_names]
+        image_paths = [
+            project.folder / name
+            for name in project.media_names
+            if (project.folder / name).suffix.lower() in IMAGE_EXTENSIONS
+        ]
         image_paths = [path for path in image_paths if path.exists()][:2]
 
         if len(image_paths) >= 2:
@@ -663,8 +673,25 @@ def portfolio_image_asset(
     return destination
 
 
-def chunked(values: list[Path], size: int) -> list[list[Path]]:
-    return [values[index:index + size] for index in range(0, len(values), size)]
+def body_image_groups(values: list[Path]) -> list[list[Path]]:
+    """Group body images so the final page is single and the prior page is paired."""
+    if not values:
+        return []
+    if len(values) <= 2:
+        return [values]
+
+    final_image = values[-1:]
+    earlier = values[:-1]
+    groups: list[list[Path]] = []
+    if len(earlier) % 2:
+        groups.append(earlier[:1])
+        earlier = earlier[1:]
+    groups.extend(
+        earlier[index:index + 2]
+        for index in range(0, len(earlier), 2)
+    )
+    groups.append(final_image)
+    return groups
 
 
 def is_areal_archive(project: Project) -> bool:
@@ -682,7 +709,8 @@ def build_portfolio_html(
     stylesheet = PORTFOLIO_CSS.read_text(encoding="utf-8")
     qr_asset = ensure_qr_asset()
     portrait_folder = published_project_folders().get("2409")
-    portrait = (portrait_folder or PROJECTS_DIR / "2409") / "image1.png"
+    fallback_portrait = (portrait_folder or PROJECTS_DIR / "2409") / "image1.png"
+    cover_image = TITLE_PAGE_IMAGE if TITLE_PAGE_IMAGE.exists() else fallback_portrait
     name = clean_text(cv["name"])
     portfolio_label = "Full portfolio" if full_portfolio else "Tailored portfolio"
     office = clean_text(application.get("office", ""))
@@ -703,21 +731,170 @@ def build_portfolio_html(
         <span class="page-number">{page_number:02d}</span>
       </div>'''
 
-    def project_images(project: Project) -> list[Path]:
+    def project_media(project: Project) -> list[Path]:
         return [
             project.folder / name
-            for name in project.image_names
+            for name in project.media_names
             if (project.folder / name).exists()
         ]
 
     def content_page_count(project: Project) -> int:
-        images = project_images(project)
+        body_media = project_media(project)[1:]
         if is_areal_archive(project):
-            return 1
-        return max(1, (len(images) + 1) // 2)
+            return 1 if body_media else 0
+        return len(body_image_groups(body_media))
+
+    def cv_list(values: Iterable[str], class_name: str = "cv-card-list") -> str:
+        items = "".join(
+            f"<li>{html.escape(clean_text(value))}</li>"
+            for value in values if clean_text(value)
+        )
+        return f'<ul class="{class_name}">{items}</ul>' if items else ""
+
+    def cv_card(number: str, title: str, body: str, modifier: str = "") -> str:
+        classes = f"cv-card {modifier}".strip()
+        return f'''<section class="{classes}">
+        <p class="cv-card-number">{html.escape(number)}</p>
+        <h2>{html.escape(title)}</h2>
+        {body}
+      </section>'''
+
+    contact_rows: list[str] = []
+    contact_icons = {
+        "phone": REPO_ROOT / "assets" / "icons" / "phone.svg",
+        "email": REPO_ROOT / "assets" / "icons" / "email.svg",
+        "linkedin": REPO_ROOT / "assets" / "icons" / "linkedin.svg",
+        "instagram": REPO_ROOT / "assets" / "icons" / "instagram.svg",
+        "location": REPO_ROOT / "assets" / "icons" / "location.svg",
+    }
+    for key in ("phone", "email", "website", "linkedin", "instagram", "location"):
+        value = clean_text(cv.get("contact", {}).get(key, ""))
+        if not value:
+            continue
+        if key == "phone":
+            href = "tel:" + re.sub(r"[^+0-9]", "", value)
+        elif key == "email":
+            href = f"mailto:{value}"
+        elif key == "location":
+            href = "https://www.google.com/maps/search/?api=1&query=" + value.replace(" ", "+")
+        else:
+            href = value if value.startswith(("http://", "https://")) else f"https://{value}"
+        icon_path = contact_icons.get(key)
+        if icon_path and icon_path.exists():
+            icon = f'<img src="{portfolio_asset_url(icon_path, html_destination)}" alt="" />'
+        else:
+            icon = '''<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l3.4-3.4a3 3 0 1 1 4.2 4.2l-2 2a3 3 0 0 1-4.2 0 1 1 0 1 1 1.4-1.4 1 1 0 0 0 1.4 0l2-2a1 1 0 0 0-1.4-1.4L12 13.4a1 1 0 0 1-1.4 0ZM13.4 10.6a1 1 0 0 1 0 1.4L10 15.4a3 3 0 1 1-4.2-4.2l2-2a3 3 0 0 1 4.2 0 1 1 0 1 1-1.4 1.4 1 1 0 0 0-1.4 0l-2 2A1 1 0 0 0 8.6 14l3.4-3.4a1 1 0 0 1 1.4 0Z"/></svg>'''
+        external = ' target="_blank" rel="noopener noreferrer"' if key not in {"phone", "email"} else ""
+        contact_rows.append(
+            f'''<a class="cv-contact-row" href="{html.escape(href, quote=True)}"{external}>
+          <span class="cv-contact-icon">{icon}</span>
+          <span class="cv-contact-value">{html.escape(value)}</span>
+        </a>'''
+        )
+
+    education_entries: list[str] = []
+    for entry in cv.get("education", []):
+        professors = entry.get("professors", [])
+        professor_markup = ""
+        if professors:
+            professor_markup = (
+                '<div class="cv-professors"><span>Professors</span>'
+                + cv_list(professors, "cv-inline-list")
+                + "</div>"
+            )
+        education_entries.append(f'''<article class="cv-education-entry">
+          <header><h3>{html.escape(clean_text(entry.get("qualification", "")))}</h3><time>{html.escape(clean_text(entry.get("dates", "")))}</time></header>
+          <p>{html.escape(clean_text(entry.get("institution", "")))}</p>
+          {professor_markup}
+        </article>''')
+
+    experience_entries: list[str] = []
+    for entry in cv.get("experience", []):
+        company = clean_text(entry.get("company", ""))
+        location = clean_text(entry.get("location", ""))
+        institution = " - ".join(value for value in (company, location) if value)
+        experience_entries.append(f'''<article class="cv-experience-entry">
+          <header><h3>{html.escape(clean_text(entry.get("role", "")))}</h3><time>{html.escape(clean_text(entry.get("dates", "")))}</time></header>
+          <p>{html.escape(institution)}</p>
+          {cv_list(entry.get("highlights", []))}
+        </article>''')
+
+    skill_groups = "".join(
+        f'''<article class="cv-skill-group">
+          <h3>{html.escape(clean_text(group.get("name", "Skills")))}</h3>
+          <div class="cv-mini-chips">{"".join(f'<span>{html.escape(clean_text(value))}</span>' for value in group.get("items", []))}</div>
+        </article>'''
+        for group in cv.get("skill_groups", [])
+    )
+    hobby_groups = "".join(
+        f'''<article class="cv-hobby-group">
+          <h3>{html.escape(clean_text(category.get("name", "Interests")))}</h3>
+          {cv_list(category.get("items", []))}
+        </article>'''
+        for category in cv.get("hobbies", {}).get("categories", [])
+    )
+    language_chips = "".join(
+        f'<span>{html.escape(clean_text(language))}</span>'
+        for language in cv.get("languages", [])
+    )
+
+    profile_card = cv_card(
+        "02",
+        "Profile",
+        f'<p class="cv-profile-text">{html.escape(clean_text(cv.get("profile_en") or cv.get("profile", "")))}</p>',
+        "cv-profile-card",
+    )
+    contact_card = cv_card(
+        "01", "Contact", f'<div class="cv-contact-list">{"".join(contact_rows)}</div>', "cv-contact-card"
+    )
+    language_card = cv_card(
+        "07", "Languages", f'<div class="cv-language-list">{language_chips}</div>', "cv-language-card"
+    )
+    education_card = cv_card(
+        "03", "Education", f'<div class="cv-education-list">{"".join(education_entries)}</div>', "cv-education-card"
+    )
+    experience_card = cv_card(
+        "04", "Experience", f'<div class="cv-experience-list">{"".join(experience_entries)}</div>', "cv-experience-card"
+    )
+    skills_card = cv_card("05", "Skills & software", skill_groups, "cv-skills-card")
+    hobbies_card = cv_card(
+        "06", "Interests & achievements", f'<div class="cv-hobby-grid">{hobby_groups}</div>', "cv-hobbies-card"
+    )
+
+    cv_page_one = f'''<section class="portfolio-page cv-document-page cv-document-page--one">
+      <div class="cv-page-one-grid">
+        <figure class="cv-portrait-card"><img src="{portfolio_asset_url(fallback_portrait, html_destination)}" alt="Portrait of {html.escape(name)}" /></figure>
+        {profile_card}
+        {contact_card}
+        {language_card}
+        {education_card}
+        {experience_card}
+      </div>
+      {page_chrome(2)}
+    </section>'''
+    cv_page_two = f'''<section class="portfolio-page cv-document-page cv-document-page--two">
+      <div class="cv-page-two-grid">{skills_card}{hobbies_card}</div>
+      {page_chrome(3)}
+    </section>'''
+
+    def media_caption(path: Path) -> str:
+        return path.stem
+
+    def text_media_markup(path: Path, modifier: str) -> str:
+        raw = read_text(path)
+        raw = re.sub(r"-\s*\n\s*", "", raw)
+        paragraphs = [clean_text(value) for value in re.split(r"\n\s*\n", raw) if clean_text(value)]
+        body = "".join(f"<p>{html.escape(value)}</p>" for value in paragraphs)
+        return f'<div class="text-media text-media--{modifier}"><div>{body}</div></div>'
+
+    def media_markup(project: Project, path: Path, variant: str, max_pixels: int) -> str:
+        if path.suffix.lower() == ".txt":
+            return text_media_markup(path, variant)
+        asset = portfolio_image_asset(project, path, variant, max_pixels)
+        return f'<img src="{portfolio_asset_url(asset, html_destination)}" alt="{html.escape(media_caption(path))}" />'
 
     project_start_pages: dict[str, int] = {}
-    next_page = 3
+    next_page = 5
     for item in selected:
         project_start_pages[item.project.project_id] = next_page
         next_page += 1 + content_page_count(item.project)
@@ -729,7 +906,7 @@ def build_portfolio_html(
         <p class="cover-headline">{html.escape(clean_text(cv.get("headline", "")))}</p>
         <p class="cover-target"><span>{html.escape(portfolio_label)}</span>{html.escape(cover_sentence)}</p>
       </div>
-      <figure class="cover-image"><img src="{portfolio_asset_url(portrait, html_destination)}" alt="Portrait of {html.escape(name)}" /></figure>
+      <figure class="cover-image"><img src="{portfolio_asset_url(cover_image, html_destination)}" alt="Portrait of {html.escape(name)}" /></figure>
       {page_chrome(1)}
     </section>'''
 
@@ -740,31 +917,25 @@ def build_portfolio_html(
     )
     contents = f'''<section class="portfolio-page contents-page">
       <div class="contents-list">
-        <h2>Contents</h2>
+        <h2>Selected projects</h2>
         <ol>{contents_items}</ol>
       </div>
       <div class="contents-frame"><span>portfolio</span></div>
-      {page_chrome(2)}
+      {page_chrome(4)}
     </section>'''
 
     project_pages: list[str] = []
     for index, item in enumerate(selected, start=1):
         project = item.project
         page_number = project_start_pages[project.project_id]
-        image_paths = project_images(project)
-        lead_image = image_paths[0] if image_paths else None
-        lead_asset = (
-            portfolio_image_asset(project, lead_image, "title", 1800)
-            if lead_image else None
-        )
-        lead_media = (
-            f'<img src="{portfolio_asset_url(lead_asset, html_destination)}" alt="{html.escape(project.title)}" />'
-            if lead_asset else '<div class="project-media-empty">Image forthcoming</div>'
-        )
+        media_paths = project_media(project)
+        lead_path = media_paths[0] if media_paths else None
+        lead_media = media_markup(project, lead_path, "title", 1800) if lead_path else '<div class="project-media-empty">Media forthcoming</div>'
+        lead_caption = html.escape(media_caption(lead_path)) if lead_path else ""
         year = project.year or "Year forthcoming"
         skills = project.skills or [f"#{tag}" for tag in project.tags[:5]]
         project_pages.append(f'''<section class="portfolio-page project-title-page">
-      <figure class="project-title-image">{lead_media}</figure>
+      <figure class="project-title-image">{lead_media}<figcaption>{lead_caption}</figcaption></figure>
       <div class="project-title-copy">
         <div>
           <p class="project-number">{project.project_id} / {index:02d}</p>
@@ -781,41 +952,52 @@ def build_portfolio_html(
     </section>''')
 
         if is_areal_archive(project):
-            if image_paths:
-                columns = max(1, round((len(image_paths) * 297 / 210) ** 0.5))
-                rows = max(1, (len(image_paths) + columns - 1) // columns)
-                grid_items = "".join(
-                    f'<img src="{portfolio_asset_url(portfolio_image_asset(project, path, "grid", 620), html_destination)}" alt="{html.escape(project.title)} - image {media_index}" />'
-                    for media_index, path in enumerate(image_paths, start=1)
-                )
-            else:
-                columns = rows = 1
-                grid_items = '<div class="project-media-empty">Images forthcoming</div>'
-            project_pages.append(f'''<section class="portfolio-page areal-grid-page">
+            body_media = media_paths[1:]
+            if body_media:
+                columns = max(1, round((len(body_media) * 297 / 210) ** 0.5))
+                rows = max(1, (len(body_media) + columns - 1) // columns)
+                remainder = len(body_media) % columns
+                last_row_spans: list[int] = []
+                if remainder:
+                    base_span, extra_spans = divmod(columns, remainder)
+                    last_row_spans = [
+                        base_span + (1 if index < extra_spans else 0)
+                        for index in range(remainder)
+                    ]
+                grid_markup: list[str] = []
+                last_row_start = len(body_media) - remainder if remainder else len(body_media)
+                for offset, path in enumerate(body_media):
+                    span = ""
+                    if remainder and offset >= last_row_start:
+                        span_value = last_row_spans[offset - last_row_start]
+                        span = f' style="grid-column:span {span_value}"'
+                    grid_markup.append(
+                        f'''<figure{span}>{media_markup(project, path, "grid", 620)}
+                  <figcaption>{html.escape(media_caption(path))}</figcaption></figure>'''
+                    )
+                grid_items = "".join(grid_markup)
+                project_pages.append(f'''<section class="portfolio-page areal-grid-page">
       <div class="areal-grid" style="--grid-columns:{columns};--grid-rows:{rows}">{grid_items}</div>
       {page_chrome(page_number + 1, inverse=True)}
     </section>''')
             continue
 
-        groups = chunked(image_paths, 2) or [[]]
+        groups = body_image_groups(media_paths[1:])
         for group_index, group in enumerate(groups):
             figures: list[str] = []
-            if group:
-                for image_index, path in enumerate(group, start=group_index * 2 + 1):
-                    text = project.description if image_index == 1 else ""
-                    content_asset = portfolio_image_asset(project, path, "content", 1600)
-                    figures.append(f'''<figure class="content-figure">
-          <div class="content-image"><img src="{portfolio_asset_url(content_asset, html_destination)}" alt="{html.escape(project.title)} - image {image_index}" /></div>
-          <figcaption><span>{html.escape(project.title)} / {image_index:02d}</span>{html.escape(text)}</figcaption>
-        </figure>''')
-            else:
-                figures.append('''<figure class="content-figure content-figure--empty">
-          <div class="content-image project-media-empty">Images forthcoming</div>
-          <figcaption>Project material can be added to this folder at any time.</figcaption>
+            for path in group:
+                figures.append(f'''<figure class="content-figure" data-caption="{html.escape(media_caption(path), quote=True)}">
+          <div class="content-image">{media_markup(project, path, "content", 1600)}</div>
+          <figcaption>{html.escape(media_caption(path))}</figcaption>
         </figure>''')
             content_number = page_number + 1 + group_index
-            project_pages.append(f'''<section class="portfolio-page project-content-page">
-      <div class="project-content-grid" data-count="{len(group)}">{"".join(figures)}</div>
+            page_modifier = " project-content-page--single" if len(group) == 1 else ""
+            single_caption = (
+                f'\n      <div class="single-page-caption">{html.escape(media_caption(group[0]))}</div>'
+                if len(group) == 1 else ""
+            )
+            project_pages.append(f'''<section class="portfolio-page project-content-page{page_modifier}">
+      <div class="project-content-grid" data-count="{len(group)}">{"".join(figures)}</div>{single_caption}
       {page_chrome(content_number)}
     </section>''')
 
@@ -839,7 +1021,7 @@ def build_portfolio_html(
             .replace("{{PORTFOLIO_STYLES}}", styles)
             .replace("{{FAVICON_URL}}", portfolio_asset_url(REPO_ROOT / "assets" / "favicon" / "favicon.svg", html_destination))
             .replace("{{COVER}}", cover)
-            .replace("{{CONTENTS}}", contents)
+            .replace("{{CONTENTS}}", cv_page_one + cv_page_two + contents)
             .replace("{{PROJECTS}}", "\n".join(project_pages))
             .replace("{{CLOSING}}", closing))
 
@@ -923,7 +1105,13 @@ def render_portfolio(
     html_destination = html_destination or destination.with_suffix(".html")
     html_destination.parent.mkdir(parents=True, exist_ok=True)
     html_destination.write_text(
-        build_portfolio_html(html_destination, cv, application, selected, full_portfolio),
+        build_portfolio_html(
+            html_destination,
+            cv,
+            application,
+            selected,
+            full_portfolio,
+        ),
         encoding="utf-8",
     )
     if not print_html_to_pdf(html_destination, destination):
@@ -1239,6 +1427,7 @@ def generate_application(
         json.dumps(prepared, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    render_cv(cv_path, cv_data, prepared, selected)
     render_portfolio(
         portfolio_path,
         cv_data,
@@ -1246,7 +1435,6 @@ def generate_application(
         selected,
         html_destination=portfolio_html_path,
     )
-    render_cv(cv_path, cv_data, prepared, selected)
     manifest = manifest_data(
         application_source, prepared, selected, portfolio_path, cv_path
     )

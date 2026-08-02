@@ -27,13 +27,21 @@ The full and tailored portfolios share
 `portfolio-export/templates/portfolio.html` and
 `portfolio-export/templates/portfolio.css`. Change these files to adjust the
 portfolio layout globally. Tailored exports change the project selection and
-cover text, but not the layout system.
+cover text, but not the layout system. Portfolio pages 2 and 3 render the CV
+directly from `data/cv.json` as full-size rounded cards; the selected-project
+contents starts on page 4. The cover artwork comes from
+`assets/titlepageimage/titlepagemage.png`.
 
 Every published project has a `skill.txt`. Write hash-prefixed labels there,
 such as `#rhino #grasshopper`; those values become the outlined skill chips on
 the project's opener and are also used by the tailored-project matcher. The
 Areal Archive keeps the same opener, then uses its complete image set as one
-edge-to-edge contact sheet.
+edge-to-edge contact sheet. Every project image is included: the first image is
+reserved for the full-height opener, paired body pages are vertically centered,
+and the final body page is a single full-bleed image. Every media item displays
+its source filename without the extension. Numbered `.txt` files that are not
+project metadata participate in the same natural filename order as images and
+are typeset as justified text-media panels.
 
 The public CV contains the
 full verified profile, experience highlights, education and professors,
@@ -117,7 +125,8 @@ with `"include_hobbies": false` or the `--no-hobbies` command-line option.
 - `projects/NNNN-readable-slug/`: existing website source; titles, descriptions, hashtags,
   and images are reused directly.
 - `portfolio-export/data/projects.json`: optional export-only metadata such as
-  software, skills, priority, year, and preferred portfolio images.
+  software, skills, priority, and year. Portfolio images always follow the
+  natural filename order from each project folder.
 - `portfolio-export/data/cv.json`: verified CV facts and reusable skill modules.
 - `portfolio-export/applications/*.json`: one target office/position per file.
 
