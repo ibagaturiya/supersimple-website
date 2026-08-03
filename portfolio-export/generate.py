@@ -721,6 +721,8 @@ def build_portfolio_html(
         target = " - ".join(value for value in (office, position) if value)
         cover_sentence = f"This tailored portfolio was prepared for {target or 'this application'}."
 
+    export_id = time.strftime("%Y%m%d%H%M%S", time.localtime())
+
     def page_chrome(page_number: int, inverse: bool = False) -> str:
         modifier = " page-chrome--inverse" if inverse else ""
         return f'''<div class="page-chrome{modifier}" aria-hidden="true">
@@ -1020,6 +1022,7 @@ def build_portfolio_html(
             .replace("{{DOCUMENT_TITLE}}", html.escape(title))
             .replace("{{PORTFOLIO_STYLES}}", styles)
             .replace("{{FAVICON_URL}}", portfolio_asset_url(REPO_ROOT / "assets" / "favicon" / "favicon.svg", html_destination))
+            .replace("{{EXPORT_ID}}", html.escape(export_id))
             .replace("{{COVER}}", cover)
             .replace("{{CONTENTS}}", cv_page_one + cv_page_two + contents)
             .replace("{{PROJECTS}}", "\n".join(project_pages))
