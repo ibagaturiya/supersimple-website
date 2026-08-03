@@ -210,7 +210,8 @@ body {
   border: 0.18mm solid rgba(17, 17, 15, 0.08);
   border-radius: 6mm;
   background: #fff;
-  box-shadow: 0 12px 30px rgba(17, 17, 15, 0.06);
+  -webkit-box-shadow: 0 12px 30px rgba(17, 17, 15, 0.06) !important;
+  box-shadow: 0 12px 30px rgba(17, 17, 15, 0.06) !important;
 }
 
 .cv-card {
